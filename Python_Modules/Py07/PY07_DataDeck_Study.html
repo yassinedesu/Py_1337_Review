@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PY_07 DataDeck — Study Page</title>
+<style>
+  :root {
+    --bg: #fbfaf7; --surface: #ffffff; --ink: #1d1c1a; --muted: #6b675f;
+    --line: #e4e0d6; --accent: #b4441f; --accent-soft: #f8e7df;
+    --code-bg: #1f1e1c; --code-ink: #f1ece2;
+    --ok: #2d6a3e; --ok-soft: #e3f1e6; --warn: #8a5a00; --warn-soft: #fbf0d6;
+    --bad: #a02525; --bad-soft: #f8e0e0; --info: #1f4e8c; --info-soft: #e1ebf7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161513; --surface: #1f1e1b; --ink: #ece7dc; --muted: #a39e92;
+      --line: #34322d; --accent: #ef8a5f; --accent-soft: #3a261d;
+      --code-bg: #0f0e0d; --code-ink: #ece7dc;
+      --ok: #7cc88f; --ok-soft: #1c2e21; --warn: #e6b455; --warn-soft: #33290f;
+      --bad: #f08a8a; --bad-soft: #3a1c1c; --info: #8db8ee; --info-soft: #1a2638;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.65 Georgia, "Iowan Old Style", "Times New Roman", serif;
+  }
+  .layout { display: flex; min-height: 100vh; }
+  nav.side {
+    position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto;
+    width: 270px; flex: 0 0 270px; padding: 24px 18px; border-right: 1px solid var(--line);
+    background: var(--surface); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px;
+  }
+  nav.side .brand { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  nav.side .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 18px; }
+  nav.side a { display: block; color: var(--ink); text-decoration: none; padding: 5px 8px; border-radius: 6px; }
+  nav.side a:hover { background: var(--accent-soft); }
+  nav.side a.l2 { padding-left: 22px; color: var(--muted); font-size: 13px; }
+  nav.side .grp { margin: 14px 8px 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  main { flex: 1; min-width: 0; padding: 40px clamp(16px, 5vw, 64px) 120px; max-width: 980px; }
+  h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 0 0 8px; }
+  h2 { font-size: 27px; margin: 56px 0 12px; padding-top: 18px; border-top: 2px solid var(--ink); line-height: 1.2; }
+  h3 { font-size: 20px; margin: 34px 0 8px; line-height: 1.25; }
+  h4 { font-size: 15px; margin: 18px 0 4px; font-family: system-ui, sans-serif; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+  p { margin: 10px 0; }
+  .lead { font-size: 18px; color: var(--muted); margin-bottom: 24px; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .88em; background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--code-bg); color: var(--code-ink); padding: 16px 18px; border-radius: 10px; overflow-x: auto; font-size: 13.5px; line-height: 1.55; margin: 14px 0; }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+  .fn { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: var(--muted); margin: 18px 0 -8px; }
+  .callout { border-left: 4px solid; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; line-height: 1.55; }
+  .callout b.t { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 2px; }
+  .say { border-color: var(--ok); background: var(--ok-soft); }
+  .say b.t { color: var(--ok); }
+  .warn { border-color: var(--warn); background: var(--warn-soft); }
+  .warn b.t { color: var(--warn); }
+  .bad { border-color: var(--bad); background: var(--bad-soft); }
+  .bad b.t { color: var(--bad); }
+  .info { border-color: var(--info); background: var(--info-soft); }
+  .info b.t { color: var(--info); }
+  .ana { border-color: var(--accent); background: var(--accent-soft); }
+  .ana b.t { color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--surface); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); position: sticky; top: 0; }
+  .tablewrap { overflow-x: auto; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin: 10px 0; font-family: system-ui, sans-serif; }
+  details summary { cursor: pointer; padding: 12px 16px; font-weight: 600; font-size: 15px; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "+"; display: inline-block; width: 22px; color: var(--accent); font-weight: 700; }
+  details[open] summary::before { content: "–"; }
+  details .ans { padding: 0 16px 14px 38px; font-size: 15px; line-height: 1.6; }
+  .tag { display: inline-block; font-family: system-ui, sans-serif; font-size: 11.5px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-right: 6px; vertical-align: middle; letter-spacing: .03em; }
+  .tag.new { background: var(--ok-soft); color: var(--ok); }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .steps { counter-reset: s; list-style: none; padding: 0; font-family: system-ui, sans-serif; }
+  .steps li { counter-increment: s; position: relative; padding: 10px 14px 10px 52px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin: 8px 0; }
+  .steps li::before { content: counter(s); position: absolute; left: 14px; top: 9px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 13px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 16px 0; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; font-family: system-ui, sans-serif; font-size: 14.5px; }
+  .card h5 { margin: 0 0 6px; font-size: 15px; }
+  @media (max-width: 860px) {
+    nav.side { display: none; }
+    main { padding-top: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side">
+  <div class="brand">PY_07 · DataDeck</div>
+  <div class="sub">Abstract Card Architecture</div>
+  <a href="#start">Start here (20-min plan)</a>
+  <a href="#big">The big picture</a>
+  <div class="grp">Concepts</div>
+  <a class="l2" href="#c-abc">Abstract classes</a>
+  <a class="l2" href="#c-inherit">Inheritance &amp; polymorphism</a>
+  <a class="l2" href="#c-factory">Abstract Factory</a>
+  <a class="l2" href="#c-package">Packages &amp; imports</a>
+  <a class="l2" href="#c-mi">Multiple inheritance &amp; MRO</a>
+  <a class="l2" href="#c-cap">Capabilities</a>
+  <a class="l2" href="#c-state">Persistent state</a>
+  <a class="l2" href="#c-strategy">Strategy pattern</a>
+  <a class="l2" href="#c-exc">Custom exceptions</a>
+  <a class="l2" href="#c-tools">Type hints, mypy, flake8</a>
+  <div class="grp">Your project</div>
+  <a class="l2" href="#ex0">Exercise 0</a>
+  <a class="l2" href="#ex1">Exercise 1</a>
+  <a class="l2" href="#ex2">Exercise 2</a>
+  <div class="grp">Correction sheet</div>
+  <a class="l2" href="#sheet">Card-variant concepts</a>
+  <a class="l2" href="#qa">Evaluator Q&amp;A</a>
+  <a class="l2" href="#checklist">Pre-defence checklist</a>
+  <a class="l2" href="#ref">Quick-reference table</a>
+</nav>
+
+<main>
+
+<h1>PY_07 · DataDeck</h1>
+<p class="lead">Everything in this module, explained: the ideas first, then your exact code, then the questions an evaluator is likely to ask. Click any “+” to reveal an answer.</p>
+
+<!-- ============================================================ -->
+<h2 id="start">Start here — the 20-minute plan</h2>
+
+<ol class="steps">
+  <li><b>Minutes 0–5:</b> Read <a href="#big">The big picture</a>. If you can say what each of the three patterns is in one sentence, you already pass most of the oral part.</li>
+  <li><b>Minutes 5–12:</b> Read the green “Say it out loud” boxes in each concept section. They are the answers to the questions evaluators ask.</li>
+  <li><b>Minutes 12–17:</b> Skim your three exercises and the <a href="#qa">Evaluator Q&amp;A</a>. Try answering each question before opening it.</li>
+  <li><b>Minutes 17–20:</b> Run the <a href="#checklist">pre-defence checklist</a> in a terminal.</li>
+</ol>
+
+<div class="callout warn"><b class="t">Important — your subject and your correction sheet describe different variants</b>
+Your <b>subject PDF</b> (v3.0) is the <b>Creature</b> version: ex0 Creature Factory, ex1 Capabilities, ex2 Abstract Strategy. The <b>correction sheet</b> you pasted talks about a <b>Card</b> version: <code>Card</code>, <code>Deck</code>, <code>EliteCard</code>, <code>GameEngine</code>, <code>TournamentPlatform</code>, with ex0 to ex4. The patterns are the same, only the names change. This page covers both: your project in sections 3–5, the extra Card-sheet concepts in <a href="#sheet">their own section</a>. Be ready to map one onto the other (for example <code>Creature</code> plays the role of <code>Card</code>, and <code>BattleStrategy</code> plays the role of <code>GameStrategy</code>).</div>
+
+<!-- ============================================================ -->
+<h2 id="big">The big picture</h2>
+
+<p>This module is about <b>design patterns</b>: reusable ways of structuring classes so that code stays flexible when requirements change. You are not learning new syntax; you are learning how to <em>arrange</em> classes you already know how to write.</p>
+
+<div class="grid2">
+  <div class="card"><h5><span class="tag">ex0</span>Abstract Factory</h5>A class whose only job is to <b>create objects</b>. The caller asks the factory for “a base creature” and never names the concrete class.</div>
+  <div class="card"><h5><span class="tag">ex1</span>Capabilities</h5>Optional behaviours (<code>heal</code>, <code>transform</code>) defined as <b>separate abstract classes</b> and mixed into creatures with multiple inheritance.</div>
+  <div class="card"><h5><span class="tag">ex2</span>Strategy</h5>A battle “script” wrapped in its own class. The tournament calls <code>strategy.act(creature)</code> without knowing what the script does.</div>
+</div>
+
+<p>All three rest on one foundation: <b>abstract classes</b> (a contract that says “whoever inherits from me must implement these methods”) and <b>polymorphism</b> (calling the same method on different objects and getting different behaviour).</p>
+
+<h3>How the pieces connect in your repo</h3>
+<pre><code>Creature (ABC)                    HealCapability (ABC)     TransformCapability (ABC)
+ ├─ Flameling, Pyrodon             └─ heal()                 ├─ transform()
+ ├─ Aquabub,  Torragon                                       ├─ revert()
+ │                                                           └─ is_transformed (state)
+ ├─ Sproutling, Bloomelle  ←── Creature + HealCapability
+ └─ Shiftling,  Morphagon  ←── Creature + TransformCapability
+
+CreatureFactory (ABC)             BattleStrategy (ABC)
+ ├─ FlameFactory                   ├─ NormalStrategy      (valid for any Creature)
+ ├─ AquaFactory                    ├─ AggressiveStrategy  (needs TransformCapability)
+ ├─ HealingCreatureFactory         └─ DefensiveStrategy   (needs HealCapability)
+ └─ TransformCreatureFactory
+                                   InvalidStrategyError(Exception)</code></pre>
+
+<!-- ============================================================ -->
+<h2>Concepts, one by one</h2>
+
+<!-- ABC -->
+<h3 id="c-abc"><span class="tag new">ex0</span>Abstract classes: <code>ABC</code> and <code>abstractmethod</code></h3>
+
+<h4>What it is</h4>
+<p>An abstract class is a class you are <b>not allowed to instantiate</b>. It exists to define a contract: a list of methods every subclass must provide. You make one by inheriting from <code>ABC</code> (from the <code>abc</code> module) and marking required methods with <code>@abstractmethod</code>.</p>
+
+<div class="callout ana"><b class="t">Analogy</b>A job description for “Chef”. You can’t hire a job description; you hire a pastry chef or a grill chef. The description guarantees whoever you hire can <code>cook()</code>.</div>
+
+<h4>The problem it solves</h4>
+<p>Without it, nothing stops someone from creating a half-finished <code>Creature</code> and calling <code>attack()</code> on something that has no attack. With it, Python refuses early, at creation time, instead of failing mysteriously later.</p>
+
+<h4>How it works inside</h4>
+<p><code>ABC</code> uses a metaclass called <code>ABCMeta</code>. When a class is defined, it collects every method marked abstract into a set called <code>__abstractmethods__</code>. A subclass that overrides a method removes it from that set. When you call <code>SomeClass()</code>, Python checks: is the set empty? If not, it raises <code>TypeError: Can't instantiate abstract class ... with abstract method ...</code>.</p>
+
+<pre><code>from abc import ABC, abstractmethod
+
+class Creature(ABC):
+    @abstractmethod
+    def attack(self) -&gt; str:       # required: every subclass MUST define this
+        pass
+
+    def describe(self) -&gt; str:     # concrete: shared by all subclasses for free
+        return "I am a creature"
+
+Creature()          # TypeError: Can't instantiate abstract class Creature
+class Dud(Creature): pass
+Dud()               # TypeError too: attack() was not implemented
+class Fire(Creature):
+    def attack(self) -&gt; str:
+        return "Ember!"
+Fire()              # works</code></pre>
+
+<h4>Abstract vs concrete methods</h4>
+<ul>
+  <li><b>Abstract method</b>: declared, not implemented. Every subclass must supply it. Your <code>Creature.attack</code> is abstract because each creature attacks differently.</li>
+  <li><b>Concrete method</b>: fully implemented, inherited as-is. Your <code>Creature.describe</code> is concrete because every creature is described the same way (“X is a Y type Creature”).</li>
+  <li>An abstract class <em>can</em> have an <code>__init__</code> and attributes. Yours stores <code>name</code> and <code>creature_type</code>.</li>
+</ul>
+
+<div class="callout say"><b class="t">Say it out loud — “Why are abstract classes useful?”</b>
+They define a contract that all subclasses must follow, so code that uses a <code>Creature</code> can rely on <code>attack()</code> existing without knowing which concrete creature it has. They also prevent creating incomplete objects: Python raises <code>TypeError</code> if you try to instantiate the abstract class or a subclass that forgot to implement an abstract method.</div>
+
+<div class="callout warn"><b class="t">Common mistakes</b>
+Forgetting to inherit from <code>ABC</code> (then <code>@abstractmethod</code> is silently ignored and the class <em>can</em> be instantiated). Forgetting to implement one abstract method in a subclass. Believing an abstract class must have only abstract methods (it doesn’t; mixing is normal).</div>
+
+<div class="callout info"><b class="t">About “decorators” in the correction sheet</b>
+The sheet asks whether “decorators are avoided”, but <code>@abstractmethod</code> <em>is</em> a decorator, and it is the standard way to use the <code>abc</code> module that the subject explicitly authorizes (<code>import abc</code>). The sheet’s intent is: don’t use <em>other</em> decorators (<code>@property</code>, <code>@staticmethod</code>, <code>@classmethod</code>, <code>@dataclass</code>, custom ones). Your code uses only <code>@abstractmethod</code>. If asked, say exactly that.</div>
+
+<!-- Inheritance & polymorphism -->
+<h3 id="c-inherit"><span class="tag new">ex0</span>Inheritance, <code>super()</code> and polymorphism</h3>
+<h4>What it is</h4>
+<p><b>Inheritance</b>: <code>Flameling(Creature)</code> receives everything <code>Creature</code> has. <b>Polymorphism</b>: the same call, <code>creature.attack()</code>, runs different code depending on the real class of the object.</p>
+<pre><code>class Flameling(Creature):
+    def __init__(self) -&gt; None:
+        super().__init__("Flameling", "Fire")   # run Creature's __init__ to set name and type
+    def attack(self) -&gt; str:
+        return "Flameling uses Ember!"</code></pre>
+<p>Why polymorphism matters here: <code>battle.py</code> has a function <code>test_factory(factory)</code> that works with <em>any</em> factory and calls <code>describe()</code> and <code>attack()</code> on whatever comes out. That function is never edited when you add a new creature family.</p>
+<div class="callout say"><b class="t">Say it out loud</b>Polymorphism means one interface, many behaviours. My test function takes a <code>Creature</code> and calls <code>attack()</code>; what runs depends on whether it is a Flameling or an Aquabub, but the calling code doesn’t change.</div>
+
+<!-- Factory -->
+<h3 id="c-factory"><span class="tag new">ex0</span>Abstract Factory pattern</h3>
+
+<h4>What it is</h4>
+<p>An <b>abstract factory</b> is an abstract class whose methods <em>create objects</em>. Concrete factories override those methods, and each one produces a different <b>family</b> of related objects. Here, a family = (base creature, evolved creature).</p>
+
+<div class="callout ana"><b class="t">Analogy</b>A car blueprint with two slots: “economy car” and “luxury car”. Ford and Toyota both follow it. You tell the dealership “give me the economy car” and it hands you a Fiesta or a Yaris depending on which manufacturer you chose. You never say the model name.</div>
+
+<h4>The problem it solves</h4>
+<p>If client code writes <code>Flameling()</code> directly, it is glued to that class: to use another family you must edit the client. With a factory, the client writes <code>factory.create_base()</code> and works with <em>any</em> family. It also guarantees the base and evolved creatures you get belong together (Flameling and Pyrodon never mix with Torragon).</p>
+
+<h4>How it works</h4>
+<pre><code>class CreatureFactory(ABC):               # the abstract factory: the contract
+    @abstractmethod
+    def create_base(self) -&gt; Creature: ...
+    @abstractmethod
+    def create_evolved(self) -&gt; Creature: ...
+
+class FlameFactory(CreatureFactory):      # a concrete factory: one family
+    def create_base(self) -&gt; Creature:
+        return Flameling()
+    def create_evolved(self) -&gt; Creature:
+        return Pyrodon()</code></pre>
+<p>Notice the return type is <code>Creature</code>, not <code>Flameling</code>. That is deliberate: callers only see the abstract type.</p>
+
+<div class="callout say"><b class="t">Say it out loud — “Explain the Abstract Factory”</b>It’s a factory interface that creates families of related objects. <code>CreatureFactory</code> declares <code>create_base</code> and <code>create_evolved</code>. <code>FlameFactory</code> and <code>AquaFactory</code> implement them for their families. The client function receives a factory and never mentions a concrete creature, so I can add a new family by adding a new factory, without touching the client code.</div>
+
+<div class="callout warn"><b class="t">Don’t confuse with</b>A plain “factory function” that creates one kind of object. The <em>abstract</em> factory pattern is specifically about an abstract creator interface with interchangeable concrete creators that produce <em>families</em>.</div>
+
+<!-- Package -->
+<h3 id="c-package"><span class="tag new">ex0</span>Packages, <code>__init__.py</code>, encapsulation, absolute imports</h3>
+
+<h4>What it is</h4>
+<p>A <b>package</b> is a folder Python treats as importable. <code>__init__.py</code> marks it and decides <b>what the package exposes</b> when someone writes <code>from ex0 import ...</code>.</p>
+
+<h4>Why your <code>__init__.py</code> files look the way they do</h4>
+<pre><code># ex0/__init__.py
+from ex0.CreatureFactory import CreatureFactory
+from ex0.FlameFactory import FlameFactory
+from ex0.AquaFactory import AquaFactory
+__all__ = ["CreatureFactory", "FlameFactory", "AquaFactory"]</code></pre>
+<p>The subject says: <em>“Your ex0 package cannot expose concrete Creature directly, it must only expose factories.”</em> So <code>__init__.py</code> imports only factories. A user of the package gets <code>FlameFactory</code> and nothing named <code>Flameling</code> in the package’s public namespace. This is <b>encapsulation</b>: the concrete classes are implementation details.</p>
+<p><code>__all__</code> lists the public names (it controls <code>from ex0 import *</code> and documents intent).</p>
+
+<div class="callout warn"><b class="t">Honest caveat</b>The concrete modules (<code>ex0/Flameling.py</code>) still exist and could be imported by path. “Not exposed” means the package’s public interface doesn’t offer them; it is a design convention, not a security wall. That is fine and normal in Python.</div>
+
+<h4>Absolute imports</h4>
+<p>You write <code>from ex0.Creature import Creature</code> (full path from the repository root) rather than <code>from .Creature import Creature</code> (relative). The correction sheet explicitly asks for absolute imports between exercises, e.g. ex1 importing from ex0.</p>
+
+<h4>Running with module syntax</h4>
+<p>The sheet mentions <code>python3 -m ex0.main</code>. In your subject the scripts sit at the repository root and are run as <code>python3 battle.py</code>, <code>python3 capacitor.py</code>, <code>python3 tournament.py</code>, which matches the subject examples. Both work because Python adds the script’s folder (the repo root) to the import path, so <code>import ex0</code> resolves.</p>
+
+<div class="callout say"><b class="t">Say it out loud</b><code>__init__.py</code> turns a folder into a package and controls its public API. I only export the factories so users can’t depend on the concrete creature classes. I use absolute imports so each file states exactly where its dependencies live.</div>
+
+<!-- Multiple inheritance -->
+<h3 id="c-mi"><span class="tag new">ex1</span>Multiple inheritance and the MRO</h3>
+
+<h4>What it is</h4>
+<p>A class may have more than one parent: <code>class Sproutling(Creature, HealCapability)</code>. It receives the methods of both.</p>
+
+<div class="callout ana"><b class="t">Analogy</b>A Swiss Army knife: it is a knife <em>and</em> a screwdriver. The two tool designs were made independently; the knife body just carries both.</div>
+
+<h4>The problem it solves</h4>
+<p>Suppose healing lived inside <code>Creature</code>. Then every creature, even a Flameling, would have <code>heal()</code>. If you instead made <code>HealingCreature</code> and <code>TransformingCreature</code> subclasses, you could never express “a creature that does both” without a third class, then a fourth… Multiple inheritance lets you <em>compose</em> abilities.</p>
+
+<h4>The MRO (Method Resolution Order)</h4>
+<p>When you call a method, Python searches classes in a fixed order. For your classes:</p>
+<pre><code>Sproutling.__mro__
+# (Sproutling, Creature, HealCapability, ABC, object)</code></pre>
+<p>Rule of thumb: the class itself first, then parents <b>left to right</b>, with shared ancestors (<code>ABC</code>, <code>object</code>) last. In your code there is no conflict because the parents own <em>different</em> method names: <code>Creature</code> owns <code>attack</code>/<code>describe</code>, <code>HealCapability</code> owns <code>heal</code>.</p>
+
+<h4>Why you call both <code>__init__</code> methods explicitly</h4>
+<pre><code>class Shiftling(Creature, TransformCapability):
+    def __init__(self) -&gt; None:
+        Creature.__init__(self, "Shiftling", "Normal")   # sets name, creature_type
+        TransformCapability.__init__(self)               # sets is_transformed = False</code></pre>
+<p><code>Creature.__init__</code> doesn’t call <code>super().__init__()</code>, so a single <code>super().__init__()</code> in the child would only reach <code>Creature</code> and the capability’s state would never be initialised. Calling each parent’s <code>__init__</code> by name guarantees both run. (For <code>Sproutling</code>, <code>HealCapability</code> has no <code>__init__</code> of its own, so that call just reaches <code>object.__init__</code> and does nothing; harmless.)</p>
+
+<div class="callout say"><b class="t">Say it out loud — “Benefits of multiple inheritance / interfaces?”</b>It lets me combine independent abilities in one class without building a huge hierarchy. A creature is a <code>Creature</code> and also has the heal capability. Each piece is defined once and reused. The danger is ambiguity when parents share method names, which Python resolves with the MRO; I avoid it by giving each interface its own distinct methods.</div>
+
+<!-- Capabilities -->
+<h3 id="c-cap"><span class="tag new">ex1</span>Capability (interface) classes</h3>
+<h4>What it is</h4>
+<p>A <b>capability</b> is an abstract class describing <em>one ability</em>, such as “can heal”. Python has no <code>interface</code> keyword, so an abstract class whose methods are all abstract plays that role.</p>
+<pre><code>class HealCapability(ABC):
+    @abstractmethod
+    def heal(self) -&gt; str: ...</code></pre>
+<h4>Key rule from the subject</h4>
+<p><em>“Capability abstract classes will not inherit from the Creature base class.”</em> They must stay independent so that one day a <code>Building</code> or a <code>Player</code> could also be healable. If <code>HealCapability</code> inherited from <code>Creature</code>, every healable thing would have to be a Creature.</p>
+<div class="callout say"><b class="t">Say it out loud — “Capability vs base class?”</b>A base class says <em>what something is</em> (a Creature). A capability says <em>what it can do</em> (heal, transform). Capabilities are separate so they can be attached to any class and don’t force a hierarchy.</div>
+
+<!-- Persistent state -->
+<h3 id="c-state"><span class="tag new">ex1</span>Persistent state</h3>
+<p>The subject says: <em>“An attribute is used to make the state persistent and it impacts the attack implementation.”</em> That attribute is <code>is_transformed</code>.</p>
+<pre><code># state starts False
+creature.attack()      # "Shiftling attacks normally."
+creature.transform()   # sets is_transformed = True
+creature.attack()      # "Shiftling performs a boosted strike!"   ← same method, new result
+creature.revert()      # sets is_transformed = False
+creature.attack()      # "Shiftling attacks normally."</code></pre>
+<p>The object <em>remembers</em> what happened to it. <code>transform()</code> writes the flag; <code>attack()</code> reads it. The flag lives on the instance (<code>self.is_transformed</code>), so each creature has its own.</p>
+<div class="callout warn"><b class="t">Common mistakes</b>Forgetting to initialise <code>is_transformed = False</code> (you’d get <code>AttributeError</code> on first <code>attack()</code>). Making it a class-level variable so all creatures share one flag. Not resetting it in <code>revert()</code>.</div>
+
+<!-- Strategy -->
+<h3 id="c-strategy"><span class="tag new">ex2</span>Strategy pattern</h3>
+<h4>What it is</h4>
+<p>You put each algorithm (here: each battle routine) in its own class behind a common interface, then pass the chosen one around. The user of the strategy just calls <code>act()</code>.</p>
+<div class="callout ana"><b class="t">Analogy</b>A GPS offering “fastest”, “shortest”, “avoid highways”. All answer “how do I get there?”, each in its own way, and you can swap them without rebuilding the app.</div>
+<h4>The problem it solves</h4>
+<p>Without it, the tournament loop would contain:</p>
+<pre><code>if isinstance(creature, TransformCapability):
+    creature.transform(); creature.attack(); creature.revert()
+elif isinstance(creature, HealCapability):
+    creature.attack(); creature.heal()
+else:
+    creature.attack()</code></pre>
+<p>Every new capability means editing this loop. With strategies, the loop is one line, <code>strategy.act(creature)</code>, and a new behaviour is a <em>new class</em>. This follows the <b>Open/Closed principle</b>: open for extension, closed for modification.</p>
+<h4>The two methods</h4>
+<ul>
+  <li><code>is_valid(creature) -&gt; bool</code>: a <b>question</b> (“can this creature use me?”). Never raises.</li>
+  <li><code>act(creature) -&gt; None</code>: the <b>action</b>. Raises <code>InvalidStrategyError</code> if called with an incompatible creature.</li>
+</ul>
+<div class="callout say"><b class="t">Say it out loud — “Strategy vs Factory?”</b>The factory is about <em>creating</em> objects; the strategy is about <em>behaviour</em>, swapping how something acts. In my tournament, a tuple <code>(factory, strategy)</code> says “create this creature, then make it fight like this”.</div>
+
+<!-- Exceptions -->
+<h3 id="c-exc"><span class="tag new">ex2</span>Custom exceptions and graceful handling</h3>
+<pre><code>class InvalidStrategyError(Exception):
+    pass</code></pre>
+<p>A <b>dedicated exception</b> tells readers exactly what went wrong and lets you catch <em>only that</em> error. <code>except InvalidStrategyError</code> won’t accidentally swallow an unrelated bug such as a <code>KeyError</code>, which a bare <code>except Exception</code> would.</p>
+<p>The subject requires: <em>“If the act method is called with an invalid combination, a dedicated exception is raised with a clear message.”</em> and <em>“Your functions should handle exceptions gracefully to avoid crashes.”</em> Your <code>battle()</code> catches the error and prints <code>Battle error, aborting tournament: ...</code> instead of crashing. This matters because the sheet says an uncontrolled termination in defence means a final grade of 0.</p>
+<div class="callout say"><b class="t">Say it out loud</b>I raise <code>InvalidStrategyError</code> in <code>act()</code> when the creature lacks the needed capability. The tournament function catches it, prints a clear message and stops, so the program never crashes. <code>is_valid</code> exists so callers can check first without using exceptions.</div>
+
+<!-- Tools -->
+<h3 id="c-tools"><span class="tag new">all</span>Type hints, <code>mypy</code>, <code>flake8</code>, <code>isinstance</code></h3>
+<ul>
+  <li><b>Type hints</b>: <code>def attack(self) -&gt; str</code>. Required on every function (parameters <em>and</em> return). <code>mypy</code> checks them. Yours: <code>Success: no issues found in 27 source files</code>.</li>
+  <li><b>flake8</b>: style checker. Yours reports zero errors. The usual enemy is line length (79 characters max).</li>
+  <li><b><code>isinstance(creature, HealCapability)</code></b>: asks “does this object inherit from that class?” It works with capabilities because the creature really inherits from them. This is how <code>is_valid</code> decides.</li>
+  <li><b><code>Tuple[CreatureFactory, BattleStrategy]</code></b>: a fixed pair; <code>Opponent</code> is a <em>type alias</em> so signatures stay readable.</li>
+  <li><b>Round-robin loop</b>: <code>for i ... for j in range(i + 1, n)</code> visits every unordered pair exactly once. With 3 opponents you get 3 fights (matches the subject example).</li>
+</ul>
+<div class="callout info"><b class="t">About <code># type: ignore</code> in your strategies</b>
+Your <code>act()</code> methods write <code>transform_creature: TransformCapability = creature  # type: ignore</code>. It works, but an evaluator may ask why. Answer: <code>is_valid</code> already proved the type, but mypy can’t see that through a method call, so the comment silences it. A cleaner alternative (optional) is to test with <code>isinstance</code> directly inside <code>act()</code> and raise; mypy then narrows the type automatically with no ignore needed.</div>
+<pre><code>def act(self, creature: Creature) -&gt; None:
+    if not isinstance(creature, TransformCapability):
+        raise InvalidStrategyError(
+            f"Invalid Creature '{creature.name}' for this aggressive strategy"
+        )                                   # (split over two lines to stay under 79 chars)
+    print(creature.transform())             # mypy now knows creature has transform()
+    print(creature.attack())
+    print(creature.revert())</code></pre>
+
+<!-- ============================================================ -->
+<h2>Your project, exercise by exercise</h2>
+
+<!-- EX0 -->
+<h3 id="ex0">Exercise 0 — Creature Factory</h3>
+<p><span class="tag">files</span><code>battle.py</code> + <code>ex0/</code> package. <span class="tag">authorized</span>builtins, standard types, <code>typing</code>, <code>abc</code>.</p>
+
+<h4>New concepts here</h4>
+<p>Abstract class, abstract method vs concrete method, concrete subclasses, Abstract Factory, package encapsulation. (Section 2 explains each.)</p>
+
+<h4>The files</h4>
+<div class="tablewrap"><table>
+  <tr><th>File</th><th>Role</th></tr>
+  <tr><td><code>Creature.py</code></td><td>Abstract base. Stores <code>name</code>, <code>creature_type</code>. <code>describe()</code> concrete; <code>attack()</code> abstract.</td></tr>
+  <tr><td><code>Flameling.py</code>, <code>Pyrodon.py</code>, <code>Aquabub.py</code>, <code>Torragon.py</code></td><td>Concrete creatures; each only sets its name/type and implements <code>attack()</code>.</td></tr>
+  <tr><td><code>CreatureFactory.py</code></td><td>Abstract factory: <code>create_base()</code>, <code>create_evolved()</code>.</td></tr>
+  <tr><td><code>FlameFactory.py</code>, <code>AquaFactory.py</code></td><td>Concrete factories (Flameling+Pyrodon, Aquabub+Torragon).</td></tr>
+  <tr><td><code>__init__.py</code></td><td>Exports only the factories.</td></tr>
+</table></div>
+
+<div class="fn">ex0/Creature.py</div>
+<pre><code>from abc import ABC, abstractmethod
+
+class Creature(ABC):
+    def __init__(self, name: str, creature_type: str) -&gt; None:
+        self.name: str = name
+        self.creature_type: str = creature_type
+
+    def describe(self) -&gt; str:                      # concrete, shared
+        return f"{self.name} is a {self.creature_type} type Creature"
+
+    @abstractmethod
+    def attack(self) -&gt; str:                        # abstract, each creature differs
+        pass</code></pre>
+
+<div class="fn">ex0/CreatureFactory.py  and  ex0/FlameFactory.py</div>
+<pre><code>class CreatureFactory(ABC):
+    @abstractmethod
+    def create_base(self) -&gt; Creature: pass
+    @abstractmethod
+    def create_evolved(self) -&gt; Creature: pass
+
+class FlameFactory(CreatureFactory):
+    def create_base(self) -&gt; Creature:
+        return Flameling()
+    def create_evolved(self) -&gt; Creature:
+        return Pyrodon()</code></pre>
+
+<div class="fn">battle.py (the logic)</div>
+<pre><code>def test_factory(factory: CreatureFactory) -&gt; None:   # ONE function for ANY factory
+    base = factory.create_base()
+    evolved = factory.create_evolved()
+    print(base.describe());    print(base.attack())
+    print(evolved.describe()); print(evolved.attack())
+
+def test_battle(factory_a: CreatureFactory, factory_b: CreatureFactory) -&gt; None:
+    a = factory_a.create_base(); b = factory_b.create_base()
+    print(a.describe()); print(" vs."); print(b.describe()); print(" fight!")
+    print(a.attack());   print(b.attack())</code></pre>
+
+<h4>What the subject checks</h4>
+<ul>
+  <li>A <b>single</b> function receives a factory and tests both forms. You have <code>test_factory</code>, used for both Flame and Aqua.</li>
+  <li>Another function takes <b>both</b> factories and makes the base creatures fight (<code>test_battle</code>).</li>
+  <li>The package exposes <b>only factories</b>.</li>
+</ul>
+
+<div class="callout bad"><b class="t">Typical mistakes</b>Writing <code>Flameling()</code> inside <code>battle.py</code> (defeats the pattern). Exporting concrete creatures in <code>__init__.py</code>. Two separate test functions for each factory instead of one generic one. Missing <code>-&gt; None</code> on a function.</div>
+
+<!-- EX1 -->
+<h3 id="ex1">Exercise 1 — Capabilities</h3>
+<p><span class="tag">files</span><code>capacitor.py</code> + <code>ex1/</code> package. Builds on ex0 (<code>Creature</code> and <code>CreatureFactory</code> are imported from <code>ex0</code>).</p>
+
+<h4>New concepts here (only)</h4>
+<p>Capability/interface classes kept <em>outside</em> the creature hierarchy; multiple inheritance; persistent state affecting <code>attack()</code>; reusing an abstract factory for new families.</p>
+
+<h4>The files</h4>
+<div class="tablewrap"><table>
+  <tr><th>File</th><th>Role</th></tr>
+  <tr><td><code>HealCapability.py</code></td><td>ABC with abstract <code>heal()</code>.</td></tr>
+  <tr><td><code>TransformCapability.py</code></td><td>ABC with abstract <code>transform()</code>, <code>revert()</code>, and the <code>is_transformed</code> flag set in <code>__init__</code>.</td></tr>
+  <tr><td><code>Sproutling.py</code>, <code>Bloomelle.py</code></td><td><code>Creature + HealCapability</code>.</td></tr>
+  <tr><td><code>Shiftling.py</code>, <code>Morphagon.py</code></td><td><code>Creature + TransformCapability</code>.</td></tr>
+  <tr><td><code>HealingCreatureFactory.py</code>, <code>TransformCreatureFactory.py</code></td><td>Concrete <code>CreatureFactory</code>s for the two new families.</td></tr>
+</table></div>
+
+<div class="fn">ex1/Shiftling.py</div>
+<pre><code>class Shiftling(Creature, TransformCapability):
+    def __init__(self) -&gt; None:
+        Creature.__init__(self, "Shiftling", "Normal")
+        TransformCapability.__init__(self)          # is_transformed = False
+
+    def attack(self) -&gt; str:
+        if self.is_transformed:                      # READ the state
+            return "Shiftling performs a boosted strike!"
+        return "Shiftling attacks normally."
+
+    def transform(self) -&gt; str:
+        self.is_transformed = True                   # WRITE the state
+        return "Shiftling shifts into a sharper form!"
+
+    def revert(self) -&gt; str:
+        self.is_transformed = False
+        return "Shiftling returns to normal."</code></pre>
+
+<div class="fn">capacitor.py (the logic)</div>
+<pre><code>creature = factory.create_base()              # or create_evolved()
+print(creature.describe()); print(creature.attack())
+if isinstance(creature, TransformCapability):  # factory returns type Creature,
+    print(creature.transform())                # so we check the capability first
+    print(creature.attack())                   # now boosted
+    print(creature.revert())</code></pre>
+
+<div class="callout info"><b class="t">Why the <code>isinstance</code> check in the test script?</b>The factory’s declared return type is <code>Creature</code>, and <code>Creature</code> has no <code>heal()</code>. The <code>isinstance</code> check proves the capability to both the reader and mypy before calling it.</div>
+
+<div class="callout bad"><b class="t">Typical mistakes</b>Making <code>HealCapability(Creature)</code> (forbidden). Not calling <code>TransformCapability.__init__</code> so <code>is_transformed</code> doesn’t exist. Forgetting that the evolved creature also needs the full sequence (describe → attack → transform → attack → revert). Exposing <code>Sproutling</code> etc. in <code>ex1/__init__.py</code>.</div>
+
+<!-- EX2 -->
+<h3 id="ex2">Exercise 2 — Abstract Strategy</h3>
+<p><span class="tag">files</span><code>tournament.py</code> + <code>ex2/</code> package.</p>
+
+<h4>New concepts here (only)</h4>
+<p>Strategy pattern; <code>is_valid</code> vs <code>act</code>; dedicated exception; a single generic <code>battle</code> function working with <code>(factory, strategy)</code> tuples; round-robin pairing.</p>
+
+<div class="tablewrap"><table>
+  <tr><th>Strategy</th><th>Valid for</th><th>What <code>act()</code> does</th></tr>
+  <tr><td><code>NormalStrategy</code></td><td>any Creature (<code>is_valid</code> always True)</td><td>attack</td></tr>
+  <tr><td><code>AggressiveStrategy</code></td><td>creatures with <code>TransformCapability</code></td><td>transform → attack → revert</td></tr>
+  <tr><td><code>DefensiveStrategy</code></td><td>creatures with <code>HealCapability</code></td><td>attack → heal</td></tr>
+</table></div>
+
+<div class="fn">ex2/BattleStrategy.py</div>
+<pre><code>class BattleStrategy(ABC):
+    @abstractmethod
+    def is_valid(self, creature: Creature) -&gt; bool: pass
+    @abstractmethod
+    def act(self, creature: Creature) -&gt; None: pass</code></pre>
+
+<div class="fn">ex2/DefensiveStrategy.py</div>
+<pre><code>class DefensiveStrategy(BattleStrategy):
+    def is_valid(self, creature: Creature) -&gt; bool:
+        return isinstance(creature, HealCapability)
+
+    def act(self, creature: Creature) -&gt; None:
+        if not self.is_valid(creature):
+            msg = (
+                f"Invalid Creature '{creature.name}'"
+                " for this defensive strategy"
+            )
+            raise InvalidStrategyError(msg)
+        heal_creature: HealCapability = creature  # type: ignore
+        print(creature.attack())
+        print(heal_creature.heal())</code></pre>
+
+<div class="fn">tournament.py — the single battle function</div>
+<pre><code>Opponent = Tuple[CreatureFactory, BattleStrategy]
+
+def battle(opponents: List[Opponent]) -&gt; None:
+    print("*** Tournament ***")
+    print(f"{len(opponents)} opponents involved")
+    for i in range(len(opponents)):
+        for j in range(i + 1, len(opponents)):          # each pair exactly once
+            factory_a, strategy_a = opponents[i]
+            factory_b, strategy_b = opponents[j]
+            creature_a = factory_a.create_base()
+            creature_b = factory_b.create_base()
+            print("\n* Battle *")
+            print(creature_a.describe()); print(" vs."); print(creature_b.describe())
+            print(" now fight!")
+            try:
+                strategy_a.act(creature_a)              # each uses ITS strategy
+                strategy_b.act(creature_b)
+            except InvalidStrategyError as error:
+                print(f"Battle error, aborting tournament: {error}")
+                return                                  # abort the tournament</code></pre>
+
+<h4>The three scenarios your script runs</h4>
+<ol>
+  <li><b>Tournament 0 (basic)</b>: Flameling+Normal vs Healing+Defensive → both valid, one fight.</li>
+  <li><b>Tournament 1 (error)</b>: Flameling+Aggressive → Flameling can’t transform → <code>InvalidStrategyError</code> → caught → “Battle error, aborting tournament: Invalid Creature 'Flameling' for this aggressive strategy”.</li>
+  <li><b>Tournament 2 (multiple)</b>: 3 opponents → 3 fights (pairs 0-1, 0-2, 1-2).</li>
+</ol>
+
+<div class="callout say"><b class="t">Say it out loud — why is this better than if/elif?</b>The battle function knows nothing about healing or transforming. It only calls <code>act()</code>. If I add a new “Stealth” capability, I add a new strategy class and the tournament code stays untouched.</div>
+
+<div class="callout bad"><b class="t">Typical mistakes</b>Putting <code>isinstance</code> checks in the tournament loop instead of in the strategies. Raising a plain <code>Exception</code>. Letting the exception escape and crash. Printing the error <em>before</em> the “now fight!” header (the subject’s output prints the header first).</div>
+
+<!-- ============================================================ -->
+<h2 id="sheet">Correction-sheet concepts (the “Card” variant)</h2>
+
+<div class="callout warn"><b class="t">Read this carefully</b>The correction sheet you pasted is written for a <b>Card</b>-based version of the module with five exercises. Your actual subject is the Creature version with three. You will be graded on <em>your</em> subject, but evaluators may use this sheet’s language, so know how the two map. Everything below is the same set of ideas under different names.</div>
+
+<div class="tablewrap"><table>
+  <tr><th>Sheet’s name</th><th>Your equivalent</th><th>Idea</th></tr>
+  <tr><td><code>Card</code> (ABC, abstract <code>play()</code>; concrete <code>get_card_info()</code>, <code>is_playable()</code>)</td><td><code>Creature</code> (abstract <code>attack()</code>; concrete <code>describe()</code>)</td><td>Abstract base class</td></tr>
+  <tr><td><code>CreatureCard</code> (attack, health)</td><td><code>Flameling</code> etc.</td><td>Concrete subclass</td></tr>
+  <tr><td><code>SpellCard</code>, <code>ArtifactCard</code></td><td>more concrete creatures</td><td>Several subclasses with unique behaviour</td></tr>
+  <tr><td><code>Deck</code></td><td>the list of opponents in <code>battle()</code></td><td>Polymorphic container</td></tr>
+  <tr><td><code>Combatable</code>, <code>Magical</code></td><td><code>HealCapability</code>, <code>TransformCapability</code></td><td>Interfaces (all-abstract ABCs)</td></tr>
+  <tr><td><code>EliteCard(Card, Combatable, Magical)</code></td><td><code>Sproutling(Creature, HealCapability)</code></td><td>Multiple inheritance</td></tr>
+  <tr><td><code>GameStrategy</code>, <code>AggressiveStrategy</code></td><td><code>BattleStrategy</code>, <code>AggressiveStrategy</code></td><td>Strategy pattern</td></tr>
+  <tr><td><code>CardFactory</code>, <code>FantasyCardFactory</code></td><td><code>CreatureFactory</code>, <code>FlameFactory</code></td><td>Abstract Factory</td></tr>
+  <tr><td><code>GameEngine</code></td><td><code>battle()</code> in <code>tournament.py</code></td><td>Orchestrator that uses a factory and a strategy</td></tr>
+  <tr><td><code>Rankable</code>, <code>TournamentCard</code>, <code>TournamentPlatform</code></td><td>(extension)</td><td>Interface composition + system integration</td></tr>
+</table></div>
+
+<h3>Concepts that appear only in the sheet</h3>
+
+<h4>Polymorphic container (<code>Deck</code>)</h4>
+<p>A <code>Deck</code> holds a <code>list[Card]</code>. Because every item is a <code>Card</code>, <code>add_card</code>, <code>remove_card</code>, <code>shuffle</code>, <code>draw_card</code> work identically for spells, artifacts and creatures. <code>get_deck_stats()</code> returns summary info (e.g. total cards, count per type, average cost). Polymorphism lets the deck call <code>card.get_card_info()</code> without knowing the card’s type.</p>
+<pre><code>class Deck:
+    def __init__(self) -&gt; None:
+        self.cards: list[Card] = []
+    def add_card(self, card: Card) -&gt; None:
+        self.cards.append(card)
+    def draw_card(self) -&gt; Card:
+        return self.cards.pop(0)        # no decorators, no external libs</code></pre>
+
+<h4>Interfaces with <em>all</em> abstract methods</h4>
+<p>The sheet insists <code>Combatable</code> and <code>Magical</code> contain <b>only</b> abstract methods. That is what makes them pure <em>interfaces</em> rather than partial base classes. Example: <code>Combatable</code> declares <code>attack()</code> and <code>defend()</code>; <code>Magical</code> declares <code>cast_spell()</code>.</p>
+
+<h4><code>EliteCard</code>: inheriting three contracts</h4>
+<pre><code>class EliteCard(Card, Combatable, Magical):
+    # must implement: play() from Card, attack()/defend() from Combatable,
+    # cast_spell() from Magical. Miss ONE and Python refuses to create it.</code></pre>
+<p>Python checks the union of every abstract method of every parent. “Does the implementation make sense?” means the methods should actually reflect an elite card that fights <em>and</em> casts spells.</p>
+
+<h4><code>GameEngine</code>: configured, not hard-wired (dependency injection)</h4>
+<p>The engine <b>receives</b> a factory and a strategy rather than creating them itself:</p>
+<pre><code>class GameEngine:
+    def configure(self, factory: CardFactory, strategy: GameStrategy) -&gt; None:
+        self.factory = factory
+        self.strategy = strategy</code></pre>
+<p>This is called <b>dependency injection</b>. The sheet’s “test pattern switching” means: run the engine with <code>FantasyCardFactory</code> then another factory, or <code>AggressiveStrategy</code> then another strategy, and show the engine code didn’t change.</p>
+
+<h4><code>Rankable</code>, <code>TournamentCard</code>, <code>TournamentPlatform</code></h4>
+<ul>
+  <li><b><code>Rankable</code></b>: another abstract interface (for example <code>get_rank()</code>, <code>update_rank()</code>). Reusable for any rankable thing.</li>
+  <li><b><code>TournamentCard(Card, Combatable, Rankable)</code></b>: interface <em>composition</em>; three contracts at once.</li>
+  <li><b><code>TournamentPlatform</code></b>: the glue. <code>register_card</code>, <code>create_match</code>, <code>get_leaderboard</code> use all the previous pieces together (system-level integration).</li>
+</ul>
+
+<div class="callout info"><b class="t">The “don’t over-engineer” rule</b>The sheet says “the focus is on patterns rather than complex game logic.” Simple strings and counters are fine. Evaluators want to see the <em>structure</em>, not a realistic game.</div>
+
+<!-- ============================================================ -->
+<h2 id="qa">Evaluator Q&amp;A — try each before opening</h2>
+
+<details><summary>What is an abstract class and why did you use one?</summary>
+<div class="ans">A class that can’t be instantiated and defines methods subclasses must implement. <code>Creature</code> declares <code>attack()</code> abstract so every creature must have its own attack, while <code>describe()</code> is concrete and shared. It prevents incomplete objects and gives the rest of the code a guaranteed interface.</div></details>
+
+<details><summary>What happens if you write <code>Creature()</code>?</summary>
+<div class="ans"><code>TypeError: Can't instantiate abstract class Creature</code> (with abstract method <code>attack</code>). Same if a subclass forgets to implement <code>attack()</code>.</div></details>
+
+<details><summary>Which methods are abstract and which are concrete in <code>Creature</code>?</summary>
+<div class="ans"><code>attack()</code> is abstract. <code>describe()</code> and <code>__init__</code> are concrete.</div></details>
+
+<details><summary>Explain the Abstract Factory pattern with your code.</summary>
+<div class="ans"><code>CreatureFactory</code> is the abstract factory with <code>create_base()</code> and <code>create_evolved()</code>. <code>FlameFactory</code> and <code>AquaFactory</code> are concrete factories, each producing one family. <code>test_factory(factory)</code> works with any of them and never names a concrete creature.</div></details>
+
+<details><summary>Why does your package only export factories?</summary>
+<div class="ans">Because the subject requires it, and because it’s encapsulation: callers depend on the factory interface, not on concrete creature classes, so I can change or add creatures without breaking users.</div></details>
+
+<details><summary>Why don’t <code>HealCapability</code> and <code>TransformCapability</code> inherit from <code>Creature</code>?</summary>
+<div class="ans">So they stay reusable. A capability describes an ability, not an entity. If it inherited from <code>Creature</code>, only creatures could ever heal or transform.</div></details>
+
+<details><summary>Why do you call <code>Creature.__init__</code> and <code>TransformCapability.__init__</code> separately?</summary>
+<div class="ans"><code>Creature.__init__</code> doesn’t forward to <code>super().__init__()</code>, so a single <code>super()</code> call would never reach the capability. Calling each parent explicitly guarantees both <code>name/type</code> and <code>is_transformed</code> are initialised.</div></details>
+
+<details><summary>What is the MRO of <code>Sproutling</code>?</summary>
+<div class="ans"><code>Sproutling → Creature → HealCapability → ABC → object</code>. Python searches left to right. There’s no clash because the parents define different method names.</div></details>
+
+<details><summary>How does <code>is_transformed</code> change <code>attack()</code>?</summary>
+<div class="ans"><code>transform()</code> sets it to <code>True</code>; <code>attack()</code> checks it and returns the boosted message; <code>revert()</code> sets it back to <code>False</code>. It’s instance state, so each creature has its own.</div></details>
+
+<details><summary>What is the Strategy pattern and what does it replace?</summary>
+<div class="ans">It wraps each battle routine in its own class behind <code>BattleStrategy</code>. It replaces a chain of <code>if isinstance(...)</code> in the tournament loop. The loop just calls <code>strategy.act(creature)</code>, and new behaviours are new classes.</div></details>
+
+<details><summary>What’s the difference between <code>is_valid</code> and <code>act</code>?</summary>
+<div class="ans"><code>is_valid</code> returns a bool (a safe check, never raises). <code>act</code> performs the sequence and raises <code>InvalidStrategyError</code> if the creature isn’t compatible.</div></details>
+
+<details><summary>Why a custom exception instead of <code>Exception</code>?</summary>
+<div class="ans">It names the exact failure and lets me catch only that case without hiding unrelated bugs. The tournament catches it and aborts cleanly instead of crashing.</div></details>
+
+<details><summary>How many fights happen with N opponents?</summary>
+<div class="ans">Every unordered pair once: N·(N−1)/2. With 3 opponents, 3 fights.</div></details>
+
+<details><summary>Why is <code>@abstractmethod</code> OK if “decorators are avoided”?</summary>
+<div class="ans">It’s the standard mechanism of the <code>abc</code> module, which the subject authorizes. No other decorators are used (no <code>@property</code>, <code>@staticmethod</code>, <code>@dataclass</code>…).</div></details>
+
+<details><summary>Why is there <code># type: ignore</code> in your strategies?</summary>
+<div class="ans">After <code>is_valid</code> passes I know the creature has the capability, but mypy can’t infer that through a method call. A cleaner version uses <code>isinstance</code> directly in <code>act()</code>, which mypy narrows automatically.</div></details>
+
+<details><summary>How would you add a new creature family (e.g. Electric)?</summary>
+<div class="ans">Add two concrete creatures and an <code>ElectricFactory(CreatureFactory)</code>, export the factory. No change to <code>battle.py</code> or <code>tournament.py</code> logic. That’s the point of the pattern.</div></details>
+
+<details><summary>How would you add a new strategy?</summary>
+<div class="ans">Create a new class inheriting <code>BattleStrategy</code> implementing <code>is_valid</code> and <code>act</code>. The tournament function stays untouched.</div></details>
+
+<details><summary>Why absolute imports?</summary>
+<div class="ans">The sheet asks for them. <code>from ex0.Creature import Creature</code> states the exact location from the repo root and works the same wherever the file is used.</div></details>
+
+<details><summary>If AI helped you, can you explain every line?</summary>
+<div class="ans">The subject’s AI chapter says you must fully understand anything you submit. Practise tracing one full run: a factory creates a creature, a strategy calls its methods, the state flag changes the attack message.</div></details>
+
+<!-- ============================================================ -->
+<h2 id="checklist">Pre-defence checklist</h2>
+
+<div class="callout warn"><b class="t">One real finding in your repo</b>The correction sheet says: <em>“Verify that an <code>__init__.py</code> file exists at the repository root.”</em> When I cloned your repository, the root contained only <code>battle.py</code>, <code>capacitor.py</code>, <code>tournament.py</code>, <code>ex0/</code>, <code>ex1/</code>, <code>ex2/</code>: <b>no root-level <code>__init__.py</code></b>. The three exercise folders do have theirs. Adding an empty root file is harmless and satisfies the sheet:
+<pre><code>touch __init__.py
+git add __init__.py &amp;&amp; git commit -m "Add root __init__.py" &amp;&amp; git push</code></pre></div>
+
+<p>Then run these from a <b>fresh clone in an empty folder</b> (the sheet requires <code>git clone</code> in an empty folder):</p>
+<pre><code>git clone https://github.com/yassinedesu/python07.git
+cd python07
+flake8 .                 # expect: no output
+mypy .                   # expect: Success: no issues found
+python3 battle.py
+python3 capacitor.py
+python3 tournament.py    # compare with the subject examples
+git status               # clean; no stray files (e.g. __pycache__ should not be committed)</code></pre>
+
+<ul>
+  <li><b>Only requested files</b> in the repo (no notes, tests, caches). If not, the review stops.</li>
+  <li>No crash, ever. An uncontrolled termination during the defence means <b>grade 0</b>.</li>
+  <li>Python ≥ 3.10; no <code>eval()</code>/<code>exec()</code>; no external libraries.</li>
+  <li>Type hints on every function (params and return).</li>
+  <li>Docstrings are <b>not</b> required by the sheet (yours are fine to keep).</li>
+  <li>Don’t edit files during the defence unless you and the evaluator agree.</li>
+</ul>
+
+<div class="callout ok" style="border-color:var(--ok);background:var(--ok-soft)"><b class="t" style="color:var(--ok)">Status as of my last check</b>flake8: no errors. mypy: no issues in 27 files. All three scripts matched the subject’s example output. Only the root <code>__init__.py</code> is outstanding.</div>
+
+<!-- ============================================================ -->
+<h2 id="ref">Quick-reference table</h2>
+
+<div class="tablewrap"><table>
+  <tr><th>Concept</th><th>What it does in one sentence</th><th>Introduced</th></tr>
+  <tr><td>Abstract class (<code>ABC</code>)</td><td>A class that can’t be instantiated and defines a contract for subclasses.</td><td>ex0</td></tr>
+  <tr><td><code>@abstractmethod</code></td><td>Marks a method every concrete subclass must implement.</td><td>ex0</td></tr>
+  <tr><td>Concrete method / class</td><td>A fully implemented method / a class with no abstract methods left.</td><td>ex0</td></tr>
+  <tr><td>Inheritance &amp; <code>super()</code></td><td>A subclass reuses its parent’s code and extends it.</td><td>ex0</td></tr>
+  <tr><td>Polymorphism</td><td>Same call, different behaviour depending on the object’s real class.</td><td>ex0</td></tr>
+  <tr><td>Abstract Factory</td><td>An abstract creator with interchangeable concrete creators that make families of related objects.</td><td>ex0</td></tr>
+  <tr><td>Package &amp; <code>__init__.py</code></td><td>Makes a folder importable and controls its public API.</td><td>ex0</td></tr>
+  <tr><td>Encapsulation (export factories only)</td><td>Hides concrete classes so users depend only on the interface.</td><td>ex0</td></tr>
+  <tr><td>Absolute imports</td><td>Imports written with the full path from the repo root.</td><td>ex0/ex1</td></tr>
+  <tr><td>Multiple inheritance</td><td>A class inheriting from several parents to combine abilities.</td><td>ex1</td></tr>
+  <tr><td>MRO</td><td>The fixed left-to-right order Python searches classes for a method.</td><td>ex1</td></tr>
+  <tr><td>Capability / interface</td><td>An abstract class describing one ability, independent of the main hierarchy.</td><td>ex1</td></tr>
+  <tr><td>Persistent state</td><td>An instance attribute (<code>is_transformed</code>) that changes later behaviour.</td><td>ex1</td></tr>
+  <tr><td><code>isinstance</code></td><td>Checks whether an object has a given class (or capability) in its ancestry.</td><td>ex1/ex2</td></tr>
+  <tr><td>Strategy pattern</td><td>Encapsulates interchangeable behaviours in classes behind one interface.</td><td>ex2</td></tr>
+  <tr><td><code>is_valid</code> guard</td><td>A safe yes/no check that a creature suits a strategy.</td><td>ex2</td></tr>
+  <tr><td>Custom exception</td><td>A specific error type (<code>InvalidStrategyError</code>) raised and caught precisely.</td><td>ex2</td></tr>
+  <tr><td>Round-robin pairing</td><td>Nested loop <code>j in range(i+1, n)</code> so each pair fights once.</td><td>ex2</td></tr>
+  <tr><td>Type alias &amp; tuples</td><td><code>Opponent = Tuple[CreatureFactory, BattleStrategy]</code> keeps signatures readable.</td><td>ex2</td></tr>
+  <tr><td>Type hints / mypy</td><td>Annotations on every function, verified by mypy.</td><td>all</td></tr>
+  <tr><td>flake8</td><td>Style checker (79-char lines etc.), must report no errors.</td><td>all</td></tr>
+  <tr><td>Polymorphic container (<code>Deck</code>)</td><td>A collection typed by the abstract class so it holds any subclass.</td><td>sheet ex1</td></tr>
+  <tr><td>Interface composition (<code>EliteCard</code>, <code>TournamentCard</code>)</td><td>One class satisfying three or more abstract interfaces.</td><td>sheet ex2/ex4</td></tr>
+  <tr><td>Dependency injection (<code>GameEngine</code>)</td><td>The engine receives its factory and strategy instead of creating them.</td><td>sheet ex3</td></tr>
+  <tr><td><code>Rankable</code></td><td>A reusable interface for anything that has a rank.</td><td>sheet ex4</td></tr>
+  <tr><td><code>TournamentPlatform</code></td><td>The integration layer combining all pieces into one system.</td><td>sheet ex4</td></tr>
+</table></div>
+
+<p style="color:var(--muted);font-size:14px;margin-top:40px">Good luck with the defence. If you can explain <em>why</em> each pattern exists, the code questions answer themselves.</p>
+
+</main>
+</div>
+</body>
+</html>
