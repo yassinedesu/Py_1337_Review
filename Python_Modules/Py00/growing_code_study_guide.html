@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Growing Code - Study Guide</title>
+<style>
+  :root {
+    --bg: #f7f8f5;
+    --card: #ffffff;
+    --text: #1f2a24;
+    --muted: #5d6b63;
+    --accent: #2f7d4f;
+    --accent-soft: #e3f2e9;
+    --warn: #b3261e;
+    --warn-soft: #fdeceb;
+    --ok-soft: #e8f5ec;
+    --code-bg: #14201a;
+    --code-text: #e6f2ea;
+    --border: #dde3dd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101613;
+      --card: #18201b;
+      --text: #e6ede8;
+      --muted: #9aa9a0;
+      --accent: #5fc58a;
+      --accent-soft: #1d2f24;
+      --warn: #ff8a80;
+      --warn-soft: #33201f;
+      --ok-soft: #1b2b21;
+      --code-bg: #0b100d;
+      --code-text: #e6f2ea;
+      --border: #2a352e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+  }
+  header {
+    background: linear-gradient(135deg, #1d5c3a, #2f7d4f);
+    color: #fff;
+    padding: 48px 20px 40px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 8px; font-size: 2.2rem; }
+  header p { margin: 0; opacity: .9; }
+  .layout { max-width: 1050px; margin: 0 auto; padding: 24px 16px 64px; display: grid; grid-template-columns: 230px 1fr; gap: 28px; }
+  nav { position: sticky; top: 16px; align-self: start; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  nav h3 { margin: 0 0 8px; font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  nav a { display: block; padding: 4px 0; color: var(--text); text-decoration: none; font-size: .92rem; }
+  nav a:hover { color: var(--accent); }
+  section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px; margin-bottom: 22px; }
+  section h2 { margin-top: 0; color: var(--accent); border-bottom: 2px solid var(--accent-soft); padding-bottom: 8px; }
+  section h3 { margin-bottom: 6px; }
+  pre { background: var(--code-bg); color: var(--code-text); padding: 14px 16px; border-radius: 10px; overflow-x: auto; font-size: .9rem; line-height: 1.5; }
+  code { font-family: "SF Mono", Consolas, Menlo, monospace; }
+  p code, li code, td code { background: var(--accent-soft); padding: 1px 6px; border-radius: 5px; font-size: .9em; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 14px 0; }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .callout strong:first-child { display: block; margin-bottom: 2px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: .95rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--accent-soft); }
+  .tag { display: inline-block; font-size: .75rem; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-weight: 600; margin-right: 6px; }
+  .wrong { color: var(--warn); }
+  .right { color: var(--accent); }
+  ul.checks { list-style: none; padding-left: 0; }
+  ul.checks li { padding: 6px 0 6px 28px; position: relative; }
+  ul.checks li::before { content: "\2713"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    nav { position: static; }
+    header h1 { font-size: 1.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Growing Code</h1>
+  <p>Python Fundamentals Through Garden Data &mdash; Study Guide</p>
+</header>
+
+<div class="layout">
+  <nav>
+    <h3>Contents</h3>
+    <a href="#rules">0. Project rules</a>
+    <a href="#functions">1. Functions</a>
+    <a href="#print">2. print() &amp; expressions</a>
+    <a href="#input">3. input() &amp; strings</a>
+    <a href="#types">4. Types &amp; conversion</a>
+    <a href="#variables">5. Variables</a>
+    <a href="#conditions">6. if / else &amp; booleans</a>
+    <a href="#loops">7. for loops &amp; range()</a>
+    <a href="#recursion">8. Recursion</a>
+    <a href="#hints">9. Type hints</a>
+    <a href="#mistakes">10. Common mistakes</a>
+    <a href="#cheatsheet">11. Cheat sheet</a>
+  </nav>
+
+  <main>
+
+    <section id="rules">
+      <h2>0. Project rules &amp; mindset</h2>
+      <ul class="checks">
+        <li>Python <strong>3.10+</strong>, code must pass <strong>flake8</strong>.</li>
+        <li>One exercise = one file, containing <strong>only the requested function</strong> (no <code>if __name__ == "__main__"</code>, no direct calls, no code outside functions).</li>
+        <li>Function names must match exactly (<code>ft_hello_garden</code>, <code>ft_plot_area</code>, ...).</li>
+        <li>No input validation needed; negative or invalid inputs are undefined behaviour.</li>
+        <li>Type hints are optional for exercises 0&ndash;6 and <strong>required</strong> for exercise 7 (checked with <strong>mypy</strong>).</li>
+        <li>Test with the provided <code>main.py</code> helper: <code>python3 main.py</code>.</li>
+      </ul>
+      <div class="callout">
+        <strong>AI usage</strong>
+        Use AI to help, but only submit what you fully understand. You may be asked to explain, trace, or modify any line during evaluation. Always test AI output and review it with a peer.
+      </div>
+    </section>
+
+    <section id="functions">
+      <h2>1. Functions (Exercise 0)</h2>
+      <h3>Defining vs calling</h3>
+      <ul>
+        <li><strong>Defining</strong> uses <code>def</code>: it creates the function but runs nothing.</li>
+        <li><strong>Calling</strong> uses the name followed by parentheses: it executes the body.</li>
+      </ul>
+<pre><code>def greet():              # definition: nothing is printed yet
+    print("Hello")
+
+greet()                   # call: now it runs</code></pre>
+
+      <h3>What do the parentheses mean?</h3>
+      <p>The parentheses hold the <strong>parameters</strong>. Empty parentheses <code>()</code> mean the function takes <strong>no parameters at all</strong>.</p>
+<pre><code>def no_params():            # takes 0 arguments
+    ...
+
+def with_default(name="x"): # optional parameter (has a default)
+    ...</code></pre>
+
+      <div class="callout warn">
+        <strong>What happens if you pass an argument to a zero-parameter function?</strong>
+        Python raises a <code>TypeError</code>: <code>ft_hello_garden() takes 0 positional arguments but 1 was given</code>.
+      </div>
+    </section>
+
+    <section id="print">
+      <h2>2. print() &amp; expressions</h2>
+      <p><code>print()</code> writes what you give it to <strong>stdout</strong> (your terminal) as text.</p>
+
+      <h3>A string alone on a line</h3>
+      <p>A bare <code>"Hello"</code> inside a function is an <strong>expression statement</strong>: Python evaluates it, gets a value, and since nothing stores or uses that value, it is <strong>immediately discarded</strong>. Nothing is displayed.</p>
+
+      <h3>The docstring special case</h3>
+      <p>If a string literal is the <strong>very first statement</strong> of a function, it becomes the function's <strong>docstring</strong> (documentation). Anywhere else (middle, end) it is just a discarded expression.</p>
+<pre><code>def ft_hello_garden():
+    "Greets the garden community"   # docstring (first statement)
+    print("Hello, Garden Community!")
+    "I am just a discarded expression"  # not a docstring</code></pre>
+    </section>
+
+    <section id="input">
+      <h2>3. input() &amp; strings (Exercises 1 &amp; 2)</h2>
+      <p><code>input(prompt)</code> shows the prompt, waits for the user, and <strong>always returns a <code>str</code></strong>, whatever the user types.</p>
+<pre><code>x = input("Enter: ")   # user types 5
+type(x)                # &lt;class 'str'&gt;   (it is "5", not 5)</code></pre>
+      <div class="callout warn">
+        <strong>Why it matters</strong>
+        Strings cannot be multiplied together. Doing arithmetic on raw <code>input()</code> results crashes with a <code>TypeError</code>. Convert first.
+      </div>
+<pre><code>length = int(input("Enter length: "))   # str -> int
+name = input("Enter name: ")            # already a str, no str() needed</code></pre>
+      <p>Wrapping <code>input()</code> in <code>str()</code> is redundant: it already returns a string.</p>
+    </section>
+
+    <section id="types">
+      <h2>4. Types &amp; conversion</h2>
+      <p><code>"5"</code> and <code>5</code> look alike but are fundamentally different objects.</p>
+      <table>
+        <tr><th>Type</th><th>Holds</th><th>Example</th></tr>
+        <tr><td><code>int</code></td><td>Whole numbers</td><td><code>15</code>, <code>-3</code></td></tr>
+        <tr><td><code>float</code></td><td>Decimal numbers</td><td><code>3.14</code></td></tr>
+        <tr><td><code>str</code></td><td>Text</td><td><code>"tomato"</code></td></tr>
+        <tr><td><code>bool</code></td><td><code>True</code> or <code>False</code> (capitalised)</td><td><code>True</code></td></tr>
+      </table>
+      <div class="callout">
+        <strong>About bool</strong>
+        <code>bool</code> is its own type. Under the hood <code>True == 1</code> and <code>False == 0</code>, but a bool holds <code>True</code>/<code>False</code>, not "0 or 1".
+      </div>
+      <p>Conversion functions: <code>int()</code>, <code>float()</code>, <code>str()</code>, <code>bool()</code>.</p>
+    </section>
+
+    <section id="variables">
+      <h2>5. Variables &amp; evaluation order (Exercise 3)</h2>
+      <p>A <strong>variable</strong> is a name that refers to a value.</p>
+<pre><code>name = "user"
+number = 19</code></pre>
+
+      <h3>Step by step: summing three harvests</h3>
+<pre><code>total = int(input("Day 1 harvest: ")) + int(input("Day 2 harvest: ")) + int(input("Day 3 harvest: "))</code></pre>
+      <ol>
+        <li>First <code>input()</code> runs, user types, result converted with <code>int()</code>.</li>
+        <li>Second <code>input()</code> runs, converted with <code>int()</code>.</li>
+        <li>Third <code>input()</code> runs, converted with <code>int()</code>.</li>
+        <li>The three integers are added together.</li>
+        <li>The sum is stored in <code>total</code>.</li>
+      </ol>
+      <p>Evaluation goes <strong>left to right</strong>, and each <code>int()</code> conversion happens on each value <strong>individually</strong> before the addition.</p>
+    </section>
+
+    <section id="conditions">
+      <h2>6. if / else &amp; booleans (Exercises 4 &amp; 5)</h2>
+      <p>A <strong>comparison expression</strong> evaluates to a <code>bool</code>, and <code>if</code> uses that boolean to choose a branch.</p>
+<pre><code>age = 75
+age &gt; 60        # evaluates to True  (type: bool, NOT int)
+
+if age &gt; 60:
+    ...           # runs when True
+else:
+    ...           # runs when False</code></pre>
+
+      <table>
+        <tr><th>Operator</th><th>Meaning</th></tr>
+        <tr><td><code>&gt;</code></td><td>Strictly greater than</td></tr>
+        <tr><td><code>&gt;=</code></td><td>Greater than or equal to</td></tr>
+        <tr><td><code>&lt;</code> / <code>&lt;=</code></td><td>Strictly less / less or equal</td></tr>
+        <tr><td><code>==</code> / <code>!=</code></td><td>Equal / not equal</td></tr>
+      </table>
+
+      <div class="callout">
+        <strong>Boundary values matter</strong>
+        Exercise 4 says "strictly more than 60", so <code>&gt;</code> is required. A plant exactly 60 days old is <em>not</em> ready (<code>&gt;=</code> would wrongly accept it). Exercise 5 follows the same logic with "more than 2 days".
+      </div>
+    </section>
+
+    <section id="loops">
+      <h2>7. for loops &amp; range() (Exercise 6, iterative)</h2>
+      <p>A <code>for</code> loop is an <strong>iteration construct</strong>: it repeats a block once <em>for each</em> element of a sequence. (The condition-driven loop is <code>while</code>.)</p>
+      <p><code>range(start, stop)</code> produces numbers from <code>start</code> up to <strong><code>stop - 1</code></strong> (stop is excluded).</p>
+<pre><code>for i in range(1, 4):
+    print(i)
+# prints 1, 2, 3  (not 4)</code></pre>
+      <p>To count to <code>n</code> inclusive, use <code>range(1, n + 1)</code>.</p>
+    </section>
+
+    <section id="recursion">
+      <h2>8. Recursion (Exercise 6, recursive)</h2>
+      <p>A <strong>recursive</strong> function calls itself. Two ingredients are essential:</p>
+      <ol>
+        <li><strong>Base case</strong>: a condition that stops the recursion.</li>
+        <li><strong>Recursive call</strong>: the function calling itself on a smaller/closer problem.</li>
+      </ol>
+      <div class="callout warn">
+        <strong>No base case?</strong>
+        The function keeps calling itself until the call stack is exhausted: <code>RecursionError: maximum recursion depth exceeded</code>.
+      </div>
+      <p>Illustration on a different problem (countdown):</p>
+<pre><code>def countdown(n):
+    if n == 0:          # base case
+        return
+    print(n)
+    countdown(n - 1)    # recursive call, closer to the base case</code></pre>
+      <p>Acceptable approaches for exercise 6: a nested helper function, default parameter values, or a separate helper function. Both versions must produce identical output.</p>
+    </section>
+
+    <section id="hints">
+      <h2>9. Type hints (Exercise 7)</h2>
+<pre><code>def ft_seed_inventory(seed_type: str, quantity: int, unit: str) -&gt; None:</code></pre>
+      <table>
+        <tr><th>Part</th><th>Meaning</th></tr>
+        <tr><td><code>seed_type: str</code></td><td>Parameter is expected to be a string</td></tr>
+        <tr><td><code>quantity: int</code></td><td>Parameter is expected to be an integer</td></tr>
+        <tr><td><code>-&gt; None</code></td><td>The function returns nothing (it only prints)</td></tr>
+      </table>
+      <div class="callout">
+        <strong>Enforced at runtime?</strong>
+        <strong>No.</strong> Python ignores hints when running. They are informational and checked by external tools such as <strong>mypy</strong>.
+      </div>
+      <p>Exercise 7 also relies on <strong>string methods</strong> (e.g. capitalising the seed type) and on handling unsupported values by printing only <code>Unknown unit type</code>.</p>
+    </section>
+
+    <section id="mistakes">
+      <h2>10. Common mistakes to avoid</h2>
+      <table>
+        <tr><th>Topic</th><th class="wrong">Wrong idea</th><th class="right">Correct idea</th></tr>
+        <tr><td>Empty parentheses</td><td>"We can pass parameters if they exist"</td><td>The function takes <strong>no</strong> parameters</td></tr>
+        <tr><td>Bare string</td><td>"Considered a string if passed in an object"</td><td>An expression evaluated then <strong>discarded</strong> (docstring only if first)</td></tr>
+        <tr><td>bool</td><td>"0 or 1"</td><td><code>True</code> / <code>False</code> (own type)</td></tr>
+        <tr><td><code>age &gt; 60</code></td><td>Evaluates to <code>int</code></td><td>Evaluates to <code>bool</code></td></tr>
+        <tr><td>for loop</td><td>"Like a condition"</td><td>An iteration construct (repeats per element)</td></tr>
+        <tr><td><code>input()</code></td><td>Only "returns what the user typed"</td><td>Always returns a <code>str</code></td></tr>
+      </table>
+    </section>
+
+    <section id="cheatsheet">
+      <h2>11. Exercise cheat sheet</h2>
+      <table>
+        <tr><th>#</th><th>Function</th><th>Concept introduced</th></tr>
+        <tr><td>0</td><td><code>ft_hello_garden</code></td><td><code>def</code>, <code>print()</code>, calling a function</td></tr>
+        <tr><td>1</td><td><code>ft_garden_name</code></td><td><code>input()</code>, returns a string, fixed output text</td></tr>
+        <tr><td>2</td><td><code>ft_plot_area</code></td><td><code>int()</code> conversion, arithmetic, variables</td></tr>
+        <tr><td>3</td><td><code>ft_harvest_total</code></td><td>Multiple inputs, addition, evaluation order</td></tr>
+        <tr><td>4</td><td><code>ft_plant_age</code></td><td><code>if/else</code>, boolean comparison, strict <code>&gt;</code></td></tr>
+        <tr><td>5</td><td><code>ft_water_reminder</code></td><td>Conditionals with a threshold ("more than 2 days")</td></tr>
+        <tr><td>6</td><td><code>ft_count_harvest_*</code></td><td><code>for</code> + <code>range()</code>, recursion, base case</td></tr>
+        <tr><td>7</td><td><code>ft_seed_inventory</code></td><td>Type hints, <code>-&gt; None</code>, string methods, mypy</td></tr>
+      </table>
+      <p><span class="tag">Tip</span>Be ready to explain, trace, and modify your own code during the defense.</p>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

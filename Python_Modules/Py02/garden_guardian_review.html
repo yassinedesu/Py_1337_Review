@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Garden Guardian — Exception Handling Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0f0e;
+    --surface: #141917;
+    --border: #1e2b22;
+    --green: #4ade80;
+    --green-dim: #166534;
+    --red: #f87171;
+    --red-dim: #7f1d1d;
+    --yellow: #fbbf24;
+    --yellow-dim: #78350f;
+    --blue: #60a5fa;
+    --blue-dim: #1e3a5f;
+    --text: #e2ede6;
+    --text-muted: #6b7f72;
+    --accent: #4ade80;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  header {
+    border-left: 3px solid var(--green);
+    padding-left: 24px;
+    margin-bottom: 56px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  header .label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  header h1 span { color: var(--green); }
+
+  header p {
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  /* SCORE CARD */
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--green);
+    border-radius: 4px;
+    padding: 32px;
+    margin-bottom: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    animation: fadeDown 0.6s 0.1s ease both;
+  }
+
+  .score-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .score-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 72px;
+    font-weight: 800;
+    color: var(--green);
+    line-height: 1;
+  }
+
+  .score-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  .score-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .bar-item { display: flex; flex-direction: column; gap: 4px; }
+
+  .bar-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .bar-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  .bar-fill.green { background: var(--green); }
+  .bar-fill.red { background: var(--red); }
+  .bar-fill.yellow { background: var(--yellow); }
+
+  /* SECTIONS */
+  section {
+    margin-bottom: 48px;
+    animation: fadeDown 0.6s 0.2s ease both;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  .tag-correct { background: var(--green-dim); color: var(--green); }
+  .tag-wrong { background: var(--red-dim); color: var(--red); }
+  .tag-aware { background: var(--yellow-dim); color: var(--yellow); }
+  .tag-info { background: var(--blue-dim); color: var(--blue); }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .card.correct::before { background: var(--green); }
+  .card.wrong::before { background: var(--red); }
+  .card.aware::before { background: var(--yellow); }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .icon { font-size: 16px; }
+
+  .card p { color: #a8bfaf; font-size: 13px; }
+
+  /* CODE BLOCKS */
+  pre {
+    background: #0a0c0b;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  code { font-family: 'IBM Plex Mono', monospace; }
+
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .st { color: #c3e88d; }
+  .cm { color: #546e6b; font-style: italic; }
+  .cl { color: #ffcb6b; }
+  .num { color: #f78c6c; }
+
+  /* CLARIFICATION BOX */
+  .clarification {
+    background: var(--surface);
+    border: 1px solid var(--blue-dim);
+    border-left: 3px solid var(--blue);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+  }
+
+  .clarification .cl-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--blue);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .clarification p { color: #a8bfaf; font-size: 13px; }
+
+  /* DIVIDER */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .score-card { grid-template-columns: 1fr; }
+    .score-number { font-size: 56px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="label">Module 02 · Python Exception Handling</div>
+    <h1>Garden Guardian<br/><span>Knowledge Review</span></h1>
+    <p>A detailed breakdown of your understanding — what you nailed, what needs work, and what to review.</p>
+  </header>
+
+  <!-- SCORE CARD -->
+  <div class="score-card">
+    <div class="score-main">
+      <div class="score-number">68%</div>
+      <div class="score-label">Overall Understanding</div>
+      <p style="margin-top:16px; color: var(--text-muted); font-size:12px;">
+        Solid grasp of the mechanics. Core misconceptions in terminology and design philosophy pulled the score down. Concepts clicked quickly once explained.
+      </p>
+    </div>
+    <div class="score-breakdown">
+      <div class="bar-item">
+        <div class="bar-label"><span>Mechanics (try/except/raise)</span><span>80%</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:80%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label"><span>Design Philosophy</span><span>55%</span></div>
+        <div class="bar-track"><div class="bar-fill yellow" style="width:55%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label"><span>OOP / Inheritance</span><span>60%</span></div>
+        <div class="bar-track"><div class="bar-fill yellow" style="width:60%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label"><span>Misconceptions</span><span>35%</span></div>
+        <div class="bar-track"><div class="bar-fill red" style="width:35%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORRECT -->
+  <section>
+    <div class="section-header">
+      <span class="section-tag tag-correct">✓ Correct</span>
+      <span class="section-title">What You Got Right</span>
+    </div>
+
+    <div class="card correct">
+      <div class="card-title"><span class="icon">✓</span> Unhandled exceptions crash the program</div>
+      <p>You correctly identified that a raised exception without a handler causes the program to stop with a traceback. Solid foundation.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-title"><span class="icon">✓</span> <code>except Exception as e</code> is better than bare <code>except</code></div>
+      <p>You understood that catching without binding to a variable loses the error message — always use <code>as e</code> to preserve information.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-title"><span class="icon">✓</span> Exception propagation — understood after explanation</div>
+      <p>You grasped the call stack mechanism perfectly: Python checks each function for a handler, travels upward, and crashes if nothing catches it. You even summarized it clearly in your own words.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-title"><span class="icon">✓</span> Most specific <code>except</code> block must come first</div>
+      <p>You correctly identified that <code>ValueError</code> should precede <code>Exception</code>, since Python matches top-to-bottom and a broad catch would swallow everything below it.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-title"><span class="icon">✓</span> <code>finally</code> always executes — including before <code>return</code></div>
+      <p>After explanation you clearly understood: finally runs whether there's an error or not, and even intercepts a <code>return</code> statement before it completes. The file-closing analogy was spot on.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-title"><span class="icon">✓</span> Custom exceptions exist for domain specificity</div>
+      <p>You identified the right reason: built-in exceptions are generic. <code>PlantError</code> communicates intent and domain far better than a plain <code>ValueError</code>.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-title"><span class="icon">✓</span> Grouping exceptions with <code>(ValueError, TypeError)</code></div>
+      <p>You gave a concrete parser example — when both errors mean the same thing to the caller, grouping them avoids repetition. Good practical thinking.</p>
+    </div>
+  </section>
+
+  <hr/>
+
+  <!-- WRONG -->
+  <section>
+    <div class="section-header">
+      <span class="section-tag tag-wrong">✗ Needs Correction</span>
+      <span class="section-title">What Was Incorrect</span>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-title"><span class="icon">✗</span> "raise stops the program"</div>
+      <p>This was the most critical misconception. <code>raise</code> does NOT stop the program — it only signals that something went wrong. What happens next depends entirely on whether a <code>try/except</code> catches it.</p>
+      <pre><code><span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">"bad input"</span>)
+<span class="cm"># ↑ does NOT stop the program</span>
+<span class="cm"># it just throws the exception upward</span>
+<span class="cm"># except is what decides what happens next</span></code></pre>
+      <p>Think of it: <code>raise</code> = throw the ball. <code>except</code> = catch it. If no one catches it, it hits the floor (crash).</p>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-title"><span class="icon">✗</span> "We should always handle every exception"</div>
+      <p>Catching every exception with a broad <code>except Exception</code> can be worse than crashing. If a <code>NameError</code> or <code>IndexError</code> from a bug in your logic gets swallowed, your program keeps running with incorrect data — silently corrupting results. Sometimes a crash is the honest, correct behavior.</p>
+      <pre><code><span class="cm"># DANGEROUS — hides real bugs</span>
+<span class="kw">try</span>:
+    result = complex_sensor_calculation()
+<span class="kw">except</span> <span class="cl">Exception</span>:
+    <span class="fn">print</span>(<span class="st">"something went wrong"</span>)
+    <span class="cm"># program continues with wrong/missing data ← worse than crash</span></code></pre>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-title"><span class="icon">✗</span> Catching locally vs propagating — "no difference"</div>
+      <p>You initially said it made no difference whether you catch inside <code>input_temperature()</code> or in its caller. The key difference is <strong>separation of concerns</strong> and <strong>flexibility</strong>. A utility function shouldn't decide what the program does on failure — its callers have the context to make that decision, and different callers may want different behavior.</p>
+      <pre><code><span class="cm"># input_temperature catches internally → forces one fixed behavior for ALL callers</span>
+
+<span class="cm"># input_temperature raises → each caller decides:</span>
+<span class="kw">def</span> <span class="fn">irrigation</span>():
+    <span class="cm"># CRITICAL: stop everything</span>
+
+<span class="kw">def</span> <span class="fn">dashboard</span>():
+    <span class="cm"># NON-CRITICAL: just skip this reading</span></code></pre>
+      <p>Rule: <strong>Low-level functions raise. High-level functions handle.</strong></p>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-title"><span class="icon">✗</span> <code>except GardenError</code> catches only GardenError itself</div>
+      <p>You said it would only catch <code>GardenError</code>, not its subclasses. In Python, exception catching respects inheritance — catching a parent catches all its children too. <code>PlantError</code> and <code>WaterError</code> ARE <code>GardenError</code>s.</p>
+      <pre><code><span class="kw">class</span> <span class="cl">PlantError</span>(<span class="cl">GardenError</span>): <span class="kw">pass</span>
+
+<span class="kw">try</span>:
+    <span class="kw">raise</span> <span class="cl">PlantError</span>(<span class="st">"wilting!"</span>)
+<span class="kw">except</span> <span class="cl">GardenError</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(e)  <span class="cm"># ← this DOES catch it</span></code></pre>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-title"><span class="icon">✗</span> Polymorphism confused with inheritance</div>
+      <p>You initially described polymorphism as "subclass inherits from parent" — that's inheritance. Polymorphism is specifically when <strong>different subclasses are treated as their parent type but respond differently</strong>. Inheritance is the mechanism; polymorphism is the behavior that results.</p>
+      <pre><code><span class="cm"># Inheritance: Dog gets everything from Animal</span>
+<span class="cm"># Polymorphism: Dog and Cat are both treated as Animal,</span>
+<span class="cm">#               but speak() behaves differently for each</span>
+
+animals: <span class="fn">list</span>[<span class="cl">Animal</span>] = [<span class="cl">Dog</span>(), <span class="cl">Cat</span>()]
+<span class="kw">for</span> a <span class="kw">in</span> animals:
+    a.speak()  <span class="cm"># same call, different result — that's polymorphism</span></code></pre>
+    </div>
+  </section>
+
+  <hr/>
+
+  <!-- AWARE -->
+  <section>
+    <div class="section-header">
+      <span class="section-tag tag-aware">⚠ Be Aware</span>
+      <span class="section-title">Things to Review & Watch Out For</span>
+    </div>
+
+    <div class="card aware">
+      <div class="card-title"><span class="icon">⚠</span> An exception is an object, not just a condition</div>
+      <p>In Python, exceptions are <strong>instances of classes</strong>. When you write <code>raise ValueError("bad input")</code>, you're creating an object of type <code>ValueError</code> with a message attribute. This is why you can access <code>str(e)</code>, why you can subclass them, and why <code>except ValueError as e</code> binds that object to <code>e</code>.</p>
+    </div>
+
+    <div class="card aware">
+      <div class="card-title"><span class="icon">⚠</span> <code>try/except</code> vs <code>if/else</code> — not just about crashes</div>
+      <p>Your answer focused on "preventing crashes." But the deeper advantage is that <code>try/except</code> keeps your happy-path code clean and uncluttered. With <code>if/else</code>, you must check return values at every call site. With exceptions, errors announce themselves — they cannot be silently ignored.</p>
+    </div>
+
+    <div class="card aware">
+      <div class="card-title"><span class="icon">⚠</span> <code>finally</code> runs even when exception is NOT caught</div>
+      <p>You understood finally runs on success and caught errors. Don't forget: if an exception propagates all the way up uncaught and the program is about to crash, <code>finally</code> <strong>still runs first</strong>. This guarantees cleanup even in worst-case scenarios.</p>
+    </div>
+
+    <div class="card aware">
+      <div class="card-title"><span class="icon">⚠</span> mypy and type hints are required — don't skip them</div>
+      <p>The module requires type hints on all functions and mypy compliance. Pay special attention to return types when exceptions are possible — a function that raises should still declare its return type for the happy path. mypy will also flag intentional TypeError code (Exercise 2) — that's expected and acceptable.</p>
+    </div>
+
+    <div class="card aware">
+      <div class="card-title"><span class="icon">⚠</span> flake8 compliance — watch your formatting</div>
+      <p>All code must pass flake8. Common pitfalls: lines over 79 characters, missing blank lines between functions, trailing whitespace, and unused imports. Run <code>flake8 yourfile.py</code> before submitting.</p>
+    </div>
+  </section>
+
+  <hr/>
+
+  <!-- CLARIFICATIONS -->
+  <section>
+    <div class="section-header">
+      <span class="section-tag tag-info">ℹ Clarifications</span>
+      <span class="section-title">Key Concepts to Internalize</span>
+    </div>
+
+    <div class="clarification">
+      <div class="cl-title">The Exception Hierarchy in Python</div>
+      <p>All exceptions inherit from <code>BaseException</code>. Most you'll use inherit from <code>Exception</code>. <code>KeyboardInterrupt</code> and <code>SystemExit</code> inherit from <code>BaseException</code> directly — this is why bare <code>except:</code> is dangerous, it catches those too.</p>
+      <pre><code>BaseException
+├── KeyboardInterrupt  <span class="cm"># Ctrl+C</span>
+├── SystemExit         <span class="cm"># sys.exit()</span>
+└── Exception          <span class="cm"># ← everything you'll normally use</span>
+    ├── ValueError
+    ├── TypeError
+    ├── FileNotFoundError
+    └── GardenError    <span class="cm"># your custom ones live here</span>
+        ├── PlantError
+        └── WaterError</code></pre>
+    </div>
+
+    <div class="clarification">
+      <div class="cl-title">The Golden Rule of Exception Handling</div>
+      <p>Catch exceptions at the level where you can <strong>meaningfully respond</strong> to them. If you can't do anything useful with an exception where it's raised — let it propagate. Don't catch what you can't handle.</p>
+    </div>
+
+    <div class="clarification">
+      <div class="cl-title">Custom Exception Default Messages</div>
+      <p>Exercise 3 requires a default message when none is provided. The standard pattern:</p>
+      <pre><code><span class="kw">class</span> <span class="cl">PlantError</span>(<span class="cl">GardenError</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, message: <span class="cl">str</span> = <span class="st">"Unknown plant error"</span>) -> <span class="kw">None</span>:
+        <span class="kw">super</span>().<span class="fn">__init__</span>(message)</code></pre>
+    </div>
+  </section>
+
+  <footer>
+    Garden Guardian · Module 02 · Python Exception Handling &nbsp;·&nbsp; Review generated May 2026
+  </footer>
+
+</div>
+</body>
+</html>

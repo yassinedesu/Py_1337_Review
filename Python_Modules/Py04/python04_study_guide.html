@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Python04 Study Guide — File I/O, Streams &amp; Context Managers</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:#0b0e14; --surface:#12161f; --surface2:#171c28; --border:#222a3b;
+    --accent:#00e5ff; --green:#a8ff78; --red:#ff4f6d; --warn:#ffb830; --violet:#c792ea;
+    --text:#c9d1e0; --muted:#6b7794; --heading:#edf0f7;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:'Syne',system-ui,-apple-system,Segoe UI,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.75;font-size:15px}
+
+  .layout{display:grid;grid-template-columns:250px minmax(0,1fr);max-width:1180px;margin:0 auto;gap:48px;padding:48px 24px 96px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}.toc{position:static!important;max-height:none!important}}
+
+  /* TOC */
+  .toc{position:sticky;top:32px;align-self:start;max-height:calc(100vh - 64px);overflow:auto;padding-right:8px}
+  .toc .brand{font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .toc h2{font-size:20px;font-weight:800;color:var(--heading);line-height:1.2;margin-bottom:22px}
+  .toc ol{list-style:none;counter-reset:t;border-left:1px solid var(--border)}
+  .toc li{counter-increment:t}
+  .toc a{display:block;padding:6px 0 6px 16px;color:var(--muted);text-decoration:none;font-size:13px;border-left:2px solid transparent;margin-left:-1px;transition:.15s}
+  .toc a::before{content:counter(t,decimal-leading-zero) "  ";font-family:var(--mono);font-size:11px;color:var(--border)}
+  .toc a:hover{color:var(--heading);border-left-color:var(--accent)}
+
+  /* Main */
+  main{min-width:0}
+  .hero{border-left:3px solid var(--accent);padding-left:20px;margin-bottom:48px}
+  .hero .tag{font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent)}
+  .hero h1{font-size:clamp(28px,5vw,44px);font-weight:800;color:var(--heading);line-height:1.1;margin:8px 0 10px}
+  .hero p{color:var(--muted);max-width:620px}
+
+  section{margin-bottom:64px;scroll-margin-top:24px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+  .sec-head .n{font-family:var(--mono);font-size:13px;color:var(--accent)}
+  .sec-head h2{font-size:26px;font-weight:800;color:var(--heading);line-height:1.2}
+  h3{font-size:16px;font-weight:600;color:var(--heading);margin:26px 0 8px}
+  p{margin-bottom:12px}
+  ul,ol.plain{margin:0 0 14px 22px}
+  li{margin-bottom:5px}
+  strong{color:var(--heading)}
+  em{color:var(--heading)}
+
+  code{font-family:var(--mono);font-size:.86em;background:#1a2030;color:var(--accent);padding:1px 6px;border-radius:4px}
+  pre{background:#080b11;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0 18px;overflow-x:auto;line-height:1.65}
+  pre code{background:none;padding:0;color:#d3dbea;font-size:12.5px;display:block;white-space:pre}
+  .cap{font-family:var(--mono);font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:16px 0 -6px}
+
+  .callout{border:1px solid var(--border);border-left-width:3px;border-radius:8px;padding:14px 18px;margin:16px 0;background:var(--surface)}
+  .callout .t{font-family:var(--mono);font-size:10.5px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+  .callout p:last-child{margin-bottom:0}
+  .c-key{border-left-color:var(--accent)} .c-key .t{color:var(--accent)}
+  .c-bad{border-left-color:var(--red)} .c-bad .t{color:var(--red)}
+  .c-ok{border-left-color:var(--green)} .c-ok .t{color:var(--green)}
+  .c-warn{border-left-color:var(--warn)} .c-warn .t{color:var(--warn)}
+
+  table{width:100%;border-collapse:collapse;margin:12px 0 20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:13.5px}
+  th{font-family:var(--mono);font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 14px;background:var(--surface2)}
+  td{padding:10px 14px;border-top:1px solid var(--border);vertical-align:top}
+  .scroll{overflow-x:auto}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+  .card h4{font-size:14px;color:var(--heading);margin-bottom:6px}
+  .card p{font-size:13.5px;margin-bottom:6px}
+
+  /* flow diagram */
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0 20px}
+  .flow .box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-family:var(--mono);font-size:12px;color:var(--heading)}
+  .flow .box small{display:block;color:var(--muted);font-size:10.5px}
+  .flow .arr{color:var(--muted);font-family:var(--mono)}
+
+  /* tree */
+  .tree{font-family:var(--mono);font-size:12.5px;background:#080b11;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:12px 0 18px;line-height:1.9;overflow-x:auto;white-space:pre;color:#d3dbea}
+  .tree .hl{color:var(--green)} .tree .hr{color:var(--red)} .tree .dim{color:var(--muted)}
+
+  /* Q&A */
+  details{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:10px}
+  summary{cursor:pointer;padding:13px 18px;font-weight:600;color:var(--heading);list-style:none;display:flex;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"Q";font-family:var(--mono);font-size:11px;color:var(--bg);background:var(--accent);border-radius:4px;padding:1px 7px;height:fit-content;margin-top:3px}
+  details[open] summary{border-bottom:1px solid var(--border)}
+  details .ans{padding:14px 18px 6px}
+
+  .check{list-style:none;margin-left:0}
+  .check li{padding:8px 0 8px 32px;position:relative;border-bottom:1px dashed var(--border)}
+  .check li::before{content:"";position:absolute;left:4px;top:13px;width:14px;height:14px;border:1.5px solid var(--green);border-radius:3px}
+
+  footer{border-top:1px solid var(--border);padding-top:20px;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center}
+  @media print{body{background:#fff;color:#111}.toc{display:none}.layout{display:block}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ============ TOC ============ -->
+<nav class="toc">
+  <div class="brand">python04</div>
+  <h2>Data Archivist<br/>Study Guide</h2>
+  <ol>
+    <li><a href="#overview">The big picture</a></li>
+    <li><a href="#fileobj">File objects &amp; open()</a></li>
+    <li><a href="#modes">Modes &amp; encoding</a></li>
+    <li><a href="#exceptions">Exceptions in file I/O</a></li>
+    <li><a href="#leaks">Resource leaks &amp; the None pattern</a></li>
+    <li><a href="#with">Context managers &amp; with</a></li>
+    <li><a href="#streams">stdin, stdout, stderr</a></li>
+    <li><a href="#text">Transforming text</a></li>
+    <li><a href="#exercises">The four exercises</a></li>
+    <li><a href="#quirks">Python quirks</a></li>
+    <li><a href="#corrections">Corrections &amp; pitfalls</a></li>
+    <li><a href="#qa">Defense Q&amp;A</a></li>
+    <li><a href="#checklist">Final checklist</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<div class="hero">
+  <div class="tag">Python 04 · Cyber Archives</div>
+  <h1>File I/O, Streams &amp; Context Managers</h1>
+  <p>Everything covered in our review session, explained from the ground up: what each concept is, why it exists, how it appears in your four exercises, and what an evaluator is likely to ask.</p>
+</div>
+
+<!-- ============ 1 ============ -->
+<section id="overview">
+  <div class="sec-head"><span class="n">01</span><h2>The big picture</h2></div>
+  <p>The module teaches one idea in four layers. Each exercise adds a layer on top of the previous one.</p>
+  <div class="scroll"><table>
+    <tr><th>Exercise</th><th>New concept</th><th>The question it answers</th></tr>
+    <tr><td><code>ex0</code> ft_ancient_text</td><td><code>open()</code>, <code>read()</code>, <code>close()</code>, <code>sys.argv</code>, <code>try/except</code></td><td>How do I read a file and survive failure?</td></tr>
+    <tr><td><code>ex1</code> ft_archive_creation</td><td>Writing files, <code>"w"</code> mode, <code>input()</code></td><td>How do I create or overwrite a file?</td></tr>
+    <tr><td><code>ex2</code> ft_stream_management</td><td><code>sys.stdin</code>, <code>sys.stdout</code>, <code>sys.stderr</code>, <code>flush()</code></td><td>Where does output really go, and why separate errors?</td></tr>
+    <tr><td><code>ex3</code> ft_vault_security</td><td><code>with</code> statement, return-a-tuple error handling</td><td>How do I guarantee the file is closed, always?</td></tr>
+  </table></div>
+  <div class="callout c-key"><div class="t">Core thread</div>
+  <p>A file is a <strong>resource</strong> owned by the operating system. You must acquire it, use it, and release it, even when something fails halfway. Every concept below serves that single idea.</p></div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="fileobj">
+  <div class="sec-head"><span class="n">02</span><h2>File objects &amp; <code>open()</code></h2></div>
+
+  <div class="callout c-bad"><div class="t">The most common misconception</div>
+  <p><code>open()</code> does <strong>not</strong> return the file's contents and it never returns <code>None</code> on failure. It returns a <strong>file object</strong>, a handle to the file. If it fails, it <em>raises an exception</em>.</p></div>
+
+  <div class="flow">
+    <div class="box">open("f.txt")<small>returns a handle</small></div><span class="arr">→</span>
+    <div class="box">file.read()<small>returns a str</small></div><span class="arr">→</span>
+    <div class="box">file.close()<small>releases the OS resource</small></div>
+  </div>
+
+  <pre><code>file = open("f.txt")     # file object (io.TextIOWrapper)
+content = file.read()    # str: the actual text
+file.close()             # give the handle back to the OS</code></pre>
+
+  <h3>What type is it, exactly?</h3>
+  <ul>
+    <li>In text mode the concrete type is <code>io.TextIOWrapper</code>.</li>
+    <li><code>typing.IO[str]</code> is an <em>abstract</em> type hint for "any text file-like object". <code>TextIOWrapper</code> satisfies it, so it is a correct and idiomatic annotation.</li>
+    <li>In binary mode (<code>"rb"</code>) the object is a <code>BufferedReader</code> and <code>read()</code> returns <code>bytes</code>, not <code>str</code>.</li>
+  </ul>
+
+  <h3>Useful methods</h3>
+  <div class="scroll"><table>
+    <tr><th>Method</th><th>Does</th></tr>
+    <tr><td><code>read()</code></td><td>Entire remaining content as one string</td></tr>
+    <tr><td><code>readline()</code></td><td>One line, including its trailing <code>\n</code>; returns <code>""</code> at end of file</td></tr>
+    <tr><td><code>write(s)</code></td><td>Writes a string; returns the number of characters written</td></tr>
+    <tr><td><code>flush()</code></td><td>Pushes buffered data out immediately</td></tr>
+    <tr><td><code>close()</code></td><td>Flushes, then releases the OS file descriptor</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="modes">
+  <div class="sec-head"><span class="n">03</span><h2>Modes &amp; encoding</h2></div>
+  <p>When you call <code>open("f")</code> with no arguments, you get mode <code>"r"</code> (read, text) and an encoding taken from the system locale (usually UTF-8, but not guaranteed).</p>
+
+  <div class="scroll"><table>
+    <tr><th>Mode</th><th>Meaning</th><th>If file missing</th><th>If file exists</th></tr>
+    <tr><td><code>"r"</code></td><td>Read text (default)</td><td>FileNotFoundError</td><td>Opens at the start</td></tr>
+    <tr><td><code>"w"</code></td><td>Write text</td><td>Creates it</td><td><strong>Erases</strong> content immediately</td></tr>
+    <tr><td><code>"a"</code></td><td>Append text</td><td>Creates it</td><td>Writes at the end</td></tr>
+    <tr><td><code>"x"</code></td><td>Exclusive create</td><td>Creates it</td><td>FileExistsError</td></tr>
+    <tr><td><code>"b"</code></td><td>Binary flag, e.g. <code>"rb"</code></td><td colspan="2">Gives <code>bytes</code> instead of <code>str</code></td></tr>
+  </table></div>
+
+  <div class="callout c-warn"><div class="t">Be aware</div>
+  <p><code>"w"</code> truncates the file the moment <code>open()</code> succeeds, before you write anything. That is why exercise 1 says "create the file or replace it if it already exists".</p></div>
+
+  <h3>Explicit encoding</h3>
+  <pre><code>open("f.txt", encoding="utf-8")   # portable across machines</code></pre>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="exceptions">
+  <div class="sec-head"><span class="n">04</span><h2>Exceptions in file I/O</h2></div>
+  <p>File operations fail for many reasons. Python groups them in a hierarchy, and knowing the tree tells you what your <code>except</code> clause really catches.</p>
+
+<div class="tree"><span class="dim">Exception</span>
+├── <span class="hl">OSError</span>                      <span class="dim"># OS-level failures</span>
+│   ├── FileNotFoundError        <span class="dim"># [Errno 2]  No such file or directory</span>
+│   ├── PermissionError          <span class="dim"># [Errno 13] Permission denied</span>
+│   ├── IsADirectoryError        <span class="dim"># tried to open a directory as a file</span>
+│   └── FileExistsError          <span class="dim"># mode "x" on an existing file</span>
+└── ValueError
+    └── <span class="hr">UnicodeDecodeError</span>      <span class="dim"># NOT an OSError: bytes can't be decoded as text</span></div>
+
+  <div class="callout c-bad"><div class="t">The trap</div>
+  <p><code>except OSError</code> does <strong>not</strong> catch everything. Reading a binary file (an image, a compiled program) in text mode raises <code>UnicodeDecodeError</code>. <code>open()</code> succeeds, <code>read()</code> blows up, and your <code>except OSError</code> never sees it.</p></div>
+
+  <h3>try / except / else / finally</h3>
+  <div class="scroll"><table>
+    <tr><th>Block</th><th>Runs when</th></tr>
+    <tr><td><code>try</code></td><td>Always first</td></tr>
+    <tr><td><code>except X</code></td><td>The try block raised an exception matching X</td></tr>
+    <tr><td><code>else</code></td><td>The try block raised nothing</td></tr>
+    <tr><td><code>finally</code></td><td><strong>Always</strong>, even on <code>return</code> or an uncaught exception</td></tr>
+  </table></div>
+
+  <p>The error message in your output (<code>[Errno 2] No such file or directory: 'foo'</code>) is simply <code>str(e)</code> of the caught exception.</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="leaks">
+  <div class="sec-head"><span class="n">05</span><h2>Resource leaks &amp; the <code>None</code> pattern</h2></div>
+
+  <h3>Why initialize <code>file</code> to <code>None</code>?</h3>
+  <pre><code>file: typing.IO[str] | None = None
+try:
+    file = open(filename)      # if THIS raises, file keeps its None value
+    content = file.read()
+except OSError as e:
+    ...
+finally:
+    if file is not None:       # safe: only close what was actually opened
+        file.close()</code></pre>
+  <p>Without the pre-initialization, a failing <code>open()</code> leaves <code>file</code> undefined, and any later reference to it raises <code>NameError</code> (more precisely <code>UnboundLocalError</code> inside a function). The <code>| None</code> in the annotation tells <code>mypy</code> that the variable may legitimately be empty.</p>
+
+  <div class="callout c-key"><div class="t">In your ex0–ex2</div>
+  <p>Because you <code>return</code> inside the <code>except</code>, <code>file.close()</code> is only reached after a successful open, so the <code>None</code> initialization is technically redundant there. It becomes essential the moment you use a <code>finally</code> block.</p></div>
+
+  <h3>Where your ex0–ex2 still leak</h3>
+  <pre><code>try:
+    file = open(filename)          # succeeds, handle is now open
+    print(file.read(), end="")     # UnicodeDecodeError raised here
+except OSError as e:               # wrong exception type, not caught
+    ...
+file.close()                       # never reached, handle leaks</code></pre>
+
+  <h3>The fix without <code>with</code> (allowed in ex0–ex2)</h3>
+  <p>The subject forbids <code>with</code> until exercise 3, so the correct older pattern is <code>try/except/finally</code>:</p>
+  <pre><code>def read_file(filename: str) -> str | None:
+    file: typing.IO[str] | None = None
+    try:
+        file = open(filename)
+        content: str = file.read()
+    except (OSError, ValueError) as e:        # ValueError covers UnicodeDecodeError
+        sys.stderr.write(f"[STDERR] Error opening file '{filename}': {e}\n")
+        return None
+    finally:
+        if file is not None:
+            file.close()
+            print(f"File '{filename}' closed.")
+    return content</code></pre>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="with">
+  <div class="sec-head"><span class="n">06</span><h2>Context managers &amp; <code>with</code></h2></div>
+  <p>The <code>with</code> statement works through a <strong>protocol</strong> made of two special methods. It isn't magic: any object that defines them can be used in a <code>with</code>.</p>
+
+  <div class="grid2">
+    <div class="card"><h4><code>__enter__(self)</code></h4><p>Runs when the block is entered. Its return value is what <code>as name</code> binds. For files it returns the file object itself.</p></div>
+    <div class="card"><h4><code>__exit__(self, exc_type, exc, tb)</code></h4><p>Runs when the block ends <em>for any reason</em>: normal end, <code>return</code>, <code>break</code>, or an exception. For files it calls <code>close()</code>.</p></div>
+  </div>
+
+  <h3>What it really expands to</h3>
+  <pre><code>with open("f.txt") as file:
+    content = file.read()
+
+# is roughly equivalent to:
+file = open("f.txt")
+try:
+    content = file.read()
+finally:
+    file.close()          # __exit__ does this, always</code></pre>
+
+  <div class="callout c-ok"><div class="t">The single most important takeaway</div>
+  <p><code>with</code> gives a <strong>guarantee</strong>: the cleanup runs no matter how the block exits. A plain <code>try/except</code> only protects against the exception types you listed; <code>with</code> (like <code>finally</code>) protects against all of them.</p></div>
+
+  <h3>Subtle points</h3>
+  <ul>
+    <li>A <code>return</code> inside a <code>with</code> block still triggers <code>__exit__</code>, which is why your ex3 can <code>return (True, file.read())</code> safely.</li>
+    <li><code>with</code> does <strong>not</strong> swallow exceptions by itself. If <code>open()</code> fails or <code>read()</code> raises, the exception still propagates after the file is closed, so you still need <code>try/except</code> around it.</li>
+    <li>If <code>open()</code> itself fails, there is no file to close, so <code>__exit__</code> is never called. That is why <code>with</code> needs no <code>None</code> initialization.</li>
+  </ul>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="streams">
+  <div class="sec-head"><span class="n">07</span><h2>stdin, stdout, stderr</h2></div>
+  <p>Every process starts with three open streams. They are file objects too, which is why <code>sys.stdout.write()</code> and <code>file.write()</code> look identical.</p>
+
+  <div class="scroll"><table>
+    <tr><th>Stream</th><th>fd</th><th>Python</th><th>Purpose</th></tr>
+    <tr><td>Standard input</td><td>0</td><td><code>sys.stdin</code></td><td>Data coming in (keyboard or a pipe)</td></tr>
+    <tr><td>Standard output</td><td>1</td><td><code>sys.stdout</code></td><td>Normal results</td></tr>
+    <tr><td>Standard error</td><td>2</td><td><code>sys.stderr</code></td><td>Diagnostics and errors</td></tr>
+  </table></div>
+
+  <h3>Why separate stdout and stderr?</h3>
+  <p>In a plain terminal they look the same. The difference appears when the user <strong>redirects</strong>:</p>
+  <pre><code>python3 prog.py foo  > out.txt        # stdout to file, errors STILL show on screen
+python3 prog.py foo 2> err.txt        # errors to file, results stay on screen
+python3 prog.py foo  > out.txt 2>&amp;1   # both into the same file</code></pre>
+  <p>Errors that vanish silently into an output file would be dangerous, and results mixed with error text would corrupt anything piped into another program.</p>
+
+  <h3>Reading input without <code>input()</code></h3>
+  <pre><code>def get_user_input(prompt: str) -> str:
+    sys.stdout.write(prompt)
+    sys.stdout.flush()
+    return sys.stdin.readline().rstrip("\n")</code></pre>
+  <ul>
+    <li><code>sys.stdin.readline()</code> keeps the trailing <code>\n</code>, so you strip it. <code>rstrip("\n")</code> is more precise than <code>strip()</code>, which would also eat meaningful leading or trailing spaces in a file name.</li>
+    <li>At end of input (Ctrl-D) <code>readline()</code> returns <code>""</code>, which your code treats as "empty, don't save".</li>
+  </ul>
+
+  <h3>Buffering and <code>flush()</code></h3>
+  <p>Python does not send every character to the screen instantly. Output waits in a <strong>buffer</strong> and is sent in chunks. On a terminal, stdout is <em>line-buffered</em>: the buffer is emptied when a newline is written.</p>
+  <div class="callout c-warn"><div class="t">Why your prompt needs flush</div>
+  <p>A prompt like <code>"Enter new file name (or empty): "</code> has <strong>no trailing newline</strong>, so it can sit in the buffer while <code>readline()</code> already waits for the user, who sees nothing. <code>flush()</code> forces it out first. The built-in <code>input()</code> flushes for you; <code>sys.stdout.write()</code> does not.</p></div>
+  <p><code>stderr</code> is unbuffered or line-buffered by design, so error messages appear immediately.</p>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="text">
+  <div class="sec-head"><span class="n">08</span><h2>Transforming text &amp; the <code>splitlines()</code> trap</h2></div>
+
+  <pre><code>"a\nb\nc\n".splitlines()   # ['a', 'b', 'c']        trailing \n is dropped
+"a\nb\nc\n".split("\n")   # ['a', 'b', 'c', '']    leaves an empty last item</code></pre>
+
+  <p>Your <code>transform_content</code> joins the lines back with <code>"\n"</code>, so a file that ended with a newline loses it:</p>
+  <pre><code>"\n".join(l + "#" for l in "a\nb\n".splitlines())
+# 'a#\nb#'          &lt;- no final newline, differs from the original</code></pre>
+
+  <div class="cap">Fix</div>
+  <pre><code>def transform_content(content: str) -> str:
+    result: str = "\n".join(line + "#" for line in content.splitlines())
+    if content.endswith("\n"):
+        result += "\n"
+    return result</code></pre>
+
+  <div class="callout c-key"><div class="t">Know the difference</div>
+  <p><code>splitlines()</code> understands <code>\n</code>, <code>\r\n</code> and <code>\r</code>. <code>split("\n")</code> only understands <code>\n</code>. Pick on purpose.</p></div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="exercises">
+  <div class="sec-head"><span class="n">09</span><h2>The four exercises</h2></div>
+
+  <h3>ex0: Ancient Text Recovery</h3>
+  <ul>
+    <li>Argument check: <code>len(sys.argv) != 2</code> prints the usage line. <code>sys.argv[0]</code> is the script name.</li>
+    <li>Open, read, print between <code>---</code> markers, close, print the closing message.</li>
+    <li>Failures (missing file, permission denied) print a message and stop cleanly.</li>
+    <li><strong>Watch:</strong> catch more than <code>OSError</code> if you want the handle to never leak; use <code>finally</code>.</li>
+  </ul>
+
+  <h3>ex1: Archive Creation</h3>
+  <ul>
+    <li>Reuses ex0, then transforms (append <code>#</code> per line), shows the result, asks for a destination.</li>
+    <li>An empty answer means "do not save". A name means open with <code>"w"</code> and write.</li>
+    <li><strong>Watch:</strong> the trailing newline preserved by <code>transform_content</code>.</li>
+  </ul>
+
+  <h3>ex2: Stream Management</h3>
+  <ul>
+    <li>Errors go to <code>sys.stderr</code> with the <code>[STDERR]</code> prefix.</li>
+    <li>Input comes from <code>sys.stdin.readline()</code>, prompt written with <code>sys.stdout.write()</code> plus <code>flush()</code>.</li>
+    <li>On a failed save, also print <code>Data not saved.</code> (stdout).</li>
+  </ul>
+
+  <h3>ex3: Vault Security</h3>
+  <p>A reusable function that never raises and always returns <code>(success, text)</code>:</p>
+  <pre><code>ALLOWED_MODES: set[str] = {"r", "w"}
+
+
+def secure_archive(
+    filename: str, mode: str = "r", content: str = ""
+) -> tuple[bool, str]:
+    """Read or write a file safely. Returns (ok, content_or_error)."""
+    if mode not in ALLOWED_MODES:
+        return (False, f"Invalid mode '{mode}': use 'r' or 'w'")
+    try:
+        with open(filename, mode) as file:
+            if mode == "r":
+                return (True, file.read())
+            file.write(content)
+            return (True, "Content successfully written to file")
+    except (OSError, ValueError) as e:
+        return (False, str(e))</code></pre>
+  <div class="callout c-warn"><div class="t">Why two changes from your version</div>
+  <p><strong>Mode validation:</strong> without it, <code>"rb"</code> would make <code>read()</code> return <code>bytes</code>, breaking the <code>tuple[bool, str]</code> promise, and <code>"x"</code> or <code>"a"</code> would behave unexpectedly. <strong>Catching <code>ValueError</code> too:</strong> your function promises it never raises, but reading a binary file would raise <code>UnicodeDecodeError</code> straight through <code>except OSError</code>. The file would still be closed by <code>with</code>, but the caller would crash.</p></div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="quirks">
+  <div class="sec-head"><span class="n">10</span><h2>Python quirks from your code</h2></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4><code>end=None</code> is not "no newline"</h4>
+      <p><code>None</code> means "use the default", and the default is <code>"\n"</code>.</p>
+      <pre><code>print("hi", end=None)  # hi + newline
+print("hi", end="")    # hi, no newline</code></pre>
+    </div>
+    <div class="card">
+      <h4>Implicit string concatenation</h4>
+      <p>Adjacent literals are joined at compile time.</p>
+      <pre><code>"" "to write"      # 'to write'
+"Hello" " world"   # 'Hello world'</code></pre>
+      <p>Harmless in your ex3, but the leading <code>""</code> is dead code.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 ============ -->
+<section id="corrections">
+  <div class="sec-head"><span class="n">11</span><h2>Corrections &amp; pitfalls</h2></div>
+
+  <div class="callout c-bad"><div class="t">Correction to something said earlier in our session</div>
+  <p>I previously said <code>print()</code> flushes automatically while <code>sys.stdout.write()</code> does not. That was imprecise. <code>print()</code> has <code>flush=False</code> by default; it only <em>appears</em> to flush on a terminal because its trailing newline triggers line-buffering. The built-in <code>input()</code> is the one that flushes the prompt. The practical advice stands: when you write a prompt without a newline, call <code>flush()</code>.</p></div>
+
+  <div class="scroll"><table>
+    <tr><th>Misconception</th><th>Reality</th></tr>
+    <tr><td><code>open()</code> returns the file content or <code>None</code></td><td>It returns a file object, or raises an exception</td></tr>
+    <tr><td><code>OSError</code> catches every file problem</td><td>Decoding errors are <code>ValueError</code> subclasses</td></tr>
+    <tr><td>stdout and stderr are the same thing</td><td>Same terminal, but independent under redirection</td></tr>
+    <tr><td><code>end=None</code> removes the newline</td><td>Only <code>end=""</code> does</td></tr>
+    <tr><td><code>splitlines()</code> keeps the final newline</td><td>It silently drops it</td></tr>
+    <tr><td><code>with</code> catches exceptions</td><td>It only guarantees cleanup; the exception still propagates</td></tr>
+    <tr><td>Initializing <code>file = None</code> is "just a type hint"</td><td>It is a real assignment that keeps the name defined</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ 12 ============ -->
+<section id="qa">
+  <div class="sec-head"><span class="n">12</span><h2>Defense Q&amp;A</h2></div>
+  <p>Click each question and try to answer out loud before opening it.</p>
+
+  <details><summary>What does <code>open()</code> return, and what happens on failure?</summary>
+    <div class="ans"><p>A file object (<code>io.TextIOWrapper</code> in text mode). On failure it raises an <code>OSError</code> subclass such as <code>FileNotFoundError</code> or <code>PermissionError</code>. It never returns <code>None</code>.</p></div></details>
+
+  <details><summary>Why can a file leak even if you wrote try/except?</summary>
+    <div class="ans"><p>Because <code>except</code> only handles the exception types listed. If <code>read()</code> raises something else (e.g. <code>UnicodeDecodeError</code>), the code after the try/except, including <code>close()</code>, is skipped. A <code>finally</code> block or <code>with</code> closes regardless.</p></div></details>
+
+  <details><summary>What are <code>__enter__</code> and <code>__exit__</code>?</summary>
+    <div class="ans"><p>The context manager protocol. <code>__enter__</code> runs on entering the <code>with</code> block and supplies the <code>as</code> value. <code>__exit__</code> runs on leaving it, whether normally, via <code>return</code>, or through an exception. For files it closes the handle.</p></div></details>
+
+  <details><summary>Why initialize <code>file</code> to <code>None</code> before the <code>try</code>?</summary>
+    <div class="ans"><p>So the name exists even if <code>open()</code> fails, allowing a safe <code>if file is not None: file.close()</code> in <code>finally</code>. Without it you could hit a <code>NameError</code>.</p></div></details>
+
+  <details><summary>Why write errors to <code>stderr</code>?</summary>
+    <div class="ans"><p>So they stay visible and separate when stdout is redirected or piped. Results and diagnostics are different data streams.</p></div></details>
+
+  <details><summary>Why call <code>sys.stdout.flush()</code> after writing a prompt?</summary>
+    <div class="ans"><p>The prompt has no newline, so line-buffered stdout may hold it back while the program already waits on <code>stdin</code>. Flushing guarantees the user sees it first.</p></div></details>
+
+  <details><summary>What does mode <code>"w"</code> do to an existing file?</summary>
+    <div class="ans"><p>It truncates it to zero length as soon as the file is opened. If the file does not exist it is created.</p></div></details>
+
+  <details><summary>Why validate the <code>mode</code> in <code>secure_archive()</code>?</summary>
+    <div class="ans"><p>To keep the contract: the function must return <code>tuple[bool, str]</code>. Binary modes would yield <code>bytes</code>; <code>"x"</code>/<code>"a"</code> have behaviours the function wasn't designed for.</p></div></details>
+
+  <details><summary>Does <code>with</code> handle exceptions for you?</summary>
+    <div class="ans"><p>No. It guarantees cleanup, then lets the exception continue upward. You still wrap it in <code>try/except</code> to turn failures into <code>(False, message)</code>.</p></div></details>
+
+  <details><summary>What does <code>splitlines()</code> do with a trailing newline, and why does it matter?</summary>
+    <div class="ans"><p>It drops it. Re-joining with <code>"\n"</code> therefore yields a file without the original final newline, so you must add it back if the input had one.</p></div></details>
+</section>
+
+<!-- ============ 13 ============ -->
+<section id="checklist">
+  <div class="sec-head"><span class="n">13</span><h2>Final checklist before the defense</h2></div>
+  <ul class="check">
+    <li>I can explain that <code>open()</code> returns a file object and <code>read()</code> returns the string.</li>
+    <li>I can draw the exception tree and explain why <code>UnicodeDecodeError</code> escapes <code>except OSError</code>.</li>
+    <li>I replaced the weak spots in ex0–ex2 with <code>try/except/finally</code> (no <code>with</code> before ex3).</li>
+    <li>I can name <code>__enter__</code> / <code>__exit__</code> and write the <code>try/finally</code> equivalent of a <code>with</code>.</li>
+    <li>I can demonstrate stdout vs stderr with <code>&gt;</code> and <code>2&gt;</code>.</li>
+    <li>I can explain buffering and why the prompt needs <code>flush()</code>.</li>
+    <li>I fixed the trailing newline in <code>transform_content</code>.</li>
+    <li>I changed <code>end=None</code> to <code>end=""</code> and removed the stray <code>""</code> literal in ex3.</li>
+    <li><code>secure_archive</code> validates the mode and catches <code>ValueError</code> as well as <code>OSError</code>.</li>
+    <li>flake8 and mypy both pass on every file.</li>
+  </ul>
+</section>
+
+<footer>python04 · Data Archivist · study guide</footer>
+
+</main>
+</div>
+</body>
+</html>

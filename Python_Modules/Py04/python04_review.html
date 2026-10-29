@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Python04 — Data Archivist Review</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0b0e14;
+    --surface: #12161f;
+    --border: #1e2535;
+    --accent: #00e5ff;
+    --accent2: #ff4f6d;
+    --accent3: #a8ff78;
+    --warn: #ffb830;
+    --text: #c9d1e0;
+    --muted: #5a6580;
+    --heading: #edf0f7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 48px 24px;
+    line-height: 1.7;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; }
+
+  /* Header */
+  header {
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+    margin-bottom: 56px;
+    animation: fadeDown 0.6s ease both;
+  }
+  header .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.15;
+  }
+  header p {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Score ring */
+  .score-block {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .ring-wrap { position: relative; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+  .ring-fill {
+    fill: none;
+    stroke: var(--accent3);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 251;
+    stroke-dashoffset: 251;
+    animation: ringFill 1.2s 0.4s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  @keyframes ringFill {
+    to { stroke-dashoffset: 63; } /* 75% of 251 ≈ 188 → offset = 251-188 = 63 */
+  }
+  .ring-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .ring-label span:first-child {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent3);
+    line-height: 1;
+  }
+  .ring-label span:last-child {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+  .score-text h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 6px;
+  }
+  .score-text p { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+  /* Sections */
+  section { margin-bottom: 44px; animation: fadeUp 0.5s ease both; }
+  section:nth-child(3) { animation-delay: 0.15s; }
+  section:nth-child(4) { animation-delay: 0.25s; }
+  section:nth-child(5) { animation-delay: 0.35s; }
+  section:nth-child(6) { animation-delay: 0.45s; }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-green { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
+  .dot-red   { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+  .dot-warn  { background: var(--warn);    box-shadow: 0 0 8px var(--warn); }
+  .dot-blue  { background: var(--accent);  box-shadow: 0 0 8px var(--accent); }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--muted); }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 400;
+  }
+  .badge-green { background: #0d2e1a; color: var(--accent3); }
+  .badge-red   { background: #2e0d14; color: var(--accent2); }
+  .badge-warn  { background: #2e2000; color: var(--warn); }
+
+  .card p { font-size: 13px; color: var(--text); line-height: 1.65; }
+
+  code, pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .code-block {
+    background: #090c12;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 14px 16px;
+    margin-top: 10px;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+  .code-block .kw  { color: #c792ea; }
+  .code-block .fn  { color: #82aaff; }
+  .code-block .st  { color: #c3e88d; }
+  .code-block .cm  { color: #546e7a; font-style: italic; }
+  .code-block .num { color: #f78c6c; }
+  .code-block .op  { color: var(--accent2); }
+
+  inline-code {
+    display: inline;
+    background: #1a1f2e;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* Review table */
+  .review-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .review-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .review-table td {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .review-table tr:last-child td { border-bottom: none; }
+  .review-table tr:hover td { background: #ffffff05; }
+  .ok   { color: var(--accent3); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  .bad  { color: var(--accent2); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  .warn-col { color: var(--warn); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="label">Python04 · Data Archivist</div>
+    <h1>Defense Review Report</h1>
+    <p>// File I/O · Streams · Context Managers · Exception Handling</p>
+  </header>
+
+  <!-- Score -->
+  <div class="score-block">
+    <div class="ring-wrap">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-bg" cx="45" cy="45" r="40"/>
+        <circle class="ring-fill" cx="45" cy="45" r="40"/>
+      </svg>
+      <div class="ring-label">
+        <span>75%</span>
+        <span>SCORE</span>
+      </div>
+    </div>
+    <div class="score-text">
+      <h2>Solid understanding — edge cases need attention</h2>
+      <p>You grasp the core concepts well: file objects, exception handling, streams, and the context manager protocol. The gaps are concentrated in edge cases and subtle behaviors, which is exactly where file I/O gets tricky in practice.</p>
+    </div>
+  </div>
+
+  <!-- What you got right -->
+  <section>
+    <div class="section-title"><span class="dot dot-green"></span>What You Got Right</div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-green">ex0–ex2</span> Resource leak awareness</div>
+      <p>You correctly identified that in ex0/ex1/ex2, if something fails during <inline-code>file.read()</inline-code>, the file handle is never closed — causing a leak. This is the exact problem <inline-code>with</inline-code> was designed to solve.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-green">ex3</span> Context manager protocol</div>
+      <p>You correctly named <inline-code>__enter__</inline-code> and <inline-code>__exit__</inline-code>, understood that <inline-code>__exit__</inline-code> is always called no matter what, and that <inline-code>with</inline-code> removes the need for manual <inline-code>file.close()</inline-code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-green">ex2</span> stderr vs stdout distinction</div>
+      <p>You understood that both go to the terminal by default, but the real value is redirection: <inline-code>stdout</inline-code> can be piped to a file while <inline-code>stderr</inline-code> stays visible in the terminal — keeping errors always surfaced.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-green">ex3</span> Mode validation</div>
+      <p>You correctly spotted that passing <inline-code>"rb"</inline-code> would return <inline-code>bytes</inline-code> instead of <inline-code>str</inline-code>, breaking your return type contract — and that validating the mode against an allowed set is the fix.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-green">ex1</span> <inline-code>None</inline-code> initialization purpose</div>
+      <p>After the correction, you correctly understood: initializing <inline-code>file = None</inline-code> before the <inline-code>try</inline-code> ensures the variable always exists even if <inline-code>open()</inline-code> fails — preventing a <inline-code>NameError</inline-code> on <inline-code>file.close()</inline-code>.</p>
+    </div>
+  </section>
+
+  <!-- What you got wrong -->
+  <section>
+    <div class="section-title"><span class="dot dot-red"></span>What You Got Wrong</div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-red">Concept</span> <inline-code>open()</inline-code> does NOT return a string</div>
+      <p>You initially said <inline-code>open()</inline-code> returns the file content as a string or <inline-code>None</inline-code>. This is a fundamental mix-up. <inline-code>open()</inline-code> returns a <strong>file object</strong> — a handle to the file resource. The string comes later when you call <inline-code>.read()</inline-code> on it.</p>
+      <div class="code-block"><code>
+<span class="cm"># open() → file object (the door handle)</span><br>
+<span class="kw">file</span> = <span class="fn">open</span>(<span class="st">"foo.txt"</span>)      <span class="cm"># TextIOWrapper object</span><br>
+<span class="kw">content</span> = file.<span class="fn">read</span>()       <span class="cm"># NOW you get the str</span><br>
+file.<span class="fn">close</span>()
+      </code></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-red">ex1/ex2</span> Trailing newline lost in <inline-code>transform_content()</inline-code></div>
+      <p><inline-code>splitlines()</inline-code> silently discards the trailing newline that most text files end with. Your <inline-code>"\n".join(...)</inline-code> then produces a file without a final newline — a silent difference from the original.</p>
+      <div class="code-block"><code>
+<span class="st">"line1\nline2\n"</span>.<span class="fn">splitlines</span>()<br>
+<span class="cm"># → ["line1", "line2"]   ← trailing \n is GONE</span><br><br>
+<span class="cm"># Fix: preserve it explicitly</span><br>
+<span class="kw">result</span> = <span class="st">"\n"</span>.<span class="fn">join</span>(l + <span class="st">"#"</span> <span class="kw">for</span> l <span class="kw">in</span> content.<span class="fn">splitlines</span>())<br>
+<span class="kw">if</span> content.<span class="fn">endswith</span>(<span class="st">"\n"</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;result += <span class="st">"\n"</span>
+      </code></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-red">ex3</span> <inline-code>end=None</inline-code> is not what you think</div>
+      <p>You thought <inline-code>end=None</inline-code> suppresses the newline. It doesn't — <inline-code>None</inline-code> is Python's sentinel for "use the default", and the default is <inline-code>"\n"</inline-code>. You meant <inline-code>end=""</inline-code>.</p>
+      <div class="code-block"><code>
+<span class="fn">print</span>(<span class="st">"hello"</span>, end=<span class="kw">None</span>)   <span class="cm"># → "hello\n"  (newline IS printed)</span><br>
+<span class="fn">print</span>(<span class="st">"hello"</span>, end=<span class="st">""</span>)     <span class="cm"># → "hello"    (no newline)</span>
+      </code></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-red">Concept</span> <inline-code>OSError</inline-code> does not catch everything</div>
+      <p>You thought <inline-code>OSError</inline-code> covered all failure cases. It only handles OS-level errors (missing file, permissions). A <inline-code>UnicodeDecodeError</inline-code> (reading a binary file in text mode) is a <inline-code>ValueError</inline-code> subclass — it escapes your <inline-code>except</inline-code> block completely, and the file handle leaks.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-red">ex2</span> <inline-code>sys.stdout.flush()</inline-code> purpose unclear</div>
+      <p>Python buffers stdout for efficiency — output sits in memory and is flushed in batches. Without <inline-code>flush()</inline-code> before reading from stdin, the prompt may never appear on screen before your program starts waiting for input. <inline-code>print()</inline-code> does this automatically; <inline-code>sys.stdout.write()</inline-code> does not.</p>
+    </div>
+  </section>
+
+  <!-- Things to review -->
+  <section>
+    <div class="section-title"><span class="dot dot-warn"></span>Things to Review &amp; Be Aware Of</div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-warn">Review</span> <inline-code>typing.IO[str]</inline-code> vs <inline-code>TextIOWrapper</inline-code></div>
+      <p>The real concrete type returned by <inline-code>open()</inline-code> in text mode is <inline-code>io.TextIOWrapper</inline-code>. <inline-code>typing.IO[str]</inline-code> is an abstract interface that <inline-code>TextIOWrapper</inline-code> satisfies — it's the idiomatic type hint for "any text file-like object". Both are correct but for different reasons.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-warn">Review</span> The <inline-code>finally</inline-code> block vs <inline-code>with</inline-code></div>
+      <p>Before context managers existed, the pattern was <inline-code>try/finally</inline-code>. Understanding this helps you grasp <em>why</em> <inline-code>with</inline-code> was invented — it's syntactic sugar for a <inline-code>try/finally</inline-code> that always closes the resource, even on any uncaught exception.</p>
+      <div class="code-block"><code>
+<span class="cm"># Equivalent to: with open("f") as file</span><br>
+<span class="kw">file</span> = <span class="fn">open</span>(<span class="st">"f"</span>)<br>
+<span class="kw">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;content = file.<span class="fn">read</span>()<br>
+<span class="kw">finally</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file.<span class="fn">close</span>()   <span class="cm"># always runs</span>
+      </code></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-warn">Aware</span> Implicit string concatenation</div>
+      <p>Two string literals written next to each other are joined at compile time: <inline-code>"hello" " world"</inline-code> → <inline-code>"hello world"</inline-code>. It's a Python quirk, useful for breaking long strings across lines, but easy to introduce silently by accident.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-warn">Aware</span> Default open() mode &amp; encoding</div>
+      <p>When you call <inline-code>open("file")</inline-code> with no arguments, the defaults are mode <inline-code>"r"</inline-code> (text read) and encoding from <inline-code>locale.getpreferredencoding()</inline-code> — usually UTF-8 on modern systems, but not guaranteed. For portability, be explicit: <inline-code>open("file", encoding="utf-8")</inline-code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-warn">Aware</span> <inline-code>splitlines()</inline-code> vs <inline-code>split("\n")</inline-code></div>
+      <p><inline-code>splitlines()</inline-code> handles all line ending styles (<inline-code>\n</inline-code>, <inline-code>\r\n</inline-code>, <inline-code>\r</inline-code>) and discards the trailing newline. <inline-code>split("\n")</inline-code> only handles Unix newlines and produces a trailing empty string. Know which behavior you need before picking one.</p>
+    </div>
+  </section>
+
+  <!-- Quick reference table -->
+  <section>
+    <div class="section-title"><span class="dot dot-blue"></span>Quick Concept Reference</div>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <table class="review-table">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>Status</th>
+            <th>Key point</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><inline-code>open()</inline-code> return type</td>
+            <td class="bad">✗ wrong</td>
+            <td>Returns a file object, not a string</td>
+          </tr>
+          <tr>
+            <td>File object / handle</td>
+            <td class="ok">✓ correct</td>
+            <td>A resource you must explicitly close</td>
+          </tr>
+          <tr>
+            <td><inline-code>None</inline-code> initialization</td>
+            <td class="ok">✓ correct</td>
+            <td>Prevents NameError if open() fails</td>
+          </tr>
+          <tr>
+            <td>Resource leak on error</td>
+            <td class="ok">✓ correct</td>
+            <td>Uncaught exception bypasses close()</td>
+          </tr>
+          <tr>
+            <td><inline-code>__enter__</inline-code> / <inline-code>__exit__</inline-code></td>
+            <td class="ok">✓ correct</td>
+            <td>Context manager protocol</td>
+          </tr>
+          <tr>
+            <td><inline-code>OSError</inline-code> scope</td>
+            <td class="bad">✗ wrong</td>
+            <td>Doesn't catch UnicodeDecodeError</td>
+          </tr>
+          <tr>
+            <td>stdout vs stderr</td>
+            <td class="ok">✓ correct</td>
+            <td>Redirection behavior differs</td>
+          </tr>
+          <tr>
+            <td><inline-code>flush()</inline-code> necessity</td>
+            <td class="bad">✗ unclear</td>
+            <td>Forces buffered output to screen immediately</td>
+          </tr>
+          <tr>
+            <td><inline-code>splitlines()</inline-code> trailing newline</td>
+            <td class="bad">✗ wrong</td>
+            <td>Silently drops the final \n</td>
+          </tr>
+          <tr>
+            <td><inline-code>end=None</inline-code> in print()</td>
+            <td class="bad">✗ wrong</td>
+            <td>Same as default — use end="" to suppress</td>
+          </tr>
+          <tr>
+            <td>Mode validation in secure_archive</td>
+            <td class="ok">✓ correct</td>
+            <td>Restrict to allowed modes only</td>
+          </tr>
+          <tr>
+            <td>Implicit string concatenation</td>
+            <td class="warn-col">~ partial</td>
+            <td>Compile-time join of adjacent string literals</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>python04 · Data Archivist · Defense Review · May 2026</footer>
+</div>
+</body>
+</html>

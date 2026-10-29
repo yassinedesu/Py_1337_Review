@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FuncMage Concepts</title>
+<style>
+  :root {
+    --bg: #fbfaf7;
+    --panel: #ffffff;
+    --ink: #1d1f24;
+    --muted: #5c6370;
+    --line: #e4e1d8;
+    --accent: #5b3df5;
+    --accent-soft: #eeebff;
+    --good: #14804a;
+    --good-soft: #e3f5ea;
+    --bad: #b3261e;
+    --bad-soft: #fde8e6;
+    --warn: #8a5a00;
+    --warn-soft: #fff3d6;
+    --code-bg: #161821;
+    --code-ink: #e8e9ef;
+    --code-inline: #efece4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12131a;
+      --panel: #1a1c26;
+      --ink: #e8e9ef;
+      --muted: #9aa0ad;
+      --line: #2c2f3d;
+      --accent: #9c8bff;
+      --accent-soft: #272446;
+      --good: #5fd08f;
+      --good-soft: #17301f;
+      --bad: #ff8a80;
+      --bad-soft: #3a1d1b;
+      --warn: #f2c463;
+      --warn-soft: #36290e;
+      --code-bg: #0d0e14;
+      --code-ink: #e8e9ef;
+      --code-inline: #262837;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12131a; --panel: #1a1c26; --ink: #e8e9ef; --muted: #9aa0ad;
+    --line: #2c2f3d; --accent: #9c8bff; --accent-soft: #272446;
+    --good: #5fd08f; --good-soft: #17301f; --bad: #ff8a80; --bad-soft: #3a1d1b;
+    --warn: #f2c463; --warn-soft: #36290e; --code-bg: #0d0e14;
+    --code-ink: #e8e9ef; --code-inline: #262837;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.65 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .layout { display: flex; max-width: 1240px; margin: 0 auto; }
+
+  nav.toc {
+    position: sticky; top: 0; align-self: flex-start;
+    width: 270px; flex-shrink: 0; height: 100vh; overflow-y: auto;
+    padding: 28px 20px 28px 24px; border-right: 1px solid var(--line);
+    font-size: 14px;
+  }
+  nav.toc h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  nav.toc a { display: block; color: var(--ink); text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+  nav.toc a:hover { background: var(--accent-soft); color: var(--accent); }
+  nav.toc a.sub { padding-left: 22px; color: var(--muted); font-size: 13px; }
+  nav.toc .group { margin-top: 14px; font-weight: 600; color: var(--accent); padding: 4px 8px; font-size: 13px; }
+  .theme-btn {
+    margin-top: 18px; background: var(--panel); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px;
+  }
+
+  main { flex: 1; min-width: 0; padding: 40px 40px 80px; }
+  header.hero { margin-bottom: 36px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+  header.hero h1 { font-size: 38px; line-height: 1.15; margin: 0 0 10px; }
+  header.hero p { color: var(--muted); margin: 0; max-width: 62ch; }
+
+  section.chapter { margin-top: 56px; }
+  section.chapter > h2 {
+    font-size: 28px; margin: 0 0 6px; padding-top: 8px;
+  }
+  .tag {
+    display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--accent); background: var(--accent-soft);
+    padding: 3px 10px; border-radius: 99px; margin-bottom: 10px;
+  }
+  .goal { color: var(--muted); margin: 0 0 22px; }
+
+  .concept {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 22px 24px; margin: 18px 0;
+  }
+  .concept h3 { margin: 0 0 12px; font-size: 21px; }
+  .concept h4 { margin: 18px 0 4px; font-size: 13px; letter-spacing: .07em; text-transform: uppercase; color: var(--accent); }
+  .concept p { margin: 6px 0; }
+  .concept ul, .concept ol { margin: 6px 0 6px 22px; padding: 0; }
+  .concept li { margin: 3px 0; }
+
+  .analogy, .pitfall, .tip, .rule {
+    border-radius: 10px; padding: 10px 14px; margin: 12px 0; font-size: 15px;
+  }
+  .analogy { background: var(--accent-soft); border-left: 4px solid var(--accent); }
+  .pitfall { background: var(--bad-soft); border-left: 4px solid var(--bad); }
+  .tip { background: var(--good-soft); border-left: 4px solid var(--good); }
+  .rule { background: var(--warn-soft); border-left: 4px solid var(--warn); }
+  .analogy b.l, .pitfall b.l, .tip b.l, .rule b.l { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 2px; }
+  .analogy b.l { color: var(--accent); }
+  .pitfall b.l { color: var(--bad); }
+  .tip b.l { color: var(--good); }
+  .rule b.l { color: var(--warn); }
+
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .9em; }
+  :not(pre) > code { background: var(--code-inline); padding: 1px 6px; border-radius: 5px; }
+  pre {
+    background: var(--code-bg); color: var(--code-ink); border-radius: 10px;
+    padding: 14px 16px; overflow-x: auto; margin: 12px 0; line-height: 1.5; font-size: 14px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .cm { color: #7d8597; }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15px; background: var(--panel); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--accent-soft); color: var(--accent); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+  .table-wrap { overflow-x: auto; }
+
+  details {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 16px; margin: 10px 0;
+  }
+  summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 8px; }
+
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+  .flow span { background: var(--accent-soft); color: var(--accent); padding: 5px 12px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .flow i { color: var(--muted); font-style: normal; }
+
+  @media (max-width: 860px) {
+    nav.toc { display: none; }
+    main { padding: 24px 16px 60px; }
+    header.hero h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc" aria-label="Table of contents">
+  <h2>FuncMage</h2>
+  <a href="#foundations">0. Foundations</a>
+  <div class="group">Exercise 0</div>
+  <a class="sub" href="#lambda">Lambda</a>
+  <a class="sub" href="#sorted">sorted + key</a>
+  <a class="sub" href="#filter-map">filter / map</a>
+  <a class="sub" href="#maxmin">max / min / sum / round</a>
+  <div class="group">Exercise 1</div>
+  <a class="sub" href="#hof">Higher-order functions</a>
+  <a class="sub" href="#firstclass">First-class functions</a>
+  <a class="sub" href="#callable">Callable &amp; callable()</a>
+  <a class="sub" href="#patterns1">The four patterns</a>
+  <div class="group">Exercise 2</div>
+  <a class="sub" href="#legb">Lexical scope &amp; LEGB</a>
+  <a class="sub" href="#closure">Closures</a>
+  <a class="sub" href="#nonlocal">nonlocal vs global</a>
+  <a class="sub" href="#mutstate">Mutable shared state</a>
+  <a class="sub" href="#factory">Factory functions</a>
+  <div class="group">Exercise 3</div>
+  <a class="sub" href="#reduce">reduce</a>
+  <a class="sub" href="#operator">operator module</a>
+  <a class="sub" href="#partial">partial</a>
+  <a class="sub" href="#lru">lru_cache</a>
+  <a class="sub" href="#dispatch">singledispatch</a>
+  <div class="group">Exercise 4</div>
+  <a class="sub" href="#decorator">Decorators</a>
+  <a class="sub" href="#wraps">functools.wraps</a>
+  <a class="sub" href="#factorydec">Decorator factories</a>
+  <a class="sub" href="#retry">Retry pattern</a>
+  <a class="sub" href="#static">@staticmethod</a>
+  <a class="sub" href="#cast">typing.cast</a>
+  <div class="group">Extras</div>
+  <a class="sub" href="#rules">Norms &amp; restrictions</a>
+  <a class="sub" href="#bugs">Bugs we hit</a>
+  <a class="sub" href="#qa">Peer-review Q&amp;A</a>
+  <a class="sub" href="#table">Quick reference</a>
+  <a class="sub" href="#research">Research keywords</a>
+  <button class="theme-btn" id="themeBtn" type="button">Toggle theme</button>
+</nav>
+
+<main>
+
+<header class="hero">
+  <div class="tag">PY_10 · Python 3.10+</div>
+  <h1>FuncMage Chronicles — every concept explained</h1>
+  <p>Five exercises, one idea: <b>functions are values</b>. This page walks through each concept: what it is, the problem it solves, how it works inside Python, when to use it, and the mistakes that trip people up.</p>
+</header>
+
+<!-- ============ FOUNDATIONS ============ -->
+<section class="chapter" id="foundations">
+  <span class="tag">Chapter 0</span>
+  <h2>Foundations you need first</h2>
+  <p class="goal">Three small ideas that every later exercise relies on.</p>
+
+  <div class="concept">
+    <h3>Everything in Python is an object, including functions</h3>
+    <p>When you write <code>def heal(...)</code>, Python creates a <b>function object</b> and binds the name <code>heal</code> to it. The name is just a label. You can attach that label to another variable, put the object in a list, or pass it into another function.</p>
+<pre><code>def greet(name):
+    return "Hello " + name
+
+hello = greet          # no parentheses: we copy the reference, not call it
+print(hello("Ash"))    # Hello Ash
+print(greet("Ash"))    # same object, same result</code></pre>
+    <div class="pitfall"><b class="l">Common mistake</b>
+      <code>greet</code> and <code>greet()</code> are completely different. Without parentheses you hold the function. With parentheses you run it and hold its result.</div>
+  </div>
+
+  <div class="concept">
+    <h3>Lazy iterators</h3>
+    <p><code>map()</code> and <code>filter()</code> do not return lists. They return <b>iterator objects</b> that compute values one at a time, only when asked. Nothing happens until you loop over them or wrap them in <code>list()</code>.</p>
+    <div class="analogy"><b class="l">Analogy</b>A recipe card versus a cooked meal. The iterator is the card; <code>list()</code> is cooking it.</div>
+    <p>It also means an iterator can only be consumed once. After you loop through it, it is empty.</p>
+  </div>
+
+  <div class="concept">
+    <h3>Type hints</h3>
+    <p>Annotations like <code>def f(x: int) -&gt; str</code> do not change how the code runs. They document intent and let tools (<code>mypy</code>) catch mistakes before you run anything. The subject requires them on every function signature and return type.</p>
+    <p>For callables use <code>from collections.abc import Callable</code>, not <code>typing.Callable</code>.</p>
+  </div>
+</section>
+
+<!-- ============ EX 0 ============ -->
+<section class="chapter" id="ex0">
+  <span class="tag">Exercise 0 · lambda_spells.py</span>
+  <h2>Lambda Sanctum</h2>
+  <p class="goal">Authorized: <code>map, filter, sorted, min, max, round, sum, len</code>. Rule: use lambdas, not <code>def</code>, for simple one-off operations.</p>
+
+  <div class="concept" id="lambda">
+    <h3>Lambda expressions (anonymous functions)</h3>
+    <h4>What it is</h4>
+    <p>A function with no name, written as a single expression: <code>lambda parameters: expression</code>. The value of the expression is automatically returned.</p>
+    <h4>Problem it solves</h4>
+    <p>Many built-ins need a tiny function (“sort by this field”, “keep items matching this test”). Writing a full <code>def</code> block, naming it, and placing it somewhere else is noisy. A lambda puts the logic right where it is used.</p>
+    <h4>How it works inside</h4>
+    <p>Python builds the same kind of function object as <code>def</code> does. The only differences: no name (it shows as <code>&lt;lambda&gt;</code> in tracebacks), and the body must be exactly one expression. No statements, no assignments, no <code>return</code> keyword.</p>
+<pre><code><span class="cm"># These two behave the same way:</span>
+def double(x):
+    return x * 2
+
+double = lambda x: x * 2    <span class="cm"># fine to learn from; flake8 (E731) dislikes naming a lambda</span></code></pre>
+    <h4>When to use</h4>
+    <ul>
+      <li>As a short <code>key=</code> for <code>sorted</code>, <code>max</code>, <code>min</code>.</li>
+      <li>As the test for <code>filter</code> or the transform for <code>map</code>.</li>
+      <li>Anywhere the logic is a single, readable expression used once.</li>
+    </ul>
+    <h4>When not to use</h4>
+    <ul>
+      <li>If you need several statements, loops, or <code>try/except</code>.</li>
+      <li>If you reuse the logic in several places, or it needs a docstring.</li>
+      <li>If you are assigning it to a name (<code>f = lambda ...</code>); flake8 flags that (E731), so use <code>def</code> instead.</li>
+    </ul>
+    <div class="analogy"><b class="l">Analogy</b>A sticky note versus a filed document. For a 10-second reminder you write a sticky note. You do not open a new folder.</div>
+  </div>
+
+  <div class="concept" id="sorted">
+    <h3><code>sorted()</code> with a <code>key</code> function</h3>
+    <p><code>sorted(iterable, key=func, reverse=False)</code> returns a <b>new sorted list</b>. It calls <code>key(item)</code> once per item, then orders the items by those returned values. The original list is untouched (<code>list.sort()</code> is the in-place version).</p>
+<pre><code>artifacts = [
+    {'name': 'Crystal Orb', 'power': 85},
+    {'name': 'Fire Staff',  'power': 92},
+]
+sorted(artifacts, key=lambda a: a['power'], reverse=True)
+<span class="cm"># Fire Staff (92) first, then Crystal Orb (85)</span></code></pre>
+    <div class="pitfall"><b class="l">Common mistake</b>Trying to sort dicts without a key raises <code>TypeError</code>, because dicts cannot be compared with <code>&lt;</code>. Also, for descending order use <code>reverse=True</code> rather than negating values (negating breaks on strings).</div>
+  </div>
+
+  <div class="concept" id="filter-map">
+    <h3><code>filter()</code> and <code>map()</code></h3>
+    <h4>filter(predicate, iterable)</h4>
+    <p>Keeps the items for which the predicate returns a truthy value.</p>
+<pre><code>list(filter(lambda mage: mage['power'] &gt;= 75, mages))</code></pre>
+    <h4>map(function, iterable)</h4>
+    <p>Applies the function to every item and yields the results.</p>
+<pre><code>list(map(lambda spell: f"* {spell} *", ['fireball', 'heal']))
+<span class="cm"># ['* fireball *', '* heal *']</span></code></pre>
+    <div class="analogy"><b class="l">Analogy</b><code>filter</code> is a bouncer: only some items get through, unchanged. <code>map</code> is a paint booth: every item comes out, changed.</div>
+    <div class="pitfall"><b class="l">Common mistake</b>Returning the raw <code>filter</code>/<code>map</code> object when the signature promises <code>list[...]</code>. Always wrap in <code>list()</code>.</div>
+    <div class="tip"><b class="l">Good to know</b>List comprehensions do the same job and are often more readable. The subject wants you to demonstrate <code>map</code>/<code>filter</code> with lambdas specifically.</div>
+  </div>
+
+  <div class="concept" id="maxmin">
+    <h3><code>max()</code>, <code>min()</code>, <code>sum()</code>, <code>round()</code>, <code>len()</code></h3>
+    <ul>
+      <li><code>max(items, key=...)</code> / <code>min(items, key=...)</code> return the <b>whole item</b> whose key is largest/smallest. For a list of dicts you then read <code>['power']</code> from the result.</li>
+      <li><code>sum(numbers)</code> adds an iterable of numbers.</li>
+      <li><code>len(items)</code> counts them.</li>
+      <li><code>round(x, 2)</code> rounds to 2 decimals. Average = <code>round(sum / len, 2)</code>.</li>
+    </ul>
+<pre><code>best = max(mages, key=lambda m: m['power'])   <span class="cm"># the whole dict</span>
+best['power']                                 <span class="cm"># just the number</span></code></pre>
+    <div class="pitfall"><b class="l">Common mistake</b>Returning the mage dict instead of its power. Also: <code>mage_stats([])</code> would divide by zero, so decide how to handle empty input if asked.</div>
+  </div>
+</section>
+
+<!-- ============ EX 1 ============ -->
+<section class="chapter" id="ex1">
+  <span class="tag">Exercise 1 · higher_magic.py</span>
+  <h2>Higher Realm</h2>
+  <p class="goal">Authorized: <code>callable()</code>, <code>Callable</code>. Every spell has the contract <code>spell(target: str, power: int) -&gt; str</code>.</p>
+
+  <div class="concept" id="firstclass">
+    <h3>First-class functions</h3>
+    <p>“First-class citizen” means the language treats functions like any other value. You can:</p>
+    <ol>
+      <li>Store them in variables and data structures.</li>
+      <li>Pass them as arguments.</li>
+      <li>Return them from other functions.</li>
+      <li>Create them at runtime (lambdas, nested <code>def</code>).</li>
+    </ol>
+    <p>This is the single idea behind the whole module. Everything else is a consequence of it.</p>
+  </div>
+
+  <div class="concept" id="hof">
+    <h3>Higher-order functions</h3>
+    <h4>What it is</h4>
+    <p>A function that takes a function as an argument, returns a function, or both. <code>sorted</code>, <code>map</code> and <code>filter</code> from Exercise 0 are already higher-order; now you write your own.</p>
+    <h4>Problem it solves</h4>
+    <p>Reuse and composition. Instead of writing <code>fireball_x3</code>, <code>heal_x3</code>, <code>freeze_x3</code>, you write one <code>power_amplifier</code> that upgrades any spell.</p>
+    <h4>How it works inside</h4>
+    <p>The outer function runs once and builds an inner function. The inner function keeps access to the outer function’s arguments (that is a closure, formalised in Exercise 2).</p>
+    <div class="flow"><span>spell</span><i>→</i><span>power_amplifier(spell, 3)</span><i>→</i><span>new spell</span></div>
+    <div class="analogy"><b class="l">Analogy</b>A recipe modifier. The base recipe is a function. “Triple everything” is a function that takes a recipe and hands back a new recipe.</div>
+  </div>
+
+  <div class="concept" id="callable">
+    <h3><code>Callable</code> and <code>callable()</code></h3>
+    <ul>
+      <li><code>collections.abc.Callable</code> is a <b>type hint</b> meaning “anything you can call with <code>()</code>”. Used in signatures like <code>def f(spell: Callable) -&gt; Callable</code>. The subject asks for <code>collections.abc</code> (the modern location) rather than <code>typing</code>.</li>
+      <li><code>callable(obj)</code> is a <b>built-in function</b> returning <code>True</code>/<code>False</code> at runtime. Use it to defensively check an argument before calling it.</li>
+    </ul>
+    <p>You can be more precise: <code>Callable[[str, int], str]</code> means “takes a str and an int, returns a str”.</p>
+<pre><code>from collections.abc import Callable
+
+Spell = Callable[[str, int], str]   <span class="cm"># alias: a spell's contract</span>
+
+callable(len)       <span class="cm"># True</span>
+callable("hello")   <span class="cm"># False</span></code></pre>
+  </div>
+
+  <div class="concept" id="patterns1">
+    <h3>The four patterns you implement</h3>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Function</th><th>Idea</th><th>Returns</th></tr>
+      <tr><td><code>spell_combiner(s1, s2)</code></td><td>Call both spells with the same arguments</td><td>A spell returning a <b>tuple</b> of both results</td></tr>
+      <tr><td><code>power_amplifier(spell, n)</code></td><td>Multiply the power before casting</td><td>A spell with the <b>same signature</b></td></tr>
+      <tr><td><code>conditional_caster(cond, spell)</code></td><td>Cast only if <code>cond(target, power)</code> is True</td><td>A spell returning <code>"Spell fizzled"</code> otherwise</td></tr>
+      <tr><td><code>spell_sequence(spells)</code></td><td>Cast every spell in order</td><td>A spell returning a <b>list</b> of results</td></tr>
+    </table>
+    </div>
+<pre><code>def power_amplifier(base_spell: Callable, multiplier: int) -&gt; Callable:
+    def amplified(target: str, power: int) -&gt; str:
+        return base_spell(target, power * multiplier)
+    return amplified</code></pre>
+    <div class="pitfall"><b class="l">Common mistakes</b>
+      <ul>
+        <li>Returning <code>base_spell(...)</code> directly instead of returning the inner function.</li>
+        <li>Forgetting to <em>call</em> the received functions inside the inner function.</li>
+        <li>Letting <code>conditional_caster</code> raise an exception instead of returning the string.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EX 2 ============ -->
+<section class="chapter" id="ex2">
+  <span class="tag">Exercise 2 · scope_mysteries.py</span>
+  <h2>Memory Depths</h2>
+  <p class="goal">Authorized: <code>nonlocal</code>. Forbidden: <code>global</code> variables.</p>
+
+  <div class="concept" id="legb">
+    <h3>Lexical (static) scope and the LEGB rule</h3>
+    <h4>What it is</h4>
+    <p>“Scope” is the region of code where a name is visible. <b>Lexical</b> means it is decided by where the code is <em>written</em>, not by where or when it is called.</p>
+    <h4>The lookup order</h4>
+    <div class="flow"><span>L · Local</span><i>→</i><span>E · Enclosing</span><i>→</i><span>G · Global</span><i>→</i><span>B · Built-in</span></div>
+    <p>Python searches the current function first, then any functions that enclose it, then the module, then built-ins (<code>len</code>, <code>print</code>…). First match wins.</p>
+<pre><code>x = "global"
+def outer():
+    x = "enclosing"
+    def inner():
+        print(x)      <span class="cm"># finds "enclosing" (E beats G)</span>
+    inner()</code></pre>
+    <div class="tip"><b class="l">Why it matters</b>You can read code and know which variable a name refers to without running it. That predictability is what makes closures safe to reason about.</div>
+  </div>
+
+  <div class="concept" id="closure">
+    <h3>Closures</h3>
+    <h4>What it is</h4>
+    <p>An inner function that <b>remembers</b> variables from the enclosing function, even after that enclosing function has returned.</p>
+    <h4>How it works inside</h4>
+    <p>When an inner function uses a variable from an outer function, Python keeps that variable alive in a small “cell” attached to the inner function. You can see them with <code>func.__closure__</code>.</p>
+    <p>Each call to the outer function creates <b>fresh cells</b>, so two closures made by two calls never share state. That is why <code>counter_a</code> and <code>counter_b</code> are independent.</p>
+<pre><code>def mage_counter() -&gt; Callable:
+    count = 0                 <span class="cm"># lives in the closure cell</span>
+    def increment() -&gt; int:
+        nonlocal count
+        count += 1
+        return count
+    return increment
+
+a = mage_counter()
+b = mage_counter()
+a(); a()    <span class="cm"># 1, 2</span>
+b()         <span class="cm"># 1  (separate cell)</span></code></pre>
+    <div class="analogy"><b class="l">Analogy</b>A mage memorises a spell component before the library closes. The library is gone, but the mage still carries the memory.</div>
+    <h4>When to use</h4>
+    <p>Private state without a class: counters, accumulators, configured functions, callbacks, memory stores.</p>
+  </div>
+
+  <div class="concept" id="nonlocal">
+    <h3><code>nonlocal</code> — and why <code>global</code> is forbidden</h3>
+    <p>Assigning to a name inside a function normally creates a <b>new local variable</b>. So <code>count = count + 1</code> inside <code>increment</code> would fail (the local <code>count</code> is read before it is assigned). <code>nonlocal count</code> says “this name means the one in the nearest enclosing <em>function</em>”.</p>
+    <div class="table-wrap">
+    <table>
+      <tr><th></th><th><code>nonlocal</code></th><th><code>global</code></th></tr>
+      <tr><td>Targets</td><td>Variable in nearest enclosing function</td><td>Variable at module level</td></tr>
+      <tr><td>Visibility</td><td>Private to that function family</td><td>Visible and editable by all code</td></tr>
+      <tr><td>Side effects</td><td>Contained</td><td>Spread across the program</td></tr>
+      <tr><td>Two instances</td><td>Independent state each</td><td>All share one value</td></tr>
+      <tr><td>In this subject</td><td>Authorized</td><td>Forbidden</td></tr>
+    </table>
+    </div>
+    <div class="pitfall"><b class="l">Mistake we actually hit</b><code>nonlocal</code> needs an enclosing <em>function</em>. Using it at module level (for example inside <code>if __name__ == "__main__":</code>) raises <code>SyntaxError: no binding for nonlocal found</code>. See “Bugs we hit”.</div>
+  </div>
+
+  <div class="concept" id="mutstate">
+    <h3>Mutable objects as shared closure state</h3>
+    <p><code>nonlocal</code> is only needed when you <b>rebind</b> a name (<code>count = ...</code>). If the closure variable is a mutable object (dict, list), you can <b>mutate</b> it (<code>d[key] = value</code>, <code>lst[0] = 5</code>) without any keyword, because the name still points to the same object.</p>
+<pre><code>def memory_vault() -&gt; dict[str, Callable]:
+    private_storage: dict = {}          <span class="cm"># one dict, shared</span>
+
+    def store(key: str, value: object) -&gt; None:
+        private_storage[key] = value    <span class="cm"># mutation: no nonlocal</span>
+
+    def recall(key: str) -&gt; object:
+        return private_storage.get(key, "Memory not found")
+
+    return {'store': store, 'recall': recall}</code></pre>
+    <p>Both <code>store</code> and <code>recall</code> close over the <em>same</em> dict, and nothing outside can reach it. That is encapsulation without a class.</p>
+    <div class="tip"><b class="l">Rule of thumb</b>Rebinding a name → needs <code>nonlocal</code>. Mutating an object → does not.</div>
+  </div>
+
+  <div class="concept" id="factory">
+    <h3>Factory functions</h3>
+    <p>A function whose job is to build and return other (configured) functions. <code>enchantment_factory("Flaming")</code> returns a function that remembers <code>"Flaming"</code>.</p>
+<pre><code>def enchantment_factory(enchantment_type: str) -&gt; Callable:
+    def enchant(item_name: str) -&gt; str:
+        return f"{enchantment_type} {item_name}"
+    return enchant
+
+flaming = enchantment_factory("Flaming")
+flaming("Sword")      <span class="cm"># "Flaming Sword"</span></code></pre>
+    <p>No <code>nonlocal</code> here: the closure only <em>reads</em> <code>enchantment_type</code>.</p>
+    <div class="pitfall"><b class="l">Classic trap (good to research)</b>Creating closures inside a loop: <code>[lambda: i for i in range(3)]</code> all return <code>2</code>, because they share one <code>i</code> that is looked up at call time (late binding).</div>
+  </div>
+</section>
+
+<!-- ============ EX 3 ============ -->
+<section class="chapter" id="ex3">
+  <span class="tag">Exercise 3 · functools_artifacts.py</span>
+  <h2>Ancient Library</h2>
+  <p class="goal">Authorized: <code>functools</code>, <code>operator</code>. The point is to <b>use</b> these tools rather than re-implement them by hand.</p>
+
+  <div class="concept" id="reduce">
+    <h3><code>functools.reduce</code></h3>
+    <h4>What it is</h4>
+    <p><code>reduce(function, iterable[, initial])</code> folds a sequence into a single value by repeatedly applying a two-argument function, carrying an accumulator.</p>
+    <div class="flow"><span>[10, 20, 30, 40]</span><i>→</i><span>f(10,20)=30</span><i>→</i><span>f(30,30)=60</span><i>→</i><span>f(60,40)=100</span></div>
+    <div class="analogy"><b class="l">Analogy</b>Pouring buckets together: combine the first two, then combine that result with the third, and so on until one bucket is left.</div>
+    <h4>Edge cases</h4>
+    <ul>
+      <li>Empty list with no initial value raises <code>TypeError</code>. The subject says return <code>0</code>, so check <code>if not spells</code> first.</li>
+      <li>Unknown operation name: handle it explicitly (we raise <code>ValueError</code> with a clear message).</li>
+    </ul>
+<pre><code>operation_map = {
+    'add': operator.add,
+    'multiply': operator.mul,
+    'max': ..., 'min': ...,
+}
+if operation not in operation_map:
+    raise ValueError(f"Unknown operation '{operation}'")
+return functools.reduce(operation_map[operation], spells)</code></pre>
+    <div class="tip"><b class="l">Design idea</b>A dictionary mapping names to functions replaces a long <code>if/elif</code> chain. That is first-class functions in action.</div>
+  </div>
+
+  <div class="concept" id="operator">
+    <h3>The <code>operator</code> module</h3>
+    <p>Function versions of Python’s operators: <code>operator.add(a, b)</code> is <code>a + b</code>, <code>operator.mul</code> is <code>*</code>, <code>operator.gt</code> is <code>&gt;</code>, <code>operator.itemgetter('power')</code> is <code>lambda d: d['power']</code>.</p>
+    <p><b>Why:</b> operators are syntax, not objects, so you cannot pass <code>+</code> to <code>reduce</code>. <code>operator.add</code> is the object form, and is faster and clearer than <code>lambda a, b: a + b</code>.</p>
+    <div class="tip"><b class="l">Peer-review note</b>There is no <code>operator.max</code>. For <code>max</code>/<code>min</code> you can pass the built-ins <code>max</code> and <code>min</code> straight to <code>reduce</code> (they accept two arguments), or write a small lambda, as we did.</div>
+  </div>
+
+  <div class="concept" id="partial">
+    <h3><code>functools.partial</code></h3>
+    <h4>What it is</h4>
+    <p>Creates a new callable from an existing one with some arguments <b>pre-filled</b>. Also called partial application.</p>
+<pre><code>def base_enchant(power: int, element: str, target: str) -&gt; str: ...
+
+fire = functools.partial(base_enchant, 50, 'fire')
+fire("Sword")      <span class="cm"># same as base_enchant(50, 'fire', "Sword")</span></code></pre>
+    <h4>How it works inside</h4>
+    <p>It returns a <code>partial</code> object that stores the original function plus the frozen arguments. When called, it merges frozen arguments with new ones and calls the original.</p>
+    <div class="analogy"><b class="l">Analogy</b>A vending machine with three buttons where you glue two of them down. Users only press the third.</div>
+    <h4>partial vs closure</h4>
+    <p>Both freeze values. <code>partial</code> does it for an existing function in one line; a closure is better when the frozen logic needs custom code.</p>
+    <div class="pitfall"><b class="l">Common mistake</b>Pre-filling positionally in the wrong order. If you freeze <code>50, 'fire'</code> they fill the first two parameters in that order. Keyword form <code>partial(f, power=50, element='fire')</code> is safer.</div>
+  </div>
+
+  <div class="concept" id="lru">
+    <h3><code>functools.lru_cache</code> and memoisation</h3>
+    <h4>What it is</h4>
+    <p>A decorator that remembers a function’s return values keyed by its arguments. Next time the same arguments appear, it returns the stored answer instantly. “LRU” = Least Recently Used: when a size limit is reached, the oldest-unused entry is dropped. <code>maxsize=None</code> means unlimited.</p>
+    <h4>Problem it solves</h4>
+    <p>Naive recursive Fibonacci recomputes the same sub-problems exponentially many times (about O(2<sup>n</sup>)). With caching each <code>n</code> is computed once (O(n)).</p>
+<pre><code>@functools.lru_cache(maxsize=None)
+def memoized_fibonacci(n: int) -&gt; int:
+    if n &lt;= 0: return 0
+    if n == 1: return 1
+    return memoized_fibonacci(n - 1) + memoized_fibonacci(n - 2)
+
+memoized_fibonacci.cache_info()
+<span class="cm"># CacheInfo(hits=..., misses=..., maxsize=None, currsize=...)</span></code></pre>
+    <h4>Requirements and limits</h4>
+    <ul>
+      <li>Arguments must be <b>hashable</b> (no lists/dicts as arguments).</li>
+      <li>The function should be <b>pure</b>: same inputs always give same output, no side effects.</li>
+      <li><code>cache_info()</code> shows hits/misses; <code>cache_clear()</code> empties it.</li>
+    </ul>
+  </div>
+
+  <div class="concept" id="dispatch">
+    <h3><code>functools.singledispatch</code></h3>
+    <h4>What it is</h4>
+    <p>Turns a function into a <b>generic function</b>: which implementation runs depends on the <em>type of the first argument</em>.</p>
+    <h4>Problem it solves</h4>
+    <p>Replaces <code>if isinstance(x, int) ... elif isinstance(x, str) ...</code> chains with separate, independently registered handlers that are easy to extend.</p>
+<pre><code>@functools.singledispatch
+def cast(spell: Any) -&gt; str:            <span class="cm"># fallback for unknown types</span>
+    return "Unknown spell type"
+
+@cast.register(int)
+def cast_int(spell: int) -&gt; str:
+    return f"Damage spell: {spell} damage"
+
+@cast.register(str)
+def cast_str(spell: str) -&gt; str:
+    return f"Enchantment: {spell}"
+
+@cast.register(list)
+def cast_list(spell: list) -&gt; str:
+    return f"Multi-cast: {len(spell)} spells"</code></pre>
+    <h4>Details worth knowing</h4>
+    <ul>
+      <li>Dispatch follows the class hierarchy (a subclass uses its parent’s handler if it has none).</li>
+      <li>Only the <b>first</b> argument is inspected (“single” dispatch).</li>
+      <li><code>bool</code> is a subclass of <code>int</code>, so <code>True</code> would hit the <code>int</code> handler. Good edge case to know.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ EX 4 ============ -->
+<section class="chapter" id="ex4">
+  <span class="tag">Exercise 4 · decorator_mastery.py</span>
+  <h2>Master’s Tower</h2>
+  <p class="goal">Authorized: <code>functools.wraps</code>, <code>staticmethod</code>. Hint: <code>time.sleep</code> helps simulate delays.</p>
+
+  <div class="concept" id="decorator">
+    <h3>Decorators</h3>
+    <h4>What it is</h4>
+    <p>A function that takes a function and returns a (usually wrapped) function. The line <code>@spell_timer</code> above <code>def fireball()</code> is exactly <code>fireball = spell_timer(fireball)</code>.</p>
+    <h4>Problem it solves</h4>
+    <p>Separation of concerns. Timing, validation, logging and retrying are <em>cross-cutting</em>: they apply to many functions but are not part of any function’s core job. A decorator adds them without touching the original code.</p>
+    <h4>Anatomy</h4>
+<pre><code>def spell_timer(func: Callable) -&gt; Callable:
+    @functools.wraps(func)
+    def timed_wrapper(*args: object, **kwargs: object) -&gt; object:
+        print(f"Casting {func.__name__}...")
+        start = time.time()
+        result = func(*args, **kwargs)     <span class="cm"># run the original</span>
+        print(f"Spell completed in {time.time() - start:.3f} seconds")
+        return result                      <span class="cm"># hand back its result</span>
+    return timed_wrapper</code></pre>
+    <ul>
+      <li><code>*args, **kwargs</code> lets the wrapper accept whatever the original accepts.</li>
+      <li>Always <b>return the original result</b>, or you silently break the function.</li>
+    </ul>
+    <div class="analogy"><b class="l">Analogy</b>A bodyguard. Every call to the VIP goes through the bodyguard first, who can check, time or retry before letting it through.</div>
+  </div>
+
+  <div class="concept" id="wraps">
+    <h3><code>functools.wraps</code></h3>
+    <p>Without it, the wrapper replaces the original’s identity: <code>fireball.__name__</code> becomes <code>"timed_wrapper"</code> and the docstring is lost. <code>@functools.wraps(func)</code> on the wrapper copies <code>__name__</code>, <code>__doc__</code>, <code>__module__</code>, annotations and sets <code>__wrapped__</code>.</p>
+    <p><b>Why it matters:</b> debugging, help(), tracebacks, and the spell_timer requirement of printing the <em>original</em> function’s name all depend on it.</p>
+    <div class="pitfall"><b class="l">Common mistake</b>Putting <code>@wraps</code> on the outer decorator instead of the inner wrapper, or forgetting it entirely (the evaluation sheet checks for it).</div>
+  </div>
+
+  <div class="concept" id="factorydec">
+    <h3>Parameterised decorators (decorator factories)</h3>
+    <p>When a decorator needs its own settings (<code>min_power=10</code>), you add one more layer. Three nested levels:</p>
+    <div class="flow"><span>power_validator(min_power)</span><i>→ returns →</i><span>decorator(func)</span><i>→ returns →</i><span>validated_wrapper(*args)</span></div>
+<pre><code>def power_validator(min_power: int) -&gt; Callable:
+    def decorator(func: Callable) -&gt; Callable:
+        @functools.wraps(func)
+        def validated_wrapper(*args: object, **kwargs: object) -&gt; object:
+            provided_power = cast(int, args[0])
+            if provided_power &lt; min_power:
+                return "Insufficient power for this spell"
+            return func(*args, **kwargs)
+        return validated_wrapper
+    return decorator
+
+@power_validator(min_power=10)     <span class="cm"># call the factory first, then apply</span>
+def lightning(power: int) -&gt; str: ...</code></pre>
+    <div class="pitfall"><b class="l">Common mistakes</b>
+      <ul>
+        <li>Writing <code>@power_validator</code> without parentheses (you pass the function as <code>min_power</code>).</li>
+        <li>Applying it directly to a method: <code>args[0]</code> would be <code>self</code>, not power. We solved this by decorating a small inner function whose first parameter is power.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="concept" id="retry">
+    <h3>The retry pattern</h3>
+    <p>A decorator factory that catches exceptions and tries again up to <code>max_attempts</code> times.</p>
+<pre><code>for attempt_number in range(1, max_attempts + 1):
+    try:
+        return func(*args, **kwargs)        <span class="cm"># success: leave immediately</span>
+    except Exception:
+        print(f"Spell failed, retrying... (attempt {attempt_number}/{max_attempts})")
+return f"Spell casting failed after {max_attempts} attempts"</code></pre>
+    <ul>
+      <li><code>return</code> inside <code>try</code> ends the loop on first success.</li>
+      <li>The failure message sits <b>after</b> the loop, reached only if every attempt failed.</li>
+      <li>Catch <code>Exception</code>, never a bare <code>except:</code> (which would also swallow <code>KeyboardInterrupt</code>).</li>
+    </ul>
+    <div class="tip"><b class="l">Real-world note</b>Production retries usually add a delay (<code>time.sleep</code>) and exponential backoff, and retry only specific exception types.</div>
+  </div>
+
+  <div class="concept" id="static">
+    <h3><code>@staticmethod</code> vs instance methods</h3>
+    <div class="table-wrap">
+    <table>
+      <tr><th></th><th>Instance method</th><th>@staticmethod</th></tr>
+      <tr><td>First parameter</td><td><code>self</code> (the instance)</td><td>none implicit</td></tr>
+      <tr><td>Access to instance data</td><td>Yes</td><td>No</td></tr>
+      <tr><td>Call it on</td><td>An instance</td><td>Class or instance</td></tr>
+      <tr><td>Use when</td><td>Logic depends on object state</td><td>Logic belongs to the class conceptually but needs no state</td></tr>
+    </table>
+    </div>
+<pre><code>class MageGuild:
+    @staticmethod
+    def validate_mage_name(name: str) -&gt; bool:
+        return len(name) &gt;= 3 and all(c.isalpha() or c == ' ' for c in name)
+
+MageGuild.validate_mage_name("Alex")   <span class="cm"># True, no instance needed</span></code></pre>
+    <p>Also exists: <code>@classmethod</code>, which receives the class (<code>cls</code>). Good to research for contrast.</p>
+    <p><code>@staticmethod</code> is itself a decorator: a built-in one.</p>
+  </div>
+
+  <div class="concept" id="cast">
+    <h3><code>typing.cast</code></h3>
+    <p>Tells the type checker “treat this value as type T”. It does <b>nothing at runtime</b>; it only silences a type error you know is safe. We needed it because <code>*args: object</code> makes <code>args[0]</code> an <code>object</code>, and mypy refused to assign it to an <code>int</code>.</p>
+    <div class="pitfall"><b class="l">Not the same as conversion</b><code>cast(int, x)</code> does not change <code>x</code>. <code>int(x)</code> does (and would turn <code>15.7</code> into <code>15</code>).</div>
+  </div>
+</section>
+
+<!-- ============ RULES ============ -->
+<section class="chapter" id="rules">
+  <span class="tag">Reference</span>
+  <h2>Norms and restrictions from the subject</h2>
+  <div class="concept">
+    <h4>Required</h4>
+    <ul>
+      <li>Python 3.10 or later; flake8 clean.</li>
+      <li>Type hints on every function signature and return type.</li>
+      <li>One file per exercise, exact file names, each in its own directory (<code>ex0/</code> … <code>ex4/</code>).</li>
+      <li>Exception handling that protects against bad input where the subject asks for it.</li>
+      <li><code>Callable</code> taken from <code>collections.abc</code>.</li>
+    </ul>
+    <h4>Forbidden</h4>
+    <ul>
+      <li>External libraries (no <code>pip install</code>).</li>
+      <li>File I/O.</li>
+      <li>Complex algorithms (keep focus on functional patterns).</li>
+      <li><code>eval()</code> and <code>exec()</code>.</li>
+      <li>Global variables.</li>
+    </ul>
+    <h4>Per exercise</h4>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Ex</th><th>File</th><th>Authorized extras</th></tr>
+      <tr><td>0</td><td><code>lambda_spells.py</code></td><td>map, filter, sorted, min, max, round, sum, len</td></tr>
+      <tr><td>1</td><td><code>higher_magic.py</code></td><td>callable(), Callable</td></tr>
+      <tr><td>2</td><td><code>scope_mysteries.py</code></td><td>nonlocal</td></tr>
+      <tr><td>3</td><td><code>functools_artifacts.py</code></td><td>functools, operator</td></tr>
+      <tr><td>4</td><td><code>decorator_mastery.py</code></td><td>functools.wraps, staticmethod</td></tr>
+    </table>
+    </div>
+    <div class="rule"><b class="l">Peer-review reminder</b>Only requested files in the repo; a segfault or uncontrolled crash during the defence means a grade of 0; you must be able to explain every line (AI-generated code you cannot explain counts against you).</div>
+  </div>
+</section>
+
+<!-- ============ BUGS ============ -->
+<section class="chapter" id="bugs">
+  <span class="tag">Lessons learned</span>
+  <h2>Bugs we hit and why</h2>
+
+  <div class="concept">
+    <h3>1. <code>SyntaxError: no binding for nonlocal 'attempt_count' found</code></h3>
+    <p><b>Cause:</b> <code>nonlocal</code> was used in a function defined at module level, where no enclosing function exists.</p>
+    <p><b>Fix:</b> use a mutable container instead of rebinding: <code>attempt_counter: list[int] = [0]</code> then <code>attempt_counter[0] += 1</code>. <code>global</code> is forbidden by the subject.</p>
+    <p><b>Concept:</b> rebinding versus mutation (see Exercise 2).</p>
+  </div>
+
+  <div class="concept">
+    <h3>2. mypy: <code>Incompatible types in assignment (expression has type "object", variable has type "int")</code></h3>
+    <p><b>Cause:</b> <code>*args: object</code> types <code>args[0]</code> as <code>object</code>.</p>
+    <p><b>Fix:</b> <code>provided_power: int = cast(int, args[0])</code>.</p>
+    <p><b>Concept:</b> <code>typing.cast</code> is a type-checker hint with zero runtime effect.</p>
+  </div>
+
+  <div class="concept">
+    <h3>3. Applying <code>power_validator</code> to a method</h3>
+    <p><b>Cause:</b> in a method, <code>args[0]</code> is <code>self</code>. The subject says the decorator applies to a standalone function whose first argument is power.</p>
+    <p><b>Fix:</b> decorate an inner helper whose first parameter is power, and call it from <code>cast_spell</code>.</p>
+  </div>
+</section>
+
+<!-- ============ Q&A ============ -->
+<section class="chapter" id="qa">
+  <span class="tag">Defence prep</span>
+  <h2>Peer-review questions and model answers</h2>
+  <p class="goal">Click a question to reveal the answer. Say it in your own words; do not recite.</p>
+
+  <details><summary>What is the difference between lambda and def?</summary>
+    <p>Both create function objects. A lambda is nameless and limited to a single expression, so it suits short throwaway logic passed to <code>sorted</code>/<code>map</code>/<code>filter</code>. <code>def</code> gives a name, allows statements and docstrings, and is better for anything reused or non-trivial.</p></details>
+
+  <details><summary>What makes functions “first-class citizens”?</summary>
+    <p>They can be assigned to variables, stored in collections, passed as arguments, returned from functions, and created at runtime, exactly like ints or strings.</p></details>
+
+  <details><summary>How do higher-order functions enable reuse and composition?</summary>
+    <p>You parameterise behaviour instead of copying code. One <code>power_amplifier</code> upgrades any spell, and results can be chained (combine an amplified spell with a conditional one).</p></details>
+
+  <details><summary>From which package should <code>Callable</code> come, and what does <code>callable()</code> do?</summary>
+    <p><code>collections.abc</code>. <code>Callable</code> is a type hint; <code>callable(obj)</code> is a runtime built-in that returns whether <code>obj</code> can be called.</p></details>
+
+  <details><summary>How do closures “remember” their environment?</summary>
+    <p>Variables used by an inner function are kept alive in cells attached to it (<code>__closure__</code>), so they survive after the outer function returns. Each outer call creates new cells, giving independent state.</p></details>
+
+  <details><summary>Why is <code>global</code> forbidden but <code>nonlocal</code> allowed?</summary>
+    <p><code>global</code> couples code to module-wide mutable state that anything can change, which breaks functional purity and makes behaviour unpredictable. <code>nonlocal</code> only reaches into the nearest enclosing function, keeping state private and instances independent.</p></details>
+
+  <details><summary>How does <code>functools.reduce</code> aggregate data, and what does <code>lru_cache</code> give you?</summary>
+    <p><code>reduce</code> folds a sequence into one value with a binary function and an accumulator. <code>lru_cache</code> stores results per argument set, so repeated calls (like recursive Fibonacci) skip recomputation, turning exponential time into linear at the cost of memory.</p></details>
+
+  <details><summary>How do decorators separate concerns?</summary>
+    <p>Cross-cutting behaviour (timing, validation, retry) lives in the decorator, and the decorated function contains only its core logic. You can add or remove the behaviour with one line.</p></details>
+
+  <details><summary>Difference between <code>@staticmethod</code> and an instance method?</summary>
+    <p>An instance method receives <code>self</code> and can use instance state. A static method receives nothing implicit, cannot touch instance state, and can be called on the class itself; it is a plain function namespaced inside the class.</p></details>
+
+  <details><summary>Why use <code>functools.wraps</code>?</summary>
+    <p>To preserve the original function’s <code>__name__</code>, <code>__doc__</code> and other metadata. Otherwise every decorated function would appear as the wrapper, breaking introspection and debugging.</p></details>
+
+  <details><summary>Why <code>partial</code> and not a lambda?</summary>
+    <p><code>partial</code> expresses “same function, some arguments fixed” directly, keeps the original’s identity (<code>.func</code>, <code>.args</code>, <code>.keywords</code>), and is the standard tool the subject asks to demonstrate.</p></details>
+</section>
+
+<!-- ============ TABLE ============ -->
+<section class="chapter" id="table">
+  <span class="tag">Cheat sheet</span>
+  <h2>Quick reference</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Concept</th><th>One-sentence summary</th><th>Ex</th></tr>
+    <tr><td>Lambda</td><td>Nameless single-expression function.</td><td>0</td></tr>
+    <tr><td><code>sorted(key=)</code></td><td>New list ordered by a key function’s value.</td><td>0</td></tr>
+    <tr><td><code>filter</code></td><td>Lazily keeps items passing a test.</td><td>0</td></tr>
+    <tr><td><code>map</code></td><td>Lazily applies a function to every item.</td><td>0</td></tr>
+    <tr><td><code>max/min(key=)</code></td><td>Item with largest/smallest key value.</td><td>0</td></tr>
+    <tr><td><code>sum / len / round</code></td><td>Total, count, and decimal rounding for statistics.</td><td>0</td></tr>
+    <tr><td>Lazy iterator</td><td>Object producing values on demand; one pass only.</td><td>0</td></tr>
+    <tr><td>First-class function</td><td>Function treated as an ordinary value.</td><td>1</td></tr>
+    <tr><td>Higher-order function</td><td>Takes and/or returns functions.</td><td>1</td></tr>
+    <tr><td><code>Callable</code></td><td>Type hint for anything callable (from <code>collections.abc</code>).</td><td>1</td></tr>
+    <tr><td><code>callable()</code></td><td>Runtime check: can this object be called?</td><td>1</td></tr>
+    <tr><td>LEGB</td><td>Name lookup: Local, Enclosing, Global, Built-in.</td><td>2</td></tr>
+    <tr><td>Lexical scope</td><td>Visibility decided by where code is written.</td><td>2</td></tr>
+    <tr><td>Closure</td><td>Inner function retaining outer variables after return.</td><td>2</td></tr>
+    <tr><td><code>nonlocal</code></td><td>Rebind a variable in the enclosing function.</td><td>2</td></tr>
+    <tr><td>Mutable shared state</td><td>Mutate a dict/list in a closure without <code>nonlocal</code>.</td><td>2</td></tr>
+    <tr><td>Factory function</td><td>Builds and returns configured functions.</td><td>2</td></tr>
+    <tr><td><code>reduce</code></td><td>Folds a sequence into one value.</td><td>3</td></tr>
+    <tr><td><code>operator</code> module</td><td>Operators as callable functions.</td><td>3</td></tr>
+    <tr><td><code>partial</code></td><td>Function with some arguments pre-filled.</td><td>3</td></tr>
+    <tr><td><code>lru_cache</code></td><td>Memoises results by arguments.</td><td>3</td></tr>
+    <tr><td><code>singledispatch</code></td><td>Chooses implementation by first argument’s type.</td><td>3</td></tr>
+    <tr><td>Decorator</td><td>Function that wraps another to add behaviour.</td><td>4</td></tr>
+    <tr><td><code>functools.wraps</code></td><td>Copies original metadata onto the wrapper.</td><td>4</td></tr>
+    <tr><td>Decorator factory</td><td>Function returning a decorator, to accept settings.</td><td>4</td></tr>
+    <tr><td>Retry pattern</td><td>Re-run a failing call up to N times.</td><td>4</td></tr>
+    <tr><td><code>@staticmethod</code></td><td>Method with no <code>self</code>/<code>cls</code>.</td><td>4</td></tr>
+    <tr><td><code>typing.cast</code></td><td>Type-checker hint with no runtime effect.</td><td>4</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ============ RESEARCH ============ -->
+<section class="chapter" id="research">
+  <span class="tag">Go deeper</span>
+  <h2>Research keywords</h2>
+  <p class="goal">Search these terms to go beyond the exercises.</p>
+  <div class="concept">
+    <ul>
+      <li><b>Ex 0:</b> list comprehension vs map/filter; <code>operator.itemgetter</code>; stable sorting; generator expressions; PEP 8 E731.</li>
+      <li><b>Ex 1:</b> function composition; <code>Callable[[...], ...]</code> parameter specs; <code>typing.ParamSpec</code>; <code>__call__</code> and callable objects; currying.</li>
+      <li><b>Ex 2:</b> late binding in closures; <code>__closure__</code> and cell objects; <code>LEGB</code>; name binding vs mutation; encapsulation via closures.</li>
+      <li><b>Ex 3:</b> <code>reduce</code> initial value; <code>functools.cache</code>; <code>lru_cache</code> maxsize and hashing; <code>singledispatchmethod</code>; <code>partialmethod</code>; <code>functools.total_ordering</code>.</li>
+      <li><b>Ex 4:</b> class-based decorators; stacking decorators (order of application); <code>@classmethod</code>; <code>@property</code>; exponential backoff; <code>time.perf_counter</code> vs <code>time.time</code>.</li>
+      <li><b>General:</b> pure functions; immutability; side effects; referential transparency; mypy and flake8 usage; <code>__name__ == "__main__"</code> guard.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    var root = document.documentElement;
+    btn.addEventListener('click', function () {
+      var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var current = root.getAttribute('data-theme') || (dark ? 'dark' : 'light');
+      root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    });
+  })();
+</script>
+</body>
+</html>

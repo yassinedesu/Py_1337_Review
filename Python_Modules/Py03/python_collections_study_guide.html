@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Collections Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f1e7;
+    --paper-2: #efe8d8;
+    --ink: #1c1a17;
+    --muted: #6d665a;
+    --rule: #d8cfbb;
+    --accent: #b8431f;
+    --accent-soft: #f3d9cd;
+    --green: #2f6b4f;
+    --green-soft: #dcebe2;
+    --amber: #9a6b00;
+    --amber-soft: #f6e8bf;
+    --code-bg: #1f1d1a;
+    --code-ink: #efe7d6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  nav {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 2.5rem 1.5rem 2rem 1.5rem;
+    border-right: 1px solid var(--rule);
+  }
+  nav .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    line-height: 1.15;
+    margin-bottom: 0.3rem;
+  }
+  nav .sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 1.8rem;
+  }
+  nav ol { list-style: none; counter-reset: n; }
+  nav li { counter-increment: n; margin-bottom: 0.15rem; }
+  nav a {
+    display: block;
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 0.88rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    border-left: 2px solid transparent;
+  }
+  nav a::before {
+    content: counter(n, decimal-leading-zero) "  ";
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+  }
+  nav a:hover { background: var(--paper-2); border-left-color: var(--accent); }
+
+  main { padding: 3rem 3rem 5rem 3rem; }
+
+  .hero { margin-bottom: 3.5rem; padding-bottom: 2rem; border-bottom: 2px solid var(--ink); }
+  .hero .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .hero p { margin-top: 1rem; color: var(--muted); max-width: 620px; }
+
+  section { margin-bottom: 4rem; scroll-margin-top: 1.5rem; }
+  section > .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.9rem;
+    line-height: 1.15;
+    margin: 0.2rem 0 1rem 0;
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin: 1.8rem 0 0.5rem 0;
+  }
+  p { margin-bottom: 0.9rem; }
+  ul, ol.plain { margin: 0 0 1rem 1.3rem; }
+  li { margin-bottom: 0.3rem; }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85em;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 0.08em 0.38em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    margin: 0.8rem 0 1.2rem 0;
+    overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+  .c { color: #8f8574; }
+  .k { color: #e8946f; }
+  .s { color: #9fd3a8; }
+  .o { color: #f0c866; }
+
+  .callout {
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin: 1.1rem 0;
+    border-left: 4px solid;
+    font-size: 0.93rem;
+  }
+  .callout .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: block;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .key { background: var(--green-soft); border-color: var(--green); }
+  .key .label { color: var(--green); }
+  .warn { background: var(--accent-soft); border-color: var(--accent); }
+  .warn .label { color: var(--accent); }
+  .note { background: var(--amber-soft); border-color: var(--amber); }
+  .note .label { color: var(--amber); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.4rem 0;
+    font-size: 0.9rem;
+  }
+  th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .qa {
+    background: #fffdf8;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.7rem;
+  }
+  .qa summary { cursor: pointer; font-weight: 600; list-style: none; }
+  .qa summary::before { content: "Q  "; font-family: 'IBM Plex Mono', monospace; color: var(--accent); }
+  .qa[open] summary { margin-bottom: 0.6rem; }
+  .qa p:last-child { margin-bottom: 0; }
+
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  footer {
+    border-top: 2px solid var(--ink);
+    padding-top: 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    nav { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--rule); }
+    main { padding: 2rem 1.25rem 4rem 1.25rem; }
+    .two { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav>
+  <div class="brand">Python Collections</div>
+  <div class="sub">Study guide · Data Quest</div>
+  <ol>
+    <li><a href="#big-picture">The big picture</a></li>
+    <li><a href="#lists">Lists &amp; sys.argv</a></li>
+    <li><a href="#mutability">Mutability &amp; references</a></li>
+    <li><a href="#tuples">Tuples &amp; hashability</a></li>
+    <li><a href="#hashing">Hash tables</a></li>
+    <li><a href="#sets">Sets</a></li>
+    <li><a href="#dicts">Dictionaries</a></li>
+    <li><a href="#generators">Generators</a></li>
+    <li><a href="#comprehensions">Comprehensions</a></li>
+    <li><a href="#cheatsheet">Cheat sheet</a></li>
+    <li><a href="#selftest">Self-test</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<div class="hero">
+  <div class="kicker">Module recap · Python 3.10+</div>
+  <h1>Python collections, explained.</h1>
+  <p>Everything we went through in the Q&amp;A, organised by concept: what each structure is, why it behaves the way it does, and the exact points an evaluator is likely to probe.</p>
+</div>
+
+<!-- 1 -->
+<section id="big-picture">
+  <div class="num">01</div>
+  <h2>The big picture</h2>
+  <p>The foreword of the subject says it in one line: <em>at scale, your data structure is your algorithm.</em> Picking the wrong container can turn a constant-time check into a linear scan, and nothing in the code looks wrong.</p>
+
+  <table>
+    <tr><th>Type</th><th>Ordered</th><th>Mutable</th><th>Duplicates</th><th>Hashable</th><th>Lookup</th></tr>
+    <tr><td><code>list</code></td><td>Yes (by index)</td><td>Yes</td><td>Yes</td><td>No</td><td>O(n) by value</td></tr>
+    <tr><td><code>tuple</code></td><td>Yes (by index)</td><td>No</td><td>Yes</td><td>Yes*</td><td>O(n) by value</td></tr>
+    <tr><td><code>set</code></td><td>No</td><td>Yes</td><td>No</td><td>No</td><td>O(1) average</td></tr>
+    <tr><td><code>dict</code></td><td>Insertion order (3.7+)</td><td>Yes</td><td>Keys unique</td><td>No</td><td>O(1) average by key</td></tr>
+    <tr><td>generator</td><td>Sequential</td><td>n/a</td><td>n/a</td><td>n/a</td><td>Single pass</td></tr>
+  </table>
+  <p style="font-size:0.85rem;color:var(--muted)">* A tuple is hashable only if everything inside it is hashable. <code>([1], 2)</code> is not.</p>
+</section>
+
+<!-- 2 -->
+<section id="lists">
+  <div class="num">02</div>
+  <h2>Lists and <code>sys.argv</code></h2>
+  <p><code>sys.argv</code> is a plain Python list of strings. Index 0 is the program name, the user's arguments start at index 1. Everything arrives as <code>str</code>, even <code>42</code>, so numeric input must be converted.</p>
+
+  <h3>Indexing vs slicing</h3>
+  <pre><code><span class="c"># python3 prog.py hello world 42</span>
+sys.argv        <span class="c"># ['prog.py', 'hello', 'world', '42']</span>
+sys.argv[1]     <span class="c"># 'hello'                  → a single element (a str)</span>
+sys.argv[1:]    <span class="c"># ['hello', 'world', '42'] → a new list (a slice)</span></code></pre>
+
+  <div class="callout key">
+    <span class="label">Key idea</span>
+    <p>Indexing returns <strong>one element</strong>. Slicing returns a <strong>new list</strong>. Slicing out of range never raises, indexing out of range raises <code>IndexError</code>.</p>
+  </div>
+
+  <h3>Three ways to loop, and when to use each</h3>
+  <pre><code><span class="c"># 1. You only need the values</span>
+<span class="k">for</span> arg <span class="k">in</span> sys.argv[1:]:
+    print(arg)
+
+<span class="c"># 2. You need the index too (what ex0 requires: "Argument 1: hello")</span>
+<span class="k">for</span> i <span class="k">in</span> range(1, len(sys.argv)):
+    print(f"Argument {i}: {sys.argv[i]}")
+
+<span class="c"># 3. Same result, most Pythonic</span>
+<span class="k">for</span> i, arg <span class="k">in</span> enumerate(sys.argv[1:], start=1):
+    print(f"Argument {i}: {arg}")</code></pre>
+
+  <p>You chose <code>range()</code> because the output needs a counter. That is a valid reason. <code>enumerate()</code> expresses the same thing without manual indexing, which removes a class of off-by-one mistakes.</p>
+
+  <div class="callout note">
+    <span class="label">Be ready to discuss</span>
+    <p>The subject says there are multiple ways to avoid printing the program name again. Slicing <code>argv[1:]</code>, starting <code>range</code> at 1, and <code>enumerate(..., start=1)</code> are all valid. Be able to compare them.</p>
+  </div>
+
+  <h3>Handling bad input</h3>
+  <pre><code>valid = []
+<span class="k">for</span> raw <span class="k">in</span> sys.argv[1:]:
+    <span class="k">try</span>:
+        valid.append(int(raw))
+    <span class="k">except</span> ValueError:
+        print(f"Invalid parameter: '{raw}'")   <span class="c"># match the subject's wording exactly</span></code></pre>
+  <p>Build a <strong>new</strong> list of valid values instead of editing <code>sys.argv</code>. It is technically mutable, but it is global shared state, so changing it can surprise any other code that reads it.</p>
+</section>
+
+<!-- 3 -->
+<section id="mutability">
+  <div class="num">03</div>
+  <h2>Mutability and references</h2>
+  <p><strong>Mutable</strong> means the object can be changed in place after creation: add, remove, or replace elements. Lists, dicts and sets are mutable. Ints, floats, strs and tuples are not.</p>
+
+  <h3>What actually gets passed to a function</h3>
+  <p>Python passes a <strong>reference to the object</strong> (sometimes called pass-by-object-reference). The parameter name and the caller's variable point to the same object in memory. Nothing is copied.</p>
+
+  <div class="two">
+<pre><code><span class="k">def</span> add_score(lst):
+    lst.append(999)
+
+scores = [100, 200]
+add_score(scores)
+print(scores)
+<span class="c"># [100, 200, 999]</span></code></pre>
+<pre><code><span class="k">def</span> add_ten(n):
+    n += 10
+
+x = 5
+add_ten(x)
+print(x)
+<span class="c"># 5</span></code></pre>
+  </div>
+
+  <p><strong>Left:</strong> <code>append</code> mutates the one shared list, so the caller sees the change. <strong>Right:</strong> an int cannot be mutated. <code>n += 10</code> builds a new int <code>15</code> and rebinds the <em>local</em> name <code>n</code> to it. The caller's <code>x</code> still points at <code>5</code>.</p>
+
+  <div class="callout warn">
+    <span class="label">Common trap</span>
+    <p>Reassigning inside a function (<code>lst = [1, 2]</code>) does <strong>not</strong> affect the caller, even for lists. Only <em>mutating</em> methods (<code>append</code>, <code>pop</code>, <code>sort</code>, item assignment) do. Knowing the difference between rebinding and mutating is the whole concept.</p>
+  </div>
+
+  <h3>Mutable default arguments</h3>
+  <pre><code><span class="k">def</span> add(item, bucket=[]):      <span class="c"># bug: one list shared by every call</span>
+    bucket.append(item)
+    <span class="k">return</span> bucket
+
+<span class="k">def</span> add(item, bucket=<span class="k">None</span>):    <span class="c"># correct</span>
+    <span class="k">if</span> bucket <span class="k">is</span> <span class="k">None</span>:
+        bucket = []
+    bucket.append(item)
+    <span class="k">return</span> bucket</code></pre>
+</section>
+
+<!-- 4 -->
+<section id="tuples">
+  <div class="num">04</div>
+  <h2>Tuples and hashability</h2>
+  <p>A tuple is an ordered, <strong>immutable</strong> sequence. Once created, you cannot add, remove or replace elements. That makes it a good fit for data that is a fixed whole, like a 3D coordinate <code>(x, y, z)</code>.</p>
+
+  <h3>Why not a list for coordinates?</h3>
+  <ul>
+    <li>A list could be modified by accident anywhere it is passed around (see section 3).</li>
+    <li>A list cannot be used as a dict key or stored in a set. A tuple can.</li>
+    <li>The tuple communicates intent: this is one position, not a growing collection.</li>
+  </ul>
+
+  <h3>Unpacking</h3>
+  <pre><code>pos = (3, 4, 0)
+x, y, z = pos                 <span class="c"># unpacking: one name per element</span>
+visited = {(3, 4, 0): <span class="s">"spawn"</span>}   <span class="c"># tuple as a dict key</span>
+single = (5,)                 <span class="c"># the comma makes it a tuple, not (5)</span></code></pre>
+
+  <h3>What "hashable" really means</h3>
+  <div class="callout warn">
+    <span class="label">Correction from the Q&amp;A</span>
+    <p>Hashing is <strong>not</strong> hiding a value and re-hashing it later to compare. A hash is a fixed-size integer "fingerprint" computed from an object's value. It is <strong>not reversible</strong>, and its job is fast lookup, not encoding.</p>
+  </div>
+  <p>An object is hashable if it has a hash value that <em>never changes during its lifetime</em> and it can be compared for equality. This is why immutability enables hashability: if an object could change after being stored, its hash would change too, and Python would look in the wrong place and lose it.</p>
+
+  <pre><code>d = {}
+d[(1, 2, 3)] = <span class="s">"position"</span>    <span class="c"># OK: tuple is hashable</span>
+d[[1, 2, 3]] = <span class="s">"position"</span>    <span class="c"># TypeError: unhashable type: 'list'</span>
+hash((1, 2, 3))              <span class="c"># an int; same value every time in one run</span>
+hash(([1], 2))               <span class="c"># TypeError: the tuple contains a list</span></code></pre>
+
+  <div class="callout note">
+    <span class="label">Review</span>
+    <p>For 3D coordinates the subject expects <code>float</code>. <code>int("2.5")</code> raises <code>ValueError</code>, <code>float("2.5")</code> works. Know that <code>float("abc")</code> raises the same <code>ValueError</code>, which is what your <code>try/except</code> catches.</p>
+  </div>
+
+  <h3>Distance formula</h3>
+  <pre><code><span class="k">import</span> math
+dist = math.sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)   <span class="c"># 3D Pythagoras</span></code></pre>
+</section>
+
+<!-- 5 -->
+<section id="hashing">
+  <div class="num">05</div>
+  <h2>How a hash table works</h2>
+  <p>Sets and dicts share one mechanism. This is the single most important idea behind the Twitter story in the foreword.</p>
+
+  <h3>List lookup: linear scan</h3>
+  <p><code>x in my_list</code> compares <code>x</code> against element 0, then 1, then 2, until it finds it or reaches the end. Cost grows with the list: <strong>O(n)</strong>.</p>
+
+  <h3>Set / dict lookup: jump straight to the slot</h3>
+  <ol class="plain">
+    <li>Compute <code>hash(x)</code>, an integer.</li>
+    <li>Reduce it to a slot number, conceptually <code>hash(x) % table_size</code>.</li>
+    <li>Look in that slot. If it holds an equal value, found. Otherwise follow Python's collision handling.</li>
+  </ol>
+  <p>The cost does not depend on how many elements are stored: <strong>O(1) on average</strong>.</p>
+
+  <div class="callout key">
+    <span class="label">Why duplicates vanish</span>
+    <p>Two equal values produce the same hash, so they land in the same slot. The table sees "already present" and does not store a second copy. That is why a set cannot hold duplicates and why dict keys are unique.</p>
+  </div>
+
+  <div class="callout note">
+    <span class="label">Be precise in an evaluation</span>
+    <p>Two <em>different</em> values can occasionally share a slot. That is a <strong>collision</strong>, and Python resolves it internally (open addressing). So O(1) is the <em>average</em> case, not a guarantee. Also, the table <strong>resizes</strong> as it fills, so the slot count is not simply the number of elements.</p>
+  </div>
+
+  <pre><code>big_list = list(range(1_000_000))
+big_set  = set(big_list)
+999_999 <span class="k">in</span> big_list    <span class="c"># scans a million items</span>
+999_999 <span class="k">in</span> big_set     <span class="c"># one hash, one probe</span></code></pre>
+</section>
+
+<!-- 6 -->
+<section id="sets">
+  <div class="num">06</div>
+  <h2>Sets</h2>
+  <p>A set is an unordered collection of <strong>unique, hashable</strong> elements. Use it when you care about membership and uniqueness, not position.</p>
+
+  <h3>Set algebra (what ex3 is built on)</h3>
+  <pre><code>a = {<span class="s">"first_kill"</span>, <span class="s">"level_10"</span>, <span class="s">"speed_demon"</span>}
+b = {<span class="s">"level_10"</span>, <span class="s">"boss_slayer"</span>}
+c = {<span class="s">"level_10"</span>, <span class="s">"collector"</span>}
+
+a.union(b, c)          <span class="c"># everything anyone has            (a | b | c)</span>
+a.intersection(b, c)   <span class="c"># shared by all                    (a &amp; b &amp; c)</span>
+a.difference(b, c)     <span class="c"># only in a, nobody else has it    (a - b - c)</span>
+all_ach = a | b | c
+all_ach.difference(a)  <span class="c"># what a is missing to have them all</span></code></pre>
+
+  <table>
+    <tr><th>Question</th><th>Operation</th></tr>
+    <tr><td>All distinct achievements among players</td><td><code>union</code></td></tr>
+    <tr><td>Achievements shared by all players</td><td><code>intersection</code></td></tr>
+    <tr><td>Achievements only this player has</td><td><code>player.difference(*others)</code></td></tr>
+    <tr><td>What this player is missing to have everything</td><td><code>all_distinct.difference(player)</code></td></tr>
+  </table>
+
+  <h3>The empty-set quirk</h3>
+  <pre><code>s = set()
+print(s)        <span class="c"># set()</span>
+type({})        <span class="c"># &lt;class 'dict'&gt;  — {} is an EMPTY DICT, not an empty set</span></code></pre>
+  <p>Dicts used <code>{}</code> first, historically, so an empty pair of braces is a dict. The only way to build an empty set is <code>set()</code>, and Python prints it that way so you never mistake it for an empty dict.</p>
+
+  <div class="callout note">
+    <span class="label">Randomised sets (newer subject)</span>
+    <p>The updated ex3 builds each player's set with <code>random</code>. Use <code>random.sample(pool, k)</code> to pick <code>k</code> <em>distinct</em> items, and choose <code>k</code> randomly too. Keep the pool small enough relative to <code>k</code> that the "only this player has" and "common" sets are usually non-empty. <code>random.choice</code> repeated would pick duplicates, which a set silently absorbs, so the set may end up smaller than intended.</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="dicts">
+  <div class="num">07</div>
+  <h2>Dictionaries</h2>
+  <p>A dict maps <strong>hashable keys</strong> to values using the same hash table as sets. Keys are unique, and since Python 3.7 dicts keep insertion order.</p>
+
+  <h3>Iterating</h3>
+  <div class="two">
+<pre><code><span class="k">for</span> key <span class="k">in</span> d:
+    print(key, d[key])   <span class="c"># second lookup</span></code></pre>
+<pre><code><span class="k">for</span> key, value <span class="k">in</span> d.items():
+    print(key, value)    <span class="c"># one pass</span></code></pre>
+  </div>
+  <p>Same output. <code>.items()</code> yields (key, value) pairs which you unpack directly, avoiding the extra lookup and reading more clearly.</p>
+
+  <h3>Membership checks keys, not values</h3>
+  <pre><code>inventory = {<span class="s">"sword"</span>: 1, <span class="s">"potion"</span>: 5}
+<span class="s">"sword"</span> <span class="k">in</span> inventory            <span class="c"># True  (O(1), hashed key lookup)</span>
+1 <span class="k">in</span> inventory                  <span class="c"># False (1 is a value, not a key)</span>
+1 <span class="k">in</span> inventory.values()         <span class="c"># True  (but this is a linear scan)</span></code></pre>
+
+  <h3>Useful methods</h3>
+  <table>
+    <tr><th>Method</th><th>Does</th></tr>
+    <tr><td><code>d.keys()</code> / <code>d.values()</code> / <code>d.items()</code></td><td>Views of keys / values / pairs. Wrap in <code>list()</code> for a list.</td></tr>
+    <tr><td><code>d[k]</code></td><td>Value, or <code>KeyError</code> if missing.</td></tr>
+    <tr><td><code>d.get(k, default)</code></td><td>Value, or the default if missing. No exception.</td></tr>
+    <tr><td><code>d.update({...})</code></td><td>Add or overwrite several pairs.</td></tr>
+  </table>
+
+  <h3>Parsing <code>name:qty</code> safely</h3>
+  <pre><code><span class="k">for</span> arg <span class="k">in</span> sys.argv[1:]:
+    <span class="k">if</span> <span class="s">":"</span> <span class="k">not in</span> arg:
+        print(f"Error - invalid parameter '{arg}'"); <span class="k">continue</span>
+    name, _, qty = arg.partition(<span class="s">":"</span>)
+    <span class="k">if</span> name <span class="k">in</span> inventory:
+        print(f"Redundant item '{name}' - discarding"); <span class="k">continue</span>
+    <span class="k">try</span>:
+        inventory[name] = int(qty)
+    <span class="k">except</span> ValueError <span class="k">as</span> e:
+        print(f"Quantity error for '{name}': {e}")</code></pre>
+  <div class="callout warn">
+    <span class="label">Watch out</span>
+    <p>Wrapping the <em>whole</em> loop in one <code>try/except</code> stops at the first bad argument. Put the <code>try</code> <em>inside</em> the loop so one bad parameter is reported and skipped while the rest are still processed.</p>
+  </div>
+
+  <h3>Percentages and ties</h3>
+  <p><code>max(d.items(), key=...)</code> returns the <strong>first</strong> maximal item encountered, which gives the "first from the command line in case of a tie" behaviour for free, because dicts preserve insertion order.</p>
+</section>
+
+<!-- 8 -->
+<section id="generators">
+  <div class="num">08</div>
+  <h2>Generators</h2>
+  <p>A generator function contains <code>yield</code>. Calling it does not run the body. It returns a <strong>generator object</strong> that runs the body lazily, one step at a time, when you call <code>next()</code> on it or loop over it.</p>
+
+  <h3>What happens at <code>yield</code></h3>
+  <ol class="plain">
+    <li>The function <strong>suspends</strong>, keeping all its local variables and its exact position.</li>
+    <li>The yielded value is <strong>handed to the caller</strong>.</li>
+    <li>On the next <code>next()</code>, execution <strong>resumes right after the yield</strong>.</li>
+  </ol>
+  <p>A normal function with <code>return</code> ends and forgets everything. A generator stays alive, frozen, between calls.</p>
+
+  <pre><code><span class="k">def</span> fibonacci():
+    a, b = 0, 1
+    <span class="k">while True</span>:          <span class="c"># infinite, and that's fine</span>
+        <span class="k">yield</span> a
+        a, b = b, a + b
+
+fib = fibonacci()
+[next(fib) <span class="k">for</span> _ <span class="k">in</span> range(10)]   <span class="c"># [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]</span></code></pre>
+
+  <div class="callout key">
+    <span class="label">Why an infinite loop doesn't hang</span>
+    <p>Nothing runs until you ask. The caller decides how many values to pull. Between pulls the generator is just a paused object holding a few variables.</p>
+  </div>
+
+  <h3>Memory: the real difference</h3>
+  <div class="callout warn">
+    <span class="label">Correction from the Q&amp;A</span>
+    <p>The difference is not about "restarting" or "continuing". It is about <strong>how many items exist in RAM at the same moment</strong>.</p>
+  </div>
+  <table>
+    <tr><th></th><th>List</th><th>Generator</th></tr>
+    <tr><td>Items in memory at once</td><td>All N</td><td>One</td></tr>
+    <tr><td>Memory growth</td><td>Linear with N</td><td>Constant</td></tr>
+    <tr><td>Start-up cost</td><td>Compute everything first</td><td>Immediate</td></tr>
+    <tr><td>Reusable</td><td>Yes, iterate many times</td><td>No, single pass</td></tr>
+    <tr><td>Indexing, <code>len()</code></td><td>Yes</td><td>No</td></tr>
+  </table>
+  <p>A list of a million events at roughly 200 bytes each is on the order of 200&nbsp;MB held at once. A generator yielding the same million events holds one event at a time. For ten items it makes no practical difference, so use a list when the data is small and you need indexing or reuse.</p>
+
+  <h3>Exhaustion</h3>
+  <pre><code>g = (n <span class="k">for</span> n <span class="k">in</span> range(2))
+next(g); next(g)
+next(g)          <span class="c"># StopIteration: the generator is used up</span>
+list(g)          <span class="c"># []  — you cannot rewind; make a new generator</span></code></pre>
+  <p>A <code>for</code> loop handles <code>StopIteration</code> for you, which is why <code>for x in generator()</code> ends cleanly.</p>
+
+  <h3>Typing</h3>
+  <pre><code><span class="k">from</span> typing <span class="k">import</span> Generator
+<span class="k">def</span> gen_event() -&gt; Generator[tuple[str, str], <span class="k">None</span>, <span class="k">None</span>]:
+    ...</code></pre>
+  <p>The three parameters are: type yielded, type accepted by <code>send()</code>, type returned at the end. <code>mypy</code> checks these, and the subject requires type hints on every function.</p>
+</section>
+
+<!-- 9 -->
+<section id="comprehensions">
+  <div class="num">09</div>
+  <h2>Comprehensions</h2>
+  <p>A comprehension builds a collection from an iterable in one expression. It is a compact form of a loop that appends.</p>
+
+  <h3>Three components</h3>
+<pre><code>[ p[<span class="s">"name"</span>]   <span class="k">for</span> p <span class="k">in</span> players   <span class="k">if</span> p[<span class="s">"score"</span>] &gt; 2000 ]
+<span class="c">#  expression    iterable            filter (optional)</span></code></pre>
+  <ul>
+    <li><strong>Expression</strong>: what ends up in the result (can transform the item).</li>
+    <li><strong>Iterable</strong>: what you loop over, with its loop variable.</li>
+    <li><strong>Filter</strong>: optional <code>if</code> that decides which items are kept.</li>
+  </ul>
+
+  <h3>The equivalent loop</h3>
+  <pre><code>high_scorers = []
+<span class="k">for</span> p <span class="k">in</span> players:
+    <span class="k">if</span> p[<span class="s">"score"</span>] &gt; 2000:
+        high_scorers.append(p[<span class="s">"name"</span>])</code></pre>
+  <p>The most common slip: forgetting the <code>append</code>. A bare <code>p["name"]</code> in a loop computes a value and throws it away.</p>
+
+  <h3>One syntax, four results</h3>
+  <table>
+    <tr><th>Brackets</th><th>Builds</th><th>Example</th></tr>
+    <tr><td><code>[ ... ]</code></td><td>list</td><td><code>[n*2 for n in nums]</code></td></tr>
+    <tr><td><code>{ k: v ... }</code></td><td>dict</td><td><code>{p["name"]: p["score"] for p in players}</code></td></tr>
+    <tr><td><code>{ ... }</code></td><td>set</td><td><code>{p["region"] for p in players}</code></td></tr>
+    <tr><td><code>( ... )</code></td><td><strong>generator</strong>, not a tuple</td><td><code>(n*2 for n in nums)</code></td></tr>
+  </table>
+
+  <div class="callout key">
+    <span class="label">Connecting it to generators</span>
+    <p><code>[x for x in data]</code> computes everything now and stores it. <code>(x for x in data)</code> computes nothing yet and yields one value per <code>next()</code>. Same syntax, eager versus lazy. There is no such thing as a "tuple comprehension".</p>
+  </div>
+
+  <h3>Subject-specific patterns (ex6)</h3>
+  <pre><code>names = [<span class="s">"Alice"</span>, <span class="s">"bob"</span>, <span class="s">"Charlie"</span>, <span class="s">"dylan"</span>]
+all_caps   = [n.capitalize() <span class="k">for</span> n <span class="k">in</span> names]
+only_caps  = [n <span class="k">for</span> n <span class="k">in</span> names <span class="k">if</span> n[0].isupper()]
+scores     = {n: random.randint(0, 1000) <span class="k">for</span> n <span class="k">in</span> all_caps}
+avg        = round(sum(scores.values()) / len(scores), 2)
+high       = {n: s <span class="k">for</span> n, s <span class="k">in</span> scores.items() <span class="k">if</span> s &gt; avg}</code></pre>
+
+  <div class="callout note">
+    <span class="label">Style rule</span>
+    <p>Keep each comprehension on one line unless it exceeds the flake8 line length (79). If a comprehension needs nested loops <em>and</em> conditions, a regular loop is usually more readable. Clever is not the goal.</p>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="cheatsheet">
+  <div class="num">10</div>
+  <h2>Cheat sheet</h2>
+  <table>
+    <tr><th>If you need…</th><th>Use</th><th>Why</th></tr>
+    <tr><td>Ordered, changeable sequence</td><td><code>list</code></td><td>Index access, append, sort</td></tr>
+    <tr><td>Fixed record, dict key</td><td><code>tuple</code></td><td>Immutable, hashable</td></tr>
+    <tr><td>Fast membership, uniqueness, set algebra</td><td><code>set</code></td><td>Hash table, O(1) average</td></tr>
+    <tr><td>Look up a value by a name</td><td><code>dict</code></td><td>Hash table keyed lookup</td></tr>
+    <tr><td>Huge or endless stream, constant memory</td><td>generator</td><td>One item at a time</td></tr>
+    <tr><td>Build a collection from another</td><td>comprehension</td><td>Compact and fast</td></tr>
+  </table>
+
+  <h3>Project rules to keep in mind</h3>
+  <ul>
+    <li>Python 3.10+, <strong>flake8</strong> clean, <strong>type hints</strong> on all functions (checked with <code>mypy</code>).</li>
+    <li>Handle exceptions gracefully. No crashes on bad input.</li>
+    <li>No file I/O. Data comes from memory or command-line arguments.</li>
+    <li>Only the allowed functions and methods listed in each exercise header.</li>
+    <li>Match the subject's output format <strong>exactly</strong>, since peers compare character by character.</li>
+    <li>AI rule: only submit what you can explain. Expect to be asked to extend your code live.</li>
+  </ul>
+</section>
+
+<!-- 11 -->
+<section id="selftest">
+  <div class="num">11</div>
+  <h2>Self-test</h2>
+  <p>Cover the answer, say it out loud, then open it.</p>
+
+  <details class="qa"><summary>Difference between <code>argv[1]</code> and <code>argv[1:]</code>?</summary>
+    <p>The first is one element (a string). The second is a new list from index 1 to the end.</p></details>
+
+  <details class="qa"><summary>When is <code>range(len(x))</code> justified, and what's the better alternative?</summary>
+    <p>When you need the index. <code>enumerate()</code> gives index and value together without manual indexing.</p></details>
+
+  <details class="qa"><summary>What is passed when you give a list to a function? What changes for an int?</summary>
+    <p>A reference to the same object. Mutating methods change the caller's list. An int is immutable, so <code>n += 10</code> only rebinds the local name.</p></details>
+
+  <details class="qa"><summary>Why can a tuple be a dict key but a list cannot?</summary>
+    <p>A tuple's hash never changes because it cannot change, so it is hashable. A list is mutable, so it has no stable hash and raises <code>TypeError</code>.</p></details>
+
+  <details class="qa"><summary>What is a hash, and is it reversible?</summary>
+    <p>A fixed-size integer fingerprint computed from a value, used to pick a slot for fast lookup. It is not reversible and not an encoding of the value.</p></details>
+
+  <details class="qa"><summary>Why is <code>x in set</code> faster than <code>x in list</code>?</summary>
+    <p>The set hashes <code>x</code> and probes one slot, O(1) on average. The list compares element by element, O(n).</p></details>
+
+  <details class="qa"><summary>Why can't a set hold duplicates?</summary>
+    <p>Equal values have the same hash and land in the same slot, where the table finds the existing equal entry and does not add another.</p></details>
+
+  <details class="qa"><summary>How do you create an empty set, and why does Python print it as <code>set()</code>?</summary>
+    <p><code>set()</code>. The literal <code>{}</code> is an empty dict, so printing an empty set as <code>{}</code> would be ambiguous.</p></details>
+
+  <details class="qa"><summary>What does <code>in</code> test on a dict?</summary>
+    <p>Keys only, via the hash table, in O(1) average time.</p></details>
+
+  <details class="qa"><summary>What happens at <code>yield</code> and at the next <code>next()</code>?</summary>
+    <p>The generator suspends with its state intact and hands out a value. The next <code>next()</code> resumes right after that <code>yield</code>.</p></details>
+
+  <details class="qa"><summary>What is the memory difference between a list and a generator over N items?</summary>
+    <p>The list holds all N at once. The generator holds one at a time, so memory is constant.</p></details>
+
+  <details class="qa"><summary>What does <code>(x for x in data)</code> produce?</summary>
+    <p>A generator expression: lazy, single-pass, nothing computed until you pull from it.</p></details>
+
+  <footer style="margin-top:3rem">
+    Data Quest · Mastering Python Collections · study guide generated 29 Oct 2026
+  </footer>
+</section>
+
+</main>
+</div>
+</body>
+</html>

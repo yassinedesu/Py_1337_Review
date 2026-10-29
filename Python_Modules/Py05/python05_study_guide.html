@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Code Nexus Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#080c10; --surface:#0d1117; --surface2:#111a22; --border:#1e2d3d;
+    --accent:#00ffe0; --pink:#ff4c6a; --gold:#f0c040; --text:#c9d6e3; --muted:#5b6f82;
+    --mono:'Share Tech Mono',monospace; --sans:'Syne',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.7;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(0,255,224,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,224,.03) 1px,transparent 1px);
+    background-size:40px 40px}
+  .layout{position:relative;z-index:1;display:grid;grid-template-columns:240px 1fr;max-width:1180px;margin:0 auto}
+  nav{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:40px 20px;border-right:1px solid var(--border)}
+  nav .brand{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:24px}
+  nav a{display:block;font-size:13px;color:var(--muted);text-decoration:none;padding:6px 0 6px 12px;border-left:2px solid transparent;transition:.2s}
+  nav a:hover{color:var(--accent);border-left-color:var(--accent)}
+  main{padding:56px 40px 100px;min-width:0}
+  header{border-left:3px solid var(--accent);padding-left:20px;margin-bottom:56px}
+  header .label{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+  header h1{font-size:clamp(30px,5vw,46px);font-weight:800;line-height:1.1;color:#fff}
+  header h1 span{color:var(--accent)}
+  header p{margin-top:12px;color:var(--muted);font-family:var(--mono);font-size:13px}
+  section{margin-bottom:72px;scroll-margin-top:30px}
+  .num{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+  h2{font-size:28px;font-weight:800;color:#fff;margin:4px 0 18px}
+  h3{font-size:16px;font-weight:700;color:#fff;margin:28px 0 8px}
+  p{margin-bottom:14px;font-size:15px}
+  strong{color:#fff}
+  ul,ol{margin:0 0 16px 22px;font-size:15px}
+  li{margin-bottom:6px}
+  code{font-family:var(--mono);font-size:12.5px;background:#12191f;border:1px solid var(--border);padding:1px 7px;border-radius:2px;color:var(--accent)}
+  pre{font-family:var(--mono);font-size:12.5px;background:#0a1118;border:1px solid var(--border);border-left:3px solid var(--accent);padding:16px 18px;margin:12px 0 20px;overflow-x:auto;line-height:1.75;color:#9db7cb}
+  pre code{background:none;border:none;padding:0;color:inherit;font-size:inherit}
+  .k{color:var(--pink)} .f{color:var(--accent)} .c{color:#3d5568} .s{color:var(--gold)}
+  .box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);padding:16px 20px;margin:18px 0}
+  .box.warn{border-left-color:var(--gold)} .box.bad{border-left-color:var(--pink)}
+  .box .t{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .box.warn .t{color:var(--gold)} .box.bad .t{color:var(--pink)}
+  .box p:last-child,.box ul:last-child{margin-bottom:0}
+  table{width:100%;border-collapse:collapse;margin:14px 0 22px;font-size:14px}
+  th,td{text-align:left;padding:10px 14px;border:1px solid var(--border);vertical-align:top}
+  th{background:var(--surface2);color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
+  td{background:var(--surface)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .tree{font-family:var(--mono);font-size:13px;background:var(--surface);border:1px solid var(--border);padding:22px;margin:18px 0;line-height:1.9;overflow-x:auto;color:#9db7cb}
+  .tree b{color:var(--accent);font-weight:400}.tree i{color:var(--gold);font-style:normal}.tree u{color:var(--pink);text-decoration:none}
+  details{background:var(--surface);border:1px solid var(--border);margin-bottom:10px}
+  summary{cursor:pointer;padding:14px 18px;font-weight:700;color:#fff;font-size:14px;list-style:none}
+  summary::before{content:'+ ';font-family:var(--mono);color:var(--accent)}
+  details[open] summary::before{content:'– '}
+  details .ans{padding:0 18px 14px;font-size:14px}
+  footer{border-top:1px solid var(--border);padding-top:20px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+  @media(max-width:860px){.layout{grid-template-columns:1fr}nav{display:none}main{padding:40px 18px 80px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav>
+  <div class="brand">// Code Nexus</div>
+  <a href="#overview">Overview</a>
+  <a href="#abc">1 · Abstract classes</a>
+  <a href="#meta">2 · Metaclasses</a>
+  <a href="#override">3 · Overriding</a>
+  <a href="#poly">4 · Polymorphism</a>
+  <a href="#lsp">5 · LSP &amp; mypy</a>
+  <a href="#ex0">6 · Exercise 0 design</a>
+  <a href="#compose">7 · Composition</a>
+  <a href="#stream">8 · DataStream routing</a>
+  <a href="#duck">9 · Protocol &amp; duck typing</a>
+  <a href="#pipeline">10 · Output pipeline</a>
+  <a href="#style">11 · flake8, imports, bugs</a>
+  <a href="#defense">12 · Defense Q&amp;A</a>
+  <a href="#glossary">13 · Glossary</a>
+</nav>
+
+<main>
+
+<header>
+  <div class="label">// python05 · study guide</div>
+  <h1>Polymorphic Data Streams<br/><span>Everything we covered</span></h1>
+  <p>Abstract classes · overriding · polymorphism · LSP · composition · Protocol</p>
+</header>
+
+<!-- OVERVIEW -->
+<section id="overview">
+  <div class="num">Overview</div>
+  <h2>The big picture</h2>
+  <p>The project builds a small data-processing pipeline in three steps. Each step reuses the previous one.</p>
+  <table>
+    <tr><th>Exercise</th><th>What you build</th><th>Concept it teaches</th></tr>
+    <tr><td><strong>ex0</strong></td><td><code>DataProcessor</code> (abstract) + <code>NumericProcessor</code>, <code>TextProcessor</code>, <code>LogProcessor</code></td><td>Abstract classes, method overriding</td></tr>
+    <tr><td><strong>ex1</strong></td><td><code>DataStream</code> that routes mixed data to the right processor</td><td>Subtype polymorphism, composition</td></tr>
+    <tr><td><strong>ex2</strong></td><td><code>ExportPlugin</code> (Protocol) + CSV / JSON plugins, <code>output_pipeline</code></td><td>Duck typing, structural typing</td></tr>
+  </table>
+
+  <div class="tree">
+<b>DataProcessor</b> <i>(ABC)</i>          <span style="color:#3d5568">← contract: validate(), ingest(), + concrete output()</span>
+ ├── <b>NumericProcessor</b>       int / float / list of both
+ ├── <b>TextProcessor</b>          str / list[str]
+ └── <b>LogProcessor</b>           dict[str,str] / list of those
+
+<b>DataStream</b>                   <span style="color:#3d5568">← HAS a list[DataProcessor]  (composition)</span>
+   register_processor · process_stream · output_pipeline · print_processors_stats
+
+<b>ExportPlugin</b> <i>(Protocol)</i>        <span style="color:#3d5568">← shape only: process_output(data)</span>
+   CSVExportPlugin · JSONExportPlugin   <u>(no inheritance, just matching method)</u>
+  </div>
+</section>
+
+<!-- ABC -->
+<section id="abc">
+  <div class="num">Concept 1</div>
+  <h2>Abstract classes (ABC)</h2>
+  <p>An <strong>abstract class</strong> defines a contract: a list of methods every subclass must provide. You can't create an instance of it directly, and you can't create an instance of a subclass that skipped any of the required methods.</p>
+<pre><code><span class="k">from</span> abc <span class="k">import</span> ABC, abstractmethod
+
+<span class="k">class</span> <span class="f">DataProcessor</span>(ABC):
+    <span class="c">@abstractmethod</span>
+    <span class="k">def</span> <span class="f">validate</span>(self, data: Any) -> bool: ...
+
+    <span class="c">@abstractmethod</span>
+    <span class="k">def</span> <span class="f">ingest</span>(self, data: Any) -> None: ...
+
+    <span class="k">def</span> <span class="f">output</span>(self) -> tuple[int, str]:   <span class="c"># concrete: shared, not overridden</span>
+        <span class="k">return</span> self._storage.pop(0)</code></pre>
+
+  <h3>What exactly is enforced?</h3>
+  <ul>
+    <li>The subclass must <strong>define</strong> every abstract method with a real body. Having the right name isn't enough if it is still the abstract one.</li>
+    <li>The error is a <code>TypeError</code>, raised at <strong>instantiation</strong> (<code>NumericProcessor()</code>), not when the class is defined. You can define an incomplete subclass; you just can't build an object from it.</li>
+    <li>Abstract classes can also contain <strong>concrete</strong> methods (like <code>output</code>, <code>remaining</code>, <code>total_processed</code>). That is how inheritance gives you code reuse while subclasses specialise the rest.</li>
+  </ul>
+<pre><code><span class="k">class</span> <span class="f">Broken</span>(DataProcessor):
+    <span class="k">def</span> <span class="f">validate</span>(self, data: Any) -> bool: <span class="k">return</span> True
+    <span class="c"># forgot ingest()</span>
+
+Broken()   <span class="c"># TypeError: Can't instantiate abstract class Broken ... abstract method 'ingest'</span></code></pre>
+</section>
+
+<!-- META -->
+<section id="meta">
+  <div class="num">Concept 2</div>
+  <h2>Metaclasses: how ABC actually works</h2>
+  <p>In Python, <strong>classes are objects too</strong>. A <strong>metaclass</strong> is the class of a class: it decides how a class gets built.</p>
+<pre><code>type(<span class="f">42</span>)       <span class="c"># &lt;class 'int'&gt;   → 42 is an instance of int</span>
+type(<span class="f">int</span>)      <span class="c"># &lt;class 'type'&gt;  → int is an instance of type (its metaclass)</span>
+type(DataProcessor)   <span class="c"># &lt;class 'abc.ABCMeta'&gt;</span></code></pre>
+  <p>Default metaclass is <code>type</code>. <code>ABC</code> simply sets <code>metaclass=ABCMeta</code>, so every class inheriting from it is built by <code>ABCMeta</code>.</p>
+
+  <div class="box">
+    <div class="t">Precise mechanism</div>
+    <ol>
+      <li>When a class is created, <code>ABCMeta</code> scans it for methods marked <code>@abstractmethod</code> and stores the still-unimplemented names in <code>__abstractmethods__</code>.</li>
+      <li>When you call <code>MyClass()</code>, object creation (<code>object.__new__</code>) checks that set. If it is non-empty → <code>TypeError</code>.</li>
+    </ol>
+    <p>Short version for your defense: <em>metaclass = class factory; ABCMeta tracks abstract methods; instantiation fails while any remain.</em></p>
+  </div>
+</section>
+
+<!-- OVERRIDE -->
+<section id="override">
+  <div class="num">Concept 3</div>
+  <h2>Method overriding (and what it is not)</h2>
+  <div class="box">
+    <div class="t">Definition</div>
+    <p><strong>Overriding</strong> = a <strong>subclass</strong> redefines a method it <strong>inherited</strong> from its parent, replacing the parent's behaviour for its own instances.</p>
+  </div>
+  <p>The word <strong>inherited</strong> is the key. Two unrelated classes that happen to share a method name is <em>not</em> overriding.</p>
+<pre><code><span class="c"># parent</span>
+<span class="k">def</span> <span class="f">processor_name</span>(self) -> str:
+    <span class="k">return</span> self.__class__.__name__
+
+<span class="c"># NumericProcessor overrides it</span>
+<span class="k">def</span> <span class="f">processor_name</span>(self) -> str:
+    <span class="k">return</span> <span class="s">"Numeric Processor"</span></code></pre>
+  <table>
+    <tr><th>Term</th><th>Meaning</th><th>In Python</th></tr>
+    <tr><td>Overriding</td><td>Subclass replaces an inherited method</td><td>Fully supported (used all over this project)</td></tr>
+    <tr><td>Overloading</td><td>Same name, different signatures, chosen by arguments</td><td>Not natively supported (last definition wins)</td></tr>
+  </table>
+  <p>Implementing abstract methods is also overriding: the subclass provides the body for a method the parent only declared.</p>
+</section>
+
+<!-- POLY -->
+<section id="poly">
+  <div class="num">Concept 4</div>
+  <h2>Polymorphism</h2>
+  <p><strong>Polymorphism</strong> (subtype polymorphism): code written against a base type works with any subclass, and each subclass reacts in its own way to the same call.</p>
+<pre><code><span class="k">for</span> proc <span class="k">in</span> self._processors:      <span class="c"># each is "a DataProcessor"</span>
+    <span class="k">if</span> proc.validate(item):         <span class="c"># Numeric? Text? Log? DataStream doesn't care</span>
+        proc.ingest(item)</code></pre>
+  <p><code>DataStream</code> never writes <code>if isinstance(x, NumericProcessor)</code>. It calls <code>validate</code> and <code>ingest</code> and each class does its own thing.</p>
+  <h3>Why it's useful (the question the subject asks)</h3>
+  <ul>
+    <li><strong>Extensibility:</strong> add a new processor type, register it, and <code>DataStream</code> is untouched.</li>
+    <li><strong>Decoupling:</strong> the stream depends on the interface, not on concrete classes.</li>
+    <li><strong>No type-checking chains:</strong> no growing <code>if/elif</code> on types.</li>
+  </ul>
+</section>
+
+<!-- LSP -->
+<section id="lsp">
+  <div class="num">Concept 5</div>
+  <h2>LSP, <code>Any</code>, and the intentional mypy warning</h2>
+  <h3>What is mypy?</h3>
+  <p><code>mypy</code> is a <strong>static type checker</strong>. It reads your annotations and reports inconsistent types <em>without running the code</em>. It never changes runtime behaviour; annotations are just hints Python itself ignores.</p>
+
+  <h3>Liskov Substitution Principle (LSP)</h3>
+  <p>Anywhere a base type is expected, any subclass should be usable without surprises. The base class promises <code>ingest(data: Any)</code>, so in theory every subclass should accept anything. But <code>NumericProcessor.ingest</code> narrows to numbers only: that is the tension.</p>
+<pre><code><span class="c"># base</span>
+<span class="k">def</span> <span class="f">ingest</span>(self, data: Any) -> None
+
+<span class="c"># NumericProcessor narrows it</span>
+<span class="k">def</span> <span class="f">ingest</span>(self, data: Union[int, float, list[Union[int, float]]]) -> None</code></pre>
+
+  <h3>Why the warning appears in the test</h3>
+<pre><code>num_proc = NumericProcessor()
+num_proc.ingest(<span class="s">"foo"</span>)   <span class="c"># mypy: Argument 1 has incompatible type "str"</span></code></pre>
+  <p><code>num_proc</code> is declared as a <code>NumericProcessor</code>, so mypy checks the <strong>narrow</strong> signature and sees a <code>str</code> being passed. That is the deliberate "bad call" the subject asks for, which is why you silence it with <code># type: ignore[arg-type]</code>.</p>
+
+  <div class="box warn">
+    <div class="t">Why a runtime guard is still needed</div>
+    <p>Because the contract is loose (<code>Any</code> in the base), the type checker can't protect every path. If someone holds a variable typed as <code>DataProcessor</code>, mypy will accept <code>.ingest("foo")</code>, and only your runtime check stops it:</p>
+<pre><code><span class="k">if not</span> self.validate(data):
+    <span class="k">raise</span> TypeError(<span class="s">"Improper numeric data"</span>)</code></pre>
+    <p>Hence the pattern: <strong>validate first, then ingest</strong>, with <code>ingest</code> raising if you skip validation.</p>
+  </div>
+</section>
+
+<!-- EX0 -->
+<section id="ex0">
+  <div class="num">Exercise 0</div>
+  <h2>Design decisions in your processors</h2>
+
+  <h3>Storage and rank</h3>
+<pre><code>self._storage: list[tuple[int, str]] = []   <span class="c"># FIFO queue of (rank, text)</span>
+self._counter: int = 0                       <span class="c"># total ever ingested</span></code></pre>
+  <ul>
+    <li><code>output()</code> pops index 0 → <strong>oldest first</strong> (FIFO) and removes it.</li>
+    <li><code>rank</code> comes from <code>_counter</code>, which only goes up.</li>
+  </ul>
+  <div class="box">
+    <div class="t">Why _counter, not len(self._storage)?</div>
+<pre><code>ingest a,b,c   → [(0,a),(1,b),(2,c)]
+output()       → [(1,b),(2,c)]
+ingest d       → len = 2 → rank 2   ← collides with c!
+              → [(1,b),(2,c),(2,d)]</code></pre>
+    <p>A growing counter keeps ranks unique and stable even after items are removed. It also doubles as "total items processed" for the stats.</p>
+  </div>
+
+  <h3>Validation details worth knowing</h3>
+  <ul>
+    <li><code>bool</code> is a subclass of <code>int</code> in Python, so <code>isinstance(True, int)</code> is <code>True</code>. Your code excludes it explicitly with <code>not isinstance(data, bool)</code>.</li>
+    <li>Lists must be non-empty and every element must match; a mixed list like <code>['Hi', 5]</code> is rejected by every processor.</li>
+    <li>Numeric items are converted with <code>str(item)</code>; logs are formatted as <code>"LEVEL: message"</code>.</li>
+  </ul>
+
+  <h3>Unpacking list vs single value</h3>
+<pre><code>items = data <span class="k">if</span> isinstance(data, list) <span class="k">else</span> [data]
+<span class="k">for</span> item <span class="k">in</span> items: ...</code></pre>
+  <p>Normalises "one thing or many things" so one loop handles both.</p>
+</section>
+
+<!-- COMPOSE -->
+<section id="compose">
+  <div class="num">Concept 6</div>
+  <h2>Composition vs inheritance</h2>
+  <div class="grid2">
+    <div class="box"><div class="t">Inheritance = "is a"</div><p><code>NumericProcessor</code> <em>is a</em> <code>DataProcessor</code>.</p></div>
+    <div class="box"><div class="t">Composition = "has a"</div><p><code>DataStream</code> <em>has</em> a list of <code>DataProcessor</code>s.</p></div>
+  </div>
+<pre><code><span class="k">class</span> <span class="f">DataStream</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(self) -> None:
+        self._processors: list[DataProcessor] = []</code></pre>
+  <p>If <code>DataStream</code> inherited from <code>DataProcessor</code>:</p>
+  <ul>
+    <li>It would be forced to implement <code>validate</code> and <code>ingest</code>, which make no sense for a router.</li>
+    <li>The relationship would be wrong semantically: a stream is not a processor.</li>
+    <li>It would carry a single <code>_storage</code> instead of managing several processors.</li>
+  </ul>
+  <p><strong>Rule of thumb:</strong> inherit when it is-a, compose when it has-a.</p>
+</section>
+
+<!-- STREAM -->
+<section id="stream">
+  <div class="num">Exercise 1</div>
+  <h2>DataStream routing</h2>
+<pre><code><span class="k">def</span> <span class="f">process_stream</span>(self, stream: list[Any]) -> None:
+    <span class="k">for</span> item <span class="k">in</span> stream:
+        routed = False
+        <span class="k">for</span> proc <span class="k">in</span> self._processors:
+            <span class="k">if</span> proc.validate(item):
+                proc.ingest(item)
+                routed = True
+                <span class="k">break</span>                 <span class="c"># first match wins</span>
+        <span class="k">if not</span> routed:
+            print(<span class="s">"DataStream error - "</span>, end=<span class="s">""</span>)
+            print(f<span class="s">"Can't process element in stream: {item}"</span>)</code></pre>
+
+  <h3>Key behaviours</h3>
+  <ul>
+    <li><strong>First match wins:</strong> after <code>break</code>, later processors never see that item.</li>
+    <li><strong>Registration order = priority.</strong> A hypothetical <code>GenericProcessor</code> whose <code>validate</code> accepts anything would steal every item if registered first, and the specialised processors would get nothing.</li>
+    <li><strong>The error is printed only when <em>no</em> processor accepts the item</strong> (<code>routed</code> stays <code>False</code>). Two processors both accepting an item does not cause an error; it just goes to the first.</li>
+    <li>In the subject's example the first batch has only a <code>NumericProcessor</code> registered, so text and logs produce error lines; the second pass with all three registered handles them.</li>
+  </ul>
+  <p>A more robust design could detect overlapping validators or add an explicit priority, but the subject keeps it simple.</p>
+</section>
+
+<!-- DUCK -->
+<section id="duck">
+  <div class="num">Exercise 2</div>
+  <h2>Duck typing and Protocol</h2>
+  <div class="grid2">
+    <div class="box"><div class="t">Duck typing (the idea)</div><p>"If it has the method, just call it." Python doesn't check the declared type of an object, only that the attribute exists when you use it. No import needed, and it long predates type hints.</p></div>
+    <div class="box"><div class="t">Protocol (the tool)</div><p>A way to <em>describe</em> that expected shape to <strong>mypy</strong>, so the type checker can verify duck-typed code statically.</p></div>
+  </div>
+<pre><code><span class="k">class</span> <span class="f">ExportPlugin</span>(Protocol):
+    <span class="k">def</span> <span class="f">process_output</span>(self, data: list[tuple[int, str]]) -> None:
+        ...
+
+<span class="k">class</span> <span class="f">CSVExportPlugin</span>:          <span class="c"># no parent class mentioned at all</span>
+    <span class="k">def</span> <span class="f">process_output</span>(self, data: list[tuple[int, str]]) -> None:
+        print(<span class="s">"CSV Output:"</span>)
+        print(<span class="s">","</span>.join(v <span class="k">for</span> _, v <span class="k">in</span> data))</code></pre>
+
+  <h3>ABC vs Protocol</h3>
+  <table>
+    <tr><th></th><th>ABC (nominal)</th><th>Protocol (structural)</th></tr>
+    <tr><td>Relationship</td><td>Must explicitly inherit: <code>class X(Base)</code></td><td>None needed; matching method shape is enough</td></tr>
+    <tr><td>Enforcement</td><td>At runtime (<code>TypeError</code> on instantiation)</td><td>Only by mypy; nothing at runtime</td></tr>
+    <tr><td>Shared code</td><td>Yes, concrete methods in the base</td><td>No, it only describes an interface</td></tr>
+    <tr><td>Best for</td><td>Families of classes you control that share logic</td><td>Plugins, third-party or unrelated classes</td></tr>
+    <tr><td>Uses overriding?</td><td>Yes</td><td><strong>No</strong>: there's no parent to override, each class independently implements the method</td></tr>
+  </table>
+
+  <div class="box warn">
+    <div class="t">Common mix-ups to avoid</div>
+    <ul>
+      <li>Protocol is <strong>not</strong> overriding and <strong>not</strong> overloading.</li>
+      <li>Duck typing is the general concept; Protocol is how mypy formalises it.</li>
+      <li>Protocol checks are static. At runtime, Python just calls <code>plugin.process_output(...)</code> on whatever object it receives (the <code>@runtime_checkable</code> decorator exists but isn't used here).</li>
+    </ul>
+  </div>
+
+  <h3>What do the three dots <code>...</code> mean?</h3>
+  <p>It's the <strong>Ellipsis</strong> literal, used here as a placeholder body meaning "no implementation, just the signature". It plays the same role as <code>pass</code>. The body of a Protocol method is never executed by your plugins.</p>
+</section>
+
+<!-- PIPELINE -->
+<section id="pipeline">
+  <div class="num">Exercise 2</div>
+  <h2>output_pipeline</h2>
+<pre><code><span class="k">def</span> <span class="f">output_pipeline</span>(self, nb: int, plugin: ExportPlugin) -> None:
+    <span class="k">for</span> proc <span class="k">in</span> self._processors:
+        collected: list[tuple[int, str]] = []
+        <span class="k">for</span> _ <span class="k">in</span> range(nb):
+            <span class="k">try</span>:
+                collected.append(proc.output())
+            <span class="k">except</span> IndexError:     <span class="c"># processor ran out of items</span>
+                <span class="k">break</span>
+        <span class="k">if</span> collected:
+            plugin.process_output(collected)</code></pre>
+  <ul>
+    <li><strong>Once per processor:</strong> matches the subject's example (separate CSV/JSON blocks for numeric, text, and logs). Merging everything into one call would mix unrelated data types in a single row and lose which processor produced what.</li>
+    <li><strong><code>try/except IndexError</code>:</strong> <code>output()</code> raises when empty, so asking for 5 items from a processor holding 3 simply stops at 3. This is the "exception handling protects the stream" requirement.</li>
+    <li><strong><code>if collected:</code></strong> skips the plugin call entirely if a processor had nothing, avoiding an empty "CSV Output:" header.</li>
+    <li>The same <code>plugin</code> object works with any processor's data because it only needs <code>process_output</code>.</li>
+  </ul>
+</section>
+
+<!-- STYLE -->
+<section id="style">
+  <div class="num">Housekeeping</div>
+  <h2>flake8, imports, and the small bugs</h2>
+
+  <h3>Imports</h3>
+  <p>Only <code>abc</code> and <code>typing</code> are allowed. Both styles are valid and identical at runtime; the real rule is <strong>be consistent</strong>:</p>
+<pre><code><span class="c"># Option A (clean): names imported directly</span>
+<span class="k">from</span> typing <span class="k">import</span> Any, Union, Protocol
+<span class="c"># ... then use Any / Protocol everywhere, no "typing." prefix</span>
+
+<span class="c"># Option B: module import</span>
+<span class="k">import</span> typing
+<span class="c"># ... then use typing.Any / typing.Protocol everywhere</span></code></pre>
+  <div class="box bad">
+    <div class="t">What went wrong for you</div>
+    <p>You removed <code>import typing</code> while the code still contained <code>typing.Protocol</code> and <code>list[typing.Any]</code>, hence <code>NameError: name 'typing' is not defined</code>. If you switch to Option A, replace <strong>every</strong> <code>typing.X</code> usage too. Fixing only one spot just moves the error to the next one.</p>
+  </div>
+
+  <h3>The <code>end=None</code> bug</h3>
+<pre><code>print(<span class="s">"DataStream error - "</span>, end=None)   <span class="c"># None → falls back to "\n" (default)</span>
+print(<span class="s">"DataStream error - "</span>, end=<span class="s">""</span>)     <span class="c"># stays on the same line ✔</span></code></pre>
+  <p>The subject's expected output shows the error on a single line, so use <code>end=""</code>.</p>
+
+  <h3>Things worth re-checking</h3>
+  <ul>
+    <li>Run <code>flake8</code> and <code>mypy</code> on each file. The only mypy complaint you should deliberately keep is the invalid <code>ingest("foo")</code> test in ex0.</li>
+    <li>In <code>process_stream</code>, <code>proc</code> is typed <code>DataProcessor</code> and <code>item</code> is <code>Any</code>, so mypy may report a <em>"unused type: ignore"</code> if configured strictly. If so, remove that comment.</li>
+    <li>Docstrings: a class with two consecutive string literals only treats the first as the docstring. Put the whole description in one docstring.</li>
+    <li>Compare your output text character by character with the subject's examples (spacing, capitalisation, wording).</li>
+  </ul>
+</section>
+
+<!-- DEFENSE -->
+<section id="defense">
+  <div class="num">Prepare</div>
+  <h2>Defense Q&amp;A: click to reveal</h2>
+
+  <details><summary>What happens if I instantiate a subclass that doesn't implement an abstract method?</summary>
+    <div class="ans"><code>TypeError</code> at instantiation. <code>ABCMeta</code> records unimplemented abstract names in <code>__abstractmethods__</code>, and object creation refuses while that set isn't empty.</div></details>
+
+  <details><summary>Define method overriding in one sentence.</summary>
+    <div class="ans">A subclass redefines a method inherited from its parent, replacing the parent's behaviour for its own instances.</div></details>
+
+  <details><summary>Define polymorphism in one sentence.</summary>
+    <div class="ans">One interface, many behaviours: code written against a base type calls the same method on different subclasses and each responds in its own way.</div></details>
+
+  <details><summary>Why does <code>ingest</code> have a narrower signature than the base?</summary>
+    <div class="ans">Each processor accepts specific types, so the signature documents that. It stretches LSP since the base says <code>Any</code>, which is why a runtime <code>validate</code> guard plus <code>TypeError</code> is needed and why the deliberate bad call triggers a mypy warning.</div></details>
+
+  <details><summary>Why is <code>output</code> not abstract?</summary>
+    <div class="ans">Its behaviour is identical for every processor (pop the oldest item). Putting it in the base class gives code reuse; only what varies (<code>validate</code>, <code>ingest</code>) is abstract.</div></details>
+
+  <details><summary>Composition or inheritance for <code>DataStream</code>, and why?</summary>
+    <div class="ans">Composition. A stream isn't a processor; it holds and coordinates several. Inheriting would force meaningless abstract methods and a wrong "is-a".</div></details>
+
+  <details><summary>What if two processors accept the same data?</summary>
+    <div class="ans">The first registered one gets it, because of the <code>break</code>. Registration order is effectively priority.</div></details>
+
+  <details><summary>Difference between duck typing and Protocol? Between ABC and Protocol?</summary>
+    <div class="ans">Duck typing is the runtime idea; Protocol lets mypy check it statically. ABC needs explicit inheritance and is enforced at runtime; Protocol only needs a matching method shape and is checked by mypy only.</div></details>
+
+  <details><summary>How would you add a new processor type live (e.g., <code>BooleanProcessor</code>)?</summary>
+    <div class="ans">Subclass <code>DataProcessor</code>, implement <code>validate</code> and <code>ingest</code> (store as <code>(counter, str)</code>, raise <code>TypeError</code> on bad input), override <code>processor_name</code>, then <code>register_processor</code>. Nothing in <code>DataStream</code> changes.</div></details>
+
+  <details><summary>How would you add a new export format (e.g., XML)?</summary>
+    <div class="ans">Write a class with <code>process_output(self, data: list[tuple[int, str]]) -> None</code>. No inheritance needed; pass it to <code>output_pipeline</code>.</div></details>
+
+  <details><summary>Why exception handling in <code>output_pipeline</code>?</summary>
+    <div class="ans">Asking for more items than a processor holds would raise <code>IndexError</code> and could abort the whole pipeline; catching it lets each processor export what it has.</div></details>
+</section>
+
+<!-- GLOSSARY -->
+<section id="glossary">
+  <div class="num">Reference</div>
+  <h2>Glossary</h2>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td>ABC / ABCMeta</td><td>Base class / metaclass that enables abstract methods</td></tr>
+    <tr><td>Abstract method</td><td>Declared but not implemented; subclasses must provide it</td></tr>
+    <tr><td>Metaclass</td><td>The class of a class; controls class creation</td></tr>
+    <tr><td>Overriding</td><td>Subclass replaces an inherited method</td></tr>
+    <tr><td>Overloading</td><td>Same name with different signatures (not native in Python)</td></tr>
+    <tr><td>Polymorphism</td><td>Same call, different behaviour by object type</td></tr>
+    <tr><td>LSP</td><td>Subclasses must be usable wherever the base type is expected</td></tr>
+    <tr><td>Composition</td><td>A class holding instances of other classes ("has-a")</td></tr>
+    <tr><td>Duck typing</td><td>Using an object based on the methods it has, not its declared type</td></tr>
+    <tr><td>Protocol</td><td>Typing construct describing a required method shape (structural typing)</td></tr>
+    <tr><td>Nominal vs structural</td><td>Compatibility by declared inheritance vs by matching shape</td></tr>
+    <tr><td>FIFO</td><td>First in, first out: oldest item leaves first</td></tr>
+    <tr><td>Ellipsis (<code>...</code>)</td><td>Placeholder body, like <code>pass</code></td></tr>
+    <tr><td>mypy</td><td>Static type checker; analyses annotations without running code</td></tr>
+  </table>
+</section>
+
+<footer>python05 · Code Nexus · Polymorphic Data Streams — study guide</footer>
+
+</main>
+</div>
+</body>
+</html>

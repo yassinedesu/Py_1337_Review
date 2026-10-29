@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Quest — Review Report</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #13131a;
+    --border: #1e1e2e;
+    --accent: #7c6aff;
+    --accent2: #ff6a6a;
+    --accent3: #6affa0;
+    --accent4: #ffd66a;
+    --text: #e2e2f0;
+    --muted: #666680;
+    --code-bg: #0a0a12;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    line-height: 1.7;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.5rem;
+  }
+
+  header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Score bar */
+  .score-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .score-circle {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    flex-shrink: 0;
+  }
+
+  .score-circle svg {
+    transform: rotate(-90deg);
+    width: 110px;
+    height: 110px;
+  }
+
+  .score-circle .track {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 8;
+  }
+
+  .score-circle .fill {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 283;
+    stroke-dashoffset: 57; /* 283 * (1 - 0.80) */
+    transition: stroke-dashoffset 1.5s ease;
+  }
+
+  .score-number {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .score-number span {
+    font-size: 0.65rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 2px;
+  }
+
+  .score-info h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .score-info p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    max-width: 500px;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot.green { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
+  .dot.red   { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+  .dot.yellow{ background: var(--accent4); box-shadow: 0 0 8px var(--accent4); }
+
+  .section-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: #2a2a3e; }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .card.correct::before { background: var(--accent3); }
+  .card.wrong::before   { background: var(--accent2); }
+  .card.review::before  { background: var(--accent4); }
+
+  .card-topic {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.4rem;
+  }
+
+  .card.correct .card-topic { color: var(--accent3); }
+  .card.wrong   .card-topic { color: var(--accent2); }
+  .card.review  .card-topic { color: var(--accent4); }
+
+  .card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+
+  .card p {
+    font-size: 0.88rem;
+    color: #a0a0c0;
+    line-height: 1.65;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    font-size: 0.82em;
+    color: var(--accent);
+  }
+
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: #c8c8e8;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+
+  pre .c  { color: var(--muted); }
+  pre .kw { color: var(--accent); }
+  pre .st { color: var(--accent3); }
+  pre .nb { color: var(--accent4); }
+
+  /* Awareness grid */
+  .awareness-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .awareness-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    border-top: 2px solid var(--accent4);
+  }
+
+  .awareness-item h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent4);
+    margin-bottom: 0.35rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .awareness-item p {
+    font-size: 0.82rem;
+    color: #a0a0c0;
+    line-height: 1.6;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .score-section { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="tag">python03 · Data Quest · Mastering Python Collections</div>
+    <h1>Evaluation Report</h1>
+    <p>yassinedesu · github.com/yassinedesu/python03</p>
+  </header>
+
+  <!-- Score -->
+  <div class="score-section">
+    <div class="score-circle">
+      <svg viewBox="0 0 100 100">
+        <circle class="track" cx="50" cy="50" r="45"/>
+        <circle class="fill"  cx="50" cy="50" r="45"/>
+      </svg>
+      <div class="score-number">80%<span>overall</span></div>
+    </div>
+    <div class="score-info">
+      <h2>Solid conceptual foundation</h2>
+      <p>You demonstrated genuine understanding of the core data structures. The gaps are mostly precision of vocabulary and a few misconceptions about hashing — not fundamental misunderstandings. With targeted review you're in good shape for evaluation.</p>
+    </div>
+  </div>
+
+  <!-- What you got right -->
+  <div class="section">
+    <div class="section-header">
+      <div class="dot green"></div>
+      <h2>What you got right</h2>
+    </div>
+
+    <div class="card correct">
+      <div class="card-topic">ex0 · Lists · sys.argv</div>
+      <h3>Slicing vs indexing</h3>
+      <p><code>sys.argv[1:]</code> returns a new list starting from element 1, while <code>sys.argv[1]</code> returns only that single element. You also correctly identified that <code>range()</code> was needed specifically to print the argument index number alongside its value.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-topic">ex1 · Mutability · Pass by reference</div>
+      <h3>Lists are passed by reference</h3>
+      <p>You correctly identified that when a list is passed to a function, Python passes a reference — both names point to the same object in memory. Modifying it inside the function modifies the original. You also understood that integers behave differently because they are immutable.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-topic">ex2 · Tuples · Immutability</div>
+      <h3>Why tuples suit coordinates</h3>
+      <p>Coordinates should never change after creation — a tuple enforces that. Using a list would leave the data vulnerable to accidental mutation. You got this right and connected it correctly to immutability.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-topic">ex3 · Sets · Hash table lookup</div>
+      <h3>O(1) lookup via hashing</h3>
+      <p>Strong answer here. A list does a linear scan O(n), while a set hashes the value and jumps directly to its bucket — O(1). You also correctly connected this to why sets don't allow duplicates: two identical values produce the same hash, so the second one collides and is discarded.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-topic">ex3 · Sets · Empty set syntax</div>
+      <h3>set() vs {}</h3>
+      <p><code>{}</code> creates an empty dict, not an empty set — because dicts came first in Python's history. <code>set()</code> is the only way to create an empty set. Python also prints <code>set()</code> to avoid confusion with dict output. You got all of this.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-topic">ex4 · Dictionaries</div>
+      <h3>.items() and key lookup</h3>
+      <p>You correctly explained that <code>.items()</code> unpacks key and value together, avoiding a double lookup. You also understood that <code>in</code> checks dict keys by default using the same hash table mechanism as sets — O(1), not a scan.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-topic">ex5 · Generators</div>
+      <h3>yield suspends, not terminates</h3>
+      <p>You understood the key point: <code>yield</code> suspends the function and saves its entire state, rather than terminating it like <code>return</code>. The function resumes from exactly where it paused on the next <code>next()</code> call. You also connected generators to constant memory usage — only one value lives in RAM at a time.</p>
+    </div>
+
+    <div class="card correct">
+      <div class="card-topic">ex6 · Comprehensions</div>
+      <h3>Three components + generator expression</h3>
+      <p>You correctly identified the three parts of a comprehension: <strong>expression</strong>, <strong>iterable</strong>, and optional <strong>filter</strong>. You also nailed the key distinction: <code>[...]</code> builds a list in memory immediately, while <code>(...)</code> creates a generator expression — lazy, one value at a time, same syntax.</p>
+    </div>
+  </div>
+
+  <!-- What you got wrong -->
+  <div class="section">
+    <div class="section-header">
+      <div class="dot red"></div>
+      <h2>What needs correction</h2>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-topic">ex2 · Tuples · Hashability</div>
+      <h3>Misconception about what "hashable" means</h3>
+      <p>You described hashing as hiding the value and retrieving it by hashing again — that's not what it does. Hashing computes a fixed-size integer fingerprint from a value, used as an index into a hash table for <strong>fast lookup</strong>. The fingerprint is not reversible — you cannot recover the original value from a hash.</p>
+      <p style="margin-top:0.5rem">Immutability enables hashability because the hash must never change. If an object mutated after being stored, its hash would change and Python would lose it entirely. That's why lists can't be dict keys but tuples can.</p>
+      <pre><span class="c"># Tuples as dict keys work because they're hashable</span>
+d = {}
+d[(1, 2, 3)] = <span class="st">"spawn point"</span>  <span class="c"># ✓</span>
+d[[1, 2, 3]] = <span class="st">"spawn point"</span>  <span class="c"># ✗ TypeError: unhashable type: 'list'</span></pre>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-topic">ex1 · Lists · Error messages</div>
+      <h3>Output format doesn't match the subject</h3>
+      <p>Your error message prints <code>"Skipping Invalid Value: 'ab'"</code> but the subject expects <code>"Invalid parameter: 'ab'"</code>. Small mismatch, but peer evaluators check output character by character. Always mirror the exact format shown in the subject examples.</p>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-topic">ex5 · Generators · Memory explanation</div>
+      <h3>Confused execution flow with memory usage</h3>
+      <p>When asked about the concrete memory difference between a list comprehension and a generator, you described the execution flow instead. The actual answer: a list stores <strong>all N elements in RAM simultaneously</strong>. A generator holds only <strong>one element at a time</strong> — memory stays constant regardless of how large the dataset is. At 1,000,000 events, this is the difference between megabytes and a few bytes.</p>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-topic">ex3 · Achievement Hunter</div>
+      <h3>Doesn't use gen_player_achievements() with random</h3>
+      <p>The subject requires a function that randomly assigns achievements to players using <code>random</code>. Your implementation hardcodes the achievement sets directly. The random generation is the whole point — it forces you to think about set sizing so that intersection/difference results are likely to be non-empty.</p>
+    </div>
+  </div>
+
+  <!-- Things to review -->
+  <div class="section">
+    <div class="section-header">
+      <div class="dot yellow"></div>
+      <h2>Be aware of / review these</h2>
+    </div>
+    <div class="awareness-grid">
+
+      <div class="awareness-item">
+        <h4>enumerate()</h4>
+        <p>More Pythonic than <code>range(len(...))</code> when you need both index and value. <code>for i, val in enumerate(args[1:], start=1)</code> is the idiomatic way.</p>
+      </div>
+
+      <div class="awareness-item">
+        <h4>int() vs float() for coordinates</h4>
+        <p>Your ex2 converts to <code>int</code> but 3D coordinates should be <code>float</code>. <code>int("2.5")</code> raises an error; <code>float("2.5")</code> works correctly.</p>
+      </div>
+
+      <div class="awareness-item">
+        <h4>Mutable default arguments</h4>
+        <p>Never do <code>def f(lst=[]):</code> — the list is created once and shared across all calls. Use <code>def f(lst=None): lst = lst or []</code> instead.</p>
+      </div>
+
+      <div class="awareness-item">
+        <h4>Why sys.argv shouldn't be mutated</h4>
+        <p>It's technically mutable, but it's global shared state. Mutating it could break other parts of your program that read it later. Always build a new list from it.</p>
+      </div>
+
+      <div class="awareness-item">
+        <h4>Hash table collision</h4>
+        <p>Two different values can produce the same hash (collision). Python handles this with open addressing or chaining — O(1) is average case, not worst case.</p>
+      </div>
+
+      <div class="awareness-item">
+        <h4>Generator exhaustion</h4>
+        <p>Once a generator is fully consumed it's empty — calling <code>next()</code> raises <code>StopIteration</code>. You can't rewind it. Create a new generator object if you need to iterate again.</p>
+      </div>
+
+      <div class="awareness-item">
+        <h4>dict.get() vs dict[]</h4>
+        <p><code>d["key"]</code> raises <code>KeyError</code> if missing. <code>d.get("key", default)</code> returns a safe fallback. Useful for the inventory exercise.</p>
+      </div>
+
+      <div class="awareness-item">
+        <h4>set() prints as set()</h4>
+        <p>Know WHY for the evaluation: printing <code>{}</code> would be ambiguous with an empty dict. Python chose <code>set()</code> to be unambiguous in output and in source code.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <span>python03 · Data Quest · Mastering Python Collections v3.0</span>
+    <span>generated · May 2026</span>
+  </footer>
+
+</div>
+</body>
+</html>

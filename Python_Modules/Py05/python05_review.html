@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Code Nexus — Session Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0d1117;
+    --border: #1e2d3d;
+    --accent: #00ffe0;
+    --accent2: #ff4c6a;
+    --accent3: #f0c040;
+    --text: #c9d6e3;
+    --muted: #4a5a6a;
+    --correct: #00ffe0;
+    --wrong: #ff4c6a;
+    --partial: #f0c040;
+    --mono: 'Share Tech Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,224,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,224,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  header {
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+    margin-bottom: 56px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  header .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  header h1 {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  header p {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    padding: 32px;
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    animation: fadeDown 0.7s ease both;
+    animation-delay: 0.1s;
+  }
+
+  .score-ring {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    flex-shrink: 0;
+  }
+
+  .score-ring svg {
+    transform: rotate(-90deg);
+    width: 110px;
+    height: 110px;
+  }
+
+  .score-ring circle { fill: none; stroke-width: 7; }
+  .score-ring .track { stroke: var(--border); }
+  .score-ring .fill {
+    stroke: var(--accent);
+    stroke-dasharray: 283;
+    stroke-dashoffset: 51;
+    stroke-linecap: round;
+  }
+
+  .score-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-label .pct {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .score-label .sub {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  .score-info h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .score-info p {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+    max-width: 480px;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cards { display: flex; flex-direction: column; gap: 16px; margin-bottom: 48px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--correct);
+    padding: 22px 24px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .card.wrong   { border-left-color: var(--wrong); }
+  .card.partial { border-left-color: var(--partial); }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .card-title { font-size: 15px; font-weight: 700; color: #fff; }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tag.correct { background: rgba(0,255,224,0.1);  color: var(--correct); border: 1px solid rgba(0,255,224,0.3); }
+  .tag.wrong   { background: rgba(255,76,106,0.1); color: var(--wrong);   border: 1px solid rgba(255,76,106,0.3); }
+  .tag.partial { background: rgba(240,192,64,0.1); color: var(--partial); border: 1px solid rgba(240,192,64,0.3); }
+
+  .card-body { font-size: 14px; color: var(--text); line-height: 1.7; }
+  .card-body strong { color: #fff; font-weight: 700; }
+  .card-body em { color: var(--muted); font-style: normal; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: #12191f;
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    color: var(--accent);
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: #0a1118;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    padding: 16px;
+    margin-top: 12px;
+    overflow-x: auto;
+    color: #8bafc7;
+    line-height: 1.7;
+  }
+
+  pre .kw { color: #ff4c6a; }
+  pre .fn { color: #00ffe0; }
+  pre .cm { color: #3a5060; }
+  pre .st { color: #f0c040; }
+
+  .awareness-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .awareness-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .awareness-item .aw-icon {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .awareness-item h4 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .awareness-item p  { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="label">// python05 — session debrief</div>
+    <h1>Code Nexus<br><span>Understanding Report</span></h1>
+    <p>Subject: Polymorphic Data Streams · Abstract Classes · Duck Typing · Composition</p>
+  </header>
+
+  <div class="score-card">
+    <div class="score-ring">
+      <svg viewBox="0 0 100 100">
+        <circle class="track" cx="50" cy="50" r="45"/>
+        <circle class="fill"  cx="50" cy="50" r="45"/>
+      </svg>
+      <div class="score-label">
+        <span class="pct">82%</span>
+        <span class="sub">SCORE</span>
+      </div>
+    </div>
+    <div class="score-info">
+      <h2>Solid Foundations — Two Gaps to Close</h2>
+      <p>You grasped the big concepts — ABC enforcement, composition vs inheritance, polymorphism, and routing priority — very well. The two areas pulling your score down are the precise definition of <strong>method overriding</strong> and the distinction between <strong>duck typing</strong> and <strong>Protocol</strong>.</p>
+    </div>
+  </div>
+
+  <p class="section-title">// what you got right</p>
+  <div class="cards">
+
+    <div class="card correct">
+      <div class="card-header">
+        <span class="card-title">ABCMeta &amp; TypeError at instantiation</span>
+        <span class="tag correct">✓ CORRECT</span>
+      </div>
+      <div class="card-body">
+        You correctly identified that <strong>ABCMeta</strong> tracks unimplemented abstract methods and that <code>__new__</code> raises <code>TypeError</code> at <strong>instantiation time</strong>, not at class definition time. The subclass can be defined — the error only fires when you call <code>MySubclass()</code>.
+      </div>
+    </div>
+
+    <div class="card correct">
+      <div class="card-header">
+        <span class="card-title">Metaclass definition</span>
+        <span class="tag correct">✓ CORRECT</span>
+      </div>
+      <div class="card-body">
+        "The class of all classes, responsible for creating and checking <code>@abstractmethod</code> decorators." Clean and accurate. Every class is an instance of <code>type</code> by default; <code>ABCMeta</code> is a custom metaclass that adds abstract-method tracking on top.
+      </div>
+    </div>
+
+    <div class="card correct">
+      <div class="card-header">
+        <span class="card-title">_counter rank uniqueness (Q5)</span>
+        <span class="tag correct">✓ CORRECT</span>
+      </div>
+      <div class="card-body">
+        You understood that <code>_counter</code> only ever increments, making ranks permanently unique. Using <code>len(self._storage)</code> instead would cause rank collisions after any <code>output()</code> removes an item — two items would share the same rank number.
+      </div>
+    </div>
+
+    <div class="card correct">
+      <div class="card-header">
+        <span class="card-title">Registration order &amp; routing priority</span>
+        <span class="tag correct">✓ CORRECT</span>
+      </div>
+      <div class="card-body">
+        In <code>process_stream</code> <em>(data_stream.py line 57)</em>, the first processor returning <code>True</code> from <code>validate()</code> wins and the loop breaks. A greedy processor registered first would steal all items before specialized processors get a chance. Order is silent but critical.
+      </div>
+    </div>
+
+    <div class="card correct">
+      <div class="card-header">
+        <span class="card-title">Composition vs Inheritance (Q9)</span>
+        <span class="tag correct">✓ CORRECT</span>
+      </div>
+      <div class="card-body">
+        <strong>"Inherit when is-a, compose when has-a."</strong> <code>DataStream</code> holds <code>self._processors: list[DataProcessor]</code> <em>(data_pipeline.py line 158)</em> — it is not a processor, it manages several of them. Inheriting would force meaningless overrides of <code>validate</code> and <code>ingest</code> and limit you to one processor's storage.
+      </div>
+    </div>
+
+    <div class="card correct">
+      <div class="card-header">
+        <span class="card-title">Polymorphism definition</span>
+        <span class="tag correct">✓ CORRECT</span>
+      </div>
+      <div class="card-body">
+        "Same method name shared between classes, each with different behavior." That is subtype polymorphism — exactly what this subject is built around.
+      </div>
+    </div>
+
+    <div class="card correct">
+      <div class="card-header">
+        <span class="card-title">ABC vs Protocol — bonus answer</span>
+        <span class="tag correct">✓ CORRECT</span>
+      </div>
+      <div class="card-body">
+        "ABC to enforce, Protocol for flexibility." Perfect one-liner. ABC requires explicit inheritance and overriding. Protocol only requires a matching method shape — no parent class needed.
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-title">// what needs sharpening</p>
+  <div class="cards">
+
+    <div class="card wrong">
+      <div class="card-header">
+        <span class="card-title">Method Overriding definition</span>
+        <span class="tag wrong">✗ INCOMPLETE</span>
+      </div>
+      <div class="card-body">
+        You said: <em>"using the same method name in different classes."</em><br><br>
+        That is too broad — it describes coincidental naming between unrelated classes. The key missing word is <strong>inherited</strong>.<br><br>
+        <strong>Correct definition:</strong> Overriding is when a subclass <strong>redefines a method it inherited from its parent</strong>, replacing the parent's behavior with its own.
+        <pre><span class="cm"># DataProcessor defines (data_processor.py line 42):</span>
+<span class="kw">def</span> <span class="fn">processor_name</span>(self) -> str:
+    <span class="kw">return</span> self.__class__.__name__
+
+<span class="cm"># NumericProcessor OVERRIDES it (data_processor.py line 72):</span>
+<span class="kw">def</span> <span class="fn">processor_name</span>(self) -> str:
+    <span class="kw">return</span> <span class="st">"Numeric Processor"</span>  <span class="cm"># replaces parent behavior</span></pre>
+      </div>
+    </div>
+
+    <div class="card wrong">
+      <div class="card-header">
+        <span class="card-title">Duck Typing vs Protocol — conflated</span>
+        <span class="tag wrong">✗ CONFLATED</span>
+      </div>
+      <div class="card-body">
+        You described <strong>Protocol</strong> when asked about <strong>duck typing</strong>. They are related but distinct.<br><br>
+        <strong>Duck typing</strong> is Python's general runtime philosophy — <em>"if the object has the method, just call it, don't check its type."</em> It predates Protocol and requires no import.<br><br>
+        <strong>Protocol</strong> is how <code>mypy</code> formalizes duck typing statically — the type checker verifies the shape without requiring inheritance.<br><br>
+        Also: what <code>CSVExportPlugin</code> does is <strong>not overriding</strong>. It never inherits from <code>ExportPlugin</code>, so there is nothing to override. It simply <strong>independently implements</strong> a method with the matching signature.
+        <pre><span class="cm"># ExportPlugin defines the SHAPE only (data_pipeline.py line 140):</span>
+<span class="kw">class</span> <span class="fn">ExportPlugin</span>(typing.Protocol):
+    <span class="kw">def</span> <span class="fn">process_output</span>(self, data: list[tuple[int, str]]) -> None: ...
+
+<span class="cm"># CSVExportPlugin satisfies it WITHOUT inheriting (line 149):</span>
+<span class="kw">class</span> <span class="fn">CSVExportPlugin</span>:        <span class="cm"># no parent class at all</span>
+    <span class="kw">def</span> <span class="fn">process_output</span>(self, ...) -> None:
+        ...                     <span class="cm"># independent implementation</span></pre>
+      </div>
+    </div>
+
+    <div class="card partial">
+      <div class="card-header">
+        <span class="card-title">LSP &amp; intentional mypy warning</span>
+        <span class="tag partial">~ PARTIAL</span>
+      </div>
+      <div class="card-body">
+        You identified <em>what</em> causes the warning — the narrowed subclass signature vs the <code>Any</code> base — but missed <em>why it matters</em>.<br><br>
+        The LSP (Liskov Substitution Principle) says: if <code>DataProcessor</code> promises <code>ingest(Any)</code>, every subclass should honor that contract. <code>NumericProcessor</code> breaks it by narrowing to numbers only. mypy can't catch the violation at the call site because the base says <code>Any</code>, hence the intentional <code># type: ignore[arg-type]</code>. The <code>if not self.validate(data): raise TypeError</code> guard is your runtime safety net where the type system falls short.
+      </div>
+    </div>
+
+    <div class="card partial">
+      <div class="card-header">
+        <span class="card-title">end=None bug in data_stream.py</span>
+        <span class="tag partial">~ MINOR BUG</span>
+      </div>
+      <div class="card-body">
+        <em>data_stream.py line 66 and same pattern in data_pipeline.py:</em><br><br>
+        <code>print("DataStream error - ", end=None)</code><br><br>
+        <code>end=None</code> falls back to the default <code>"\n"</code>, producing two separate lines. You intended <code>end=""</code> to keep the cursor on the same line. The subject's expected output shows it as one single line.
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-title">// things to review before evaluation</p>
+  <div class="awareness-grid">
+
+    <div class="awareness-item">
+      <div class="aw-icon">// review</div>
+      <h4>Overriding vs Overloading</h4>
+      <p>Python has no true overloading. Overriding = subclass replaces an <strong>inherited</strong> method. Know the exact distinction — evaluators ask this directly.</p>
+    </div>
+
+    <div class="awareness-item">
+      <div class="aw-icon">// review</div>
+      <h4>Duck Typing is not Protocol</h4>
+      <p>Duck typing is the concept — "if it has the method, call it." Protocol is the mypy tool that formalizes it. Be able to explain one without mentioning the other.</p>
+    </div>
+
+    <div class="awareness-item">
+      <div class="aw-icon">// review</div>
+      <h4>Protocol: no inheritance, no overriding</h4>
+      <p>A class satisfying a Protocol never inherits from it and never overrides anything. It just independently has a method with the matching name and signature. mypy checks the shape.</p>
+    </div>
+
+    <div class="awareness-item">
+      <div class="aw-icon">// fix</div>
+      <h4>import typing cleanup</h4>
+      <p>Replace <code>typing.Any</code> with <code>Any</code> and <code>typing.Protocol</code> with <code>Protocol</code> everywhere. Use one clean line: <code>from typing import Any, Union, Protocol</code>. Drop <code>import typing</code> entirely.</p>
+    </div>
+
+    <div class="awareness-item">
+      <div class="aw-icon">// fix</div>
+      <h4>end=None → end=""</h4>
+      <p>Fix the print bug in <em>data_stream.py line 66</em> and the equivalent line in <em>data_pipeline.py</em>. Output must match the subject's expected format.</p>
+    </div>
+
+    <div class="awareness-item">
+      <div class="aw-icon">// be ready</div>
+      <h4>Live extension during evaluation</h4>
+      <p>You may be asked to add a new processor type on the spot. Recipe: subclass <code>DataProcessor</code>, implement <code>validate</code> + <code>ingest</code>, call <code>register_processor</code>. Nothing else in the architecture changes — that's the point of polymorphism.</p>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>python05 · Code Nexus — Polymorphic Data Streams</span>
+    <span>session review · generated by Claude</span>
+  </footer>
+
+</div>
+</body>
+</html>

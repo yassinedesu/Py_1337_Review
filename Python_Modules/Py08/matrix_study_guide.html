@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Matrix - Study Guide</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --green: #3fb950; --lime: #7ee787;
+    --blue: #58a6ff; --yellow: #d29922; --red: #f85149; --code: #010409;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+  nav {
+    position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto;
+    width: 260px; padding: 24px 16px; border-right: 1px solid var(--border); flex-shrink: 0;
+  }
+  nav h2 { font-size: 14px; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-top: 0; }
+  nav a { display: block; color: var(--muted); text-decoration: none; padding: 4px 8px; border-radius: 6px; font-size: 14px; }
+  nav a:hover { background: var(--panel); color: var(--text); }
+  nav a.sub { padding-left: 22px; font-size: 13px; }
+  main { padding: 32px 40px 80px; min-width: 0; flex: 1; }
+  h1 { font-size: 32px; margin: 0 0 4px; color: var(--lime); }
+  .subtitle { color: var(--muted); margin-bottom: 32px; }
+  h2.part { font-size: 26px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 56px; color: var(--green); }
+  h3 { font-size: 19px; margin-top: 36px; color: var(--blue); }
+  p, li { font-size: 15.5px; }
+  code {
+    background: var(--code); padding: 2px 6px; border-radius: 4px;
+    font-family: "SF Mono", Consolas, monospace; font-size: 13.5px; color: var(--lime);
+  }
+  pre {
+    background: var(--code); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  .c { color: var(--muted); }
+  .box { border-left: 4px solid; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 18px 0; background: var(--panel); }
+  .box.tip { border-color: var(--green); }
+  .box.warn { border-color: var(--yellow); }
+  .box.fix { border-color: var(--red); }
+  .box.analogy { border-color: var(--blue); }
+  .box strong.label { display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .tip .label { color: var(--green); } .warn .label { color: var(--yellow); }
+  .fix .label { color: var(--red); } .analogy .label { color: var(--blue); }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14.5px; display: block; overflow-x: auto; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--panel); color: var(--green); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 16px 0; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .card h4 { margin: 0 0 6px; color: var(--lime); }
+  .card p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .steps { counter-reset: s; list-style: none; padding: 0; }
+  .steps li { counter-increment: s; position: relative; padding: 8px 0 8px 44px; }
+  .steps li::before {
+    content: counter(s); position: absolute; left: 0; top: 6px; width: 30px; height: 30px;
+    border-radius: 50%; background: var(--green); color: #000; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .checklist li { list-style: none; margin-left: -20px; }
+  .checklist li::before { content: "\2610  "; color: var(--yellow); }
+  details { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  @media (max-width: 800px) {
+    nav { display: none; } main { padding: 20px 16px 60px; } h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav>
+  <h2>Contents</h2>
+  <a href="#overview">Overview</a>
+  <a href="#ex0">Exercise 0: Virtual Env</a>
+  <a class="sub" href="#ex0-why">Why venvs exist</a>
+  <a class="sub" href="#ex0-how">How activation works</a>
+  <a class="sub" href="#ex0-detect">Detecting a venv</a>
+  <a class="sub" href="#ex0-modules">sys / os / site</a>
+  <a href="#ex1">Exercise 1: Packages</a>
+  <a class="sub" href="#ex1-pip">pip vs Poetry</a>
+  <a class="sub" href="#ex1-files">requirements vs toml</a>
+  <a class="sub" href="#ex1-importlib">importlib</a>
+  <a class="sub" href="#ex1-libs">numpy / pandas / plt</a>
+  <a class="sub" href="#ex1-walk">Code walkthrough</a>
+  <a class="sub" href="#ex1-sine">Sine, noise, rolling</a>
+  <a href="#ex2">Exercise 2: To research</a>
+  <a href="#cheat">Cheat sheet</a>
+  <a href="#review">Peer-review questions</a>
+</nav>
+
+<main>
+
+<h1>The Matrix: Study Guide</h1>
+<div class="subtitle">Virtual environments, package management and environment configuration</div>
+
+<section id="overview">
+  <p>This module has three ideas, one per exercise:</p>
+  <div class="grid">
+    <div class="card"><h4>Ex0: Construct</h4><p>Isolate your project with a virtual environment, and detect it from Python.</p></div>
+    <div class="card"><h4>Ex1: Loading</h4><p>Manage dependencies with pip and Poetry, then build a small data pipeline.</p></div>
+    <div class="card"><h4>Ex2: Oracle</h4><p>Keep secrets and settings out of code using environment variables and <code>.env</code> files.</p></div>
+  </div>
+  <div class="box warn"><strong class="label">Peer review</strong>
+    You are graded on understanding the <em>why</em>, not only on working code. Be ready to explain every line you submit.
+  </div>
+</section>
+
+<!-- ============ EX 0 ============ -->
+<h2 class="part" id="ex0">Exercise 0: Entering the Matrix</h2>
+<p><strong>File:</strong> <code>construct.py</code> &middot; <strong>Allowed:</strong> <code>sys</code>, <code>os</code>, <code>site</code>, <code>print()</code></p>
+
+<h3 id="ex0-why">1. Why virtual environments exist</h3>
+<p>A virtual environment is an <strong>isolated bubble</strong> with its own Python and its own installed packages, so projects don't interfere with each other.</p>
+<table>
+  <tr><th>Without a venv (global install)</th><th>With a venv per project</th></tr>
+  <tr><td>Project A needs <code>pandas 1.0</code>, Project B needs <code>pandas 2.0</code>. One of them breaks.</td>
+      <td>Each project has its own <code>pandas</code> version. No conflicts.</td></tr>
+  <tr><td>Everything you install pollutes the system Python.</td><td>The global Python stays clean.</td></tr>
+</table>
+
+<h3 id="ex0-how">2. How creating and activating works</h3>
+<pre><code>python3 -m venv matrix_env          <span class="c"># create the venv (a folder)</span>
+source matrix_env/bin/activate      <span class="c"># activate it (Linux/macOS)</span>
+matrix_env\Scripts\activate         <span class="c"># activate it (Windows)</span>
+deactivate                          <span class="c"># leave the venv</span></code></pre>
+
+<div class="box analogy"><strong class="label">What activation really does</strong>
+Activation <strong>prepends the venv's <code>bin/</code> folder to your <code>PATH</code></strong>. When you type <code>python3</code>, the shell searches PATH from left to right, so it now finds the venv's Python first instead of <code>/usr/bin/python3</code>.<br>
+The <code>(matrix_env)</code> text in your prompt is only a visual hint ("cosmetic"). The PATH change is the real mechanism. Activation also sets the variable <code>VIRTUAL_ENV</code>.
+</div>
+<pre><code>which python3        <span class="c"># before -> /usr/bin/python3</span>
+source matrix_env/bin/activate
+which python3        <span class="c"># after  -> /path/to/matrix_env/bin/python3</span></code></pre>
+
+<div class="box tip"><strong class="label">Do not submit your venv</strong>
+Never commit the venv folder to git. You must be able to recreate it during review.</div>
+
+<h3 id="ex0-detect">3. Detecting a venv from Python</h3>
+<pre><code>import sys
+
+sys.prefix        <span class="c"># where the CURRENT Python lives</span>
+sys.base_prefix   <span class="c"># where the ORIGINAL global Python lives</span>
+
+if sys.prefix != sys.base_prefix:
+    print("Inside a virtual environment")
+else:
+    print("Global environment")</code></pre>
+<table>
+  <tr><th>Situation</th><th><code>sys.prefix</code></th><th><code>sys.base_prefix</code></th><th>Result</th></tr>
+  <tr><td>Global</td><td><code>/usr</code></td><td><code>/usr</code></td><td>Equal &rarr; not in venv</td></tr>
+  <tr><td>Inside venv</td><td><code>/path/to/matrix_env</code></td><td><code>/usr</code></td><td>Different &rarr; in venv</td></tr>
+</table>
+
+<h3 id="ex0-modules">4. The three modules and what each is for</h3>
+<table>
+  <tr><th>Module / call</th><th>What it answers</th><th>Example</th></tr>
+  <tr><td><code>sys.prefix</code></td><td>Folder of the current environment</td><td><code>/path/to/matrix_env</code></td></tr>
+  <tr><td><code>sys.base_prefix</code></td><td>Folder of the original global Python</td><td><code>/usr</code></td></tr>
+  <tr><td><code>sys.executable</code></td><td>The exact Python binary running (a file, not a folder)</td><td><code>/path/to/matrix_env/bin/python3</code></td></tr>
+  <tr><td><code>os.environ.get("VIRTUAL_ENV")</code></td><td>Venv folder path, or <code>None</code> outside a venv</td><td><code>/path/to/matrix_env</code></td></tr>
+  <tr><td><code>os.path.basename(path)</code></td><td>The last part of a path</td><td><code>/a/b/matrix_env</code> &rarr; <code>matrix_env</code></td></tr>
+  <tr><td><code>site.getsitepackages()</code></td><td>Where pip installs packages</td><td><code>.../matrix_env/lib/python3.11/site-packages</code></td></tr>
+</table>
+<pre><code>venv_path = os.environ.get("VIRTUAL_ENV")    <span class="c"># None if not in a venv</span>
+venv_name = os.path.basename(venv_path)      <span class="c"># "matrix_env"</span></code></pre>
+<div class="box tip"><strong class="label">Good to know</strong>
+<code>VIRTUAL_ENV</code> is a standard name set automatically by the <code>activate</code> script. You never create it yourself.
+<code>.get()</code> returns <code>None</code> instead of crashing when the variable doesn't exist.</div>
+<div class="box fix"><strong class="label">sys.prefix vs sys.executable</strong>
+<code>sys.prefix</code> is a <em>folder</em>; <code>sys.executable</code> is the <em>python file</em>. The expected output of the subject shows <code>Current Python: .../bin/python</code>, which matches <code>sys.executable</code>.</div>
+
+<!-- ============ EX 1 ============ -->
+<h2 class="part" id="ex1">Exercise 1: Loading Programs</h2>
+<p><strong>Files:</strong> <code>loading.py</code>, <code>requirements.txt</code>, <code>pyproject.toml</code> &middot; <strong>Allowed:</strong> pandas, requests, matplotlib, numpy, sys, importlib</p>
+
+<h3 id="ex1-pip">1. pip vs Poetry</h3>
+<table>
+  <tr><th></th><th>pip</th><th>Poetry</th></tr>
+  <tr><td>Role</td><td>Just an installer</td><td>Full project and dependency manager</td></tr>
+  <tr><td>Tracks dependencies</td><td>You maintain <code>requirements.txt</code> by hand</td><td>Updates <code>pyproject.toml</code> automatically</td></tr>
+  <tr><td>Creates a venv</td><td>No (you do it)</td><td>Yes, automatically</td></tr>
+  <tr><td>Locks exact versions</td><td>No</td><td>Yes, in <code>poetry.lock</code></td></tr>
+  <tr><td>Install command</td><td><code>pip install -r requirements.txt</code></td><td><code>poetry install</code></td></tr>
+  <tr><td>Run command</td><td><code>python3 loading.py</code></td><td><code>poetry run python loading.py</code></td></tr>
+</table>
+<div class="box fix"><strong class="label">About the apt/aptitude analogy</strong>
+It is close but not exact. The key point is: <strong>pip installs; Poetry manages the whole project</strong> (environment, dependencies, versions, lock file).</div>
+<pre><code>poetry add pandas      <span class="c"># installs AND records it in pyproject.toml</span>
+poetry install         <span class="c"># installs everything listed in pyproject.toml</span></code></pre>
+
+<h3 id="ex1-files">2. requirements.txt vs pyproject.toml</h3>
+<div class="grid">
+<div>
+<strong>requirements.txt</strong> (pip): only a list
+<pre><code>pandas==2.1.0
+numpy==1.25.0
+matplotlib==3.7.2</code></pre>
+</div>
+<div>
+<strong>pyproject.toml</strong> (Poetry): project info + dependencies
+<pre><code>[tool.poetry]
+name = "matrix"
+version = "1.0.0"
+description = "Matrix pipeline"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.1.0"
+numpy = "^1.25.0"
+matplotlib = "^3.7.2"</code></pre>
+</div>
+</div>
+<table>
+  <tr><th>Symbol</th><th>Meaning</th><th>Example</th></tr>
+  <tr><td><code>==2.1.0</code></td><td>Exactly this version, nothing else</td><td>Only 2.1.0</td></tr>
+  <tr><td><code>^2.1.0</code></td><td>Compatible: 2.1.0 or higher, but below the next major version</td><td>2.1.0, 2.5.3 OK; 3.0.0 not OK</td></tr>
+</table>
+<p><code>^</code> is more flexible because it accepts newer compatible versions, not just the exact one.</p>
+
+<h3 id="ex1-importlib">3. importlib: handling missing dependencies</h3>
+<p>The subject requires the program to handle missing packages gracefully, with a helpful message instead of a crash.</p>
+<pre><code>import importlib.util
+
+def check_package(name: str) -> bool:
+    spec = importlib.util.find_spec(name)   <span class="c"># None = not installed</span>
+    if spec is None:
+        print(f"[MISSING] {name} - run: pip install {name}")
+        return False
+    return True</code></pre>
+<p><code>find_spec()</code> only <strong>checks whether the package exists</strong>, without importing it.</p>
+<div class="box tip"><strong class="label">find_spec vs try/except import</strong>
+<code>find_spec</code> is a clean check with no side effects (the package isn't executed or loaded). It lets you list all missing packages up front, then print install instructions for both pip and Poetry.</div>
+
+<h3 id="ex1-libs">4. The three libraries and their role</h3>
+<div class="grid">
+  <div class="card"><h4>numpy</h4><p>Powerful calculator for large sets of numbers. Here: <strong>generates the simulated Matrix data</strong> (required by the subject, no hardcoded lists or <code>range()</code>).</p></div>
+  <div class="card"><h4>pandas</h4><p>"Excel in Python". Puts the data into a table (<code>DataFrame</code>) and lets you compute on columns.</p></div>
+  <div class="card"><h4>matplotlib</h4><p>Draws charts. <code>matplotlib.pyplot</code> (imported as <code>plt</code>) is the interface used to build and save a chart as a PNG.</p></div>
+</div>
+
+<h3 id="ex1-walk">5. How a PNG comes out of a Python script</h3>
+<ol class="steps">
+  <li><strong>Check dependencies</strong> with <code>importlib</code>. If any is missing, print instructions and stop.</li>
+  <li><strong>Generate data</strong> with numpy (time values + noisy wave).</li>
+  <li><strong>Structure it</strong> with <code>pd.DataFrame</code> into <code>time</code> and <code>signal</code> columns.</li>
+  <li><strong>Smooth it</strong> with <code>.rolling(20).mean()</code>.</li>
+  <li><strong>Plot and save</strong> with matplotlib: <code>savefig("matrix_analysis.png")</code>.</li>
+</ol>
+
+<pre><code>import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use("Agg")             <span class="c"># render to files, no window needed</span>
+import matplotlib.pyplot as plt
+
+time_values = np.linspace(0, 4 * np.pi, 1000)
+noise = np.random.normal(0, 0.3, 1000)
+signal_values = np.sin(time_values) + noise
+
+data_frame = pd.DataFrame({"time": time_values, "signal": signal_values})
+smoothed = data_frame["signal"].rolling(window=20).mean()
+
+figure, axis = plt.subplots(figsize=(10, 4))
+axis.plot(data_frame["time"], data_frame["signal"], alpha=0.4, color="green", linewidth=0.6, label="Raw signal")
+axis.plot(data_frame["time"], smoothed, color="lime", linewidth=2, label="Smoothed signal")
+axis.set_title("Matrix Signal Analysis")
+axis.legend()
+figure.savefig("matrix_analysis.png", dpi=100, bbox_inches="tight")
+plt.close(figure)</code></pre>
+
+<h3 id="ex1-sine">6. Every function explained</h3>
+
+<details open><summary><code>dict.get(key, default)</code></summary>
+<pre><code>package_descriptions.get(package, "Ready")</code></pre>
+<ul>
+  <li><strong>Parameter 1:</strong> the key to look up.</li>
+  <li><strong>Parameter 2:</strong> the value returned if the key doesn't exist (default is <code>None</code>).</li>
+  <li>Works on dictionaries (and dict-like objects such as <code>os.environ</code>).</li>
+</ul>
+</details>
+
+<details open><summary><code>np.linspace(start, stop, count)</code></summary>
+<pre><code>np.linspace(0, 10, 5)   # [0, 2.5, 5, 7.5, 10]</code></pre>
+<ul>
+  <li><strong>start</strong>, <strong>stop</strong> (both included), and <strong>count</strong> of numbers.</li>
+  <li>The spacing is <strong>always equal</strong>. For 0 to 4&pi; with 1000 points, each step is about 0.0126.</li>
+  <li>Here it builds the <strong>time axis</strong>.</li>
+</ul>
+</details>
+
+<details open><summary><code>np.sin(x)</code>: what is a sine?</summary>
+<p>Forget the maths: <code>sin</code> turns a list of numbers into a <strong>smooth repeating wave</strong> that goes up to +1, down to -1, and repeats.</p>
+<pre><code>  1 |  *   *
+    | * * * *
+  0 |*       *       *
+    |         * * * *
+ -1 |          *   *</code></pre>
+<p><code>4 * np.pi</code> covers <strong>2 full wave cycles</strong> (one cycle = 2&pi;).</p>
+</details>
+
+<details open><summary><code>np.random.normal(mean, std, count)</code>: the noise</summary>
+<ul>
+  <li><strong>0 (mean):</strong> the centre the numbers cluster around.</li>
+  <li><strong>0.3 (standard deviation):</strong> how spread out they are.</li>
+  <li><strong>count:</strong> how many numbers.</li>
+</ul>
+<div class="box fix"><strong class="label">Common misunderstanding</strong>
+0.3 is <em>not</em> a hard maximum. Values can exceed it, but most (about 68%) fall between -0.3 and +0.3.</div>
+<p><code>sin(time) + noise</code> = a clean wave plus random mess = a realistic signal.</p>
+</details>
+
+<details open><summary><code>.rolling(window=20).mean()</code>: moving average</summary>
+<p>Look at <strong>20 points at a time</strong>, average them, slide forward by 1, repeat. The result is a smoother line that keeps the trend and drops the jitter.</p>
+<pre><code>raw:       [1, 5, 2, 8, 3, 6, 4, 7 ...]
+window=3:  [avg(1,5,2), avg(5,2,8), avg(2,8,3) ...]
+result:    [2.7, 5.0, 4.3 ...]</code></pre>
+<ul>
+  <li><code>.rolling(window=20)</code>: defines the sliding group size.</li>
+  <li><code>.mean()</code>: what to compute for each group (the average).</li>
+  <li>The first 19 values are <code>NaN</code> because there aren't 20 points yet.</li>
+</ul>
+</details>
+
+<details open><summary>matplotlib calls</summary>
+<table>
+  <tr><th>Call</th><th>What it does</th></tr>
+  <tr><td><code>matplotlib.use("Agg")</code></td><td>Choose a backend that renders to image files (no GUI window)</td></tr>
+  <tr><td><code>plt.subplots(figsize=(10, 4))</code></td><td>Create the <code>figure</code> (whole image) and <code>axis</code> (drawing area). Size is width 10, height 4 inches</td></tr>
+  <tr><td><code>axis.plot(x, y, ...)</code></td><td>Draw a line. Options: <code>alpha</code> (transparency 0-1), <code>color</code>, <code>linewidth</code>, <code>label</code></td></tr>
+  <tr><td><code>axis.set_title / set_xlabel / set_ylabel</code></td><td>Title and axis labels</td></tr>
+  <tr><td><code>axis.legend()</code></td><td>Show the labels defined in <code>label=</code></td></tr>
+  <tr><td><code>axis.set_facecolor</code>, <code>figure.patch.set_facecolor</code></td><td>Background colour of the chart area / whole image</td></tr>
+  <tr><td><code>figure.savefig(name, dpi=100, bbox_inches="tight")</code></td><td>Write the PNG. <code>dpi</code> = resolution, <code>tight</code> = trim extra margins</td></tr>
+  <tr><td><code>plt.close(figure)</code></td><td>Free memory</td></tr>
+</table>
+</details>
+
+<details><summary><code>pd.DataFrame({...})</code></summary>
+<p>Builds a table from a dict: keys become column names, lists/arrays become the column values. <code>data_frame["signal"]</code> accesses one column.</p>
+</details>
+
+<!-- ============ EX 2 ============ -->
+<h2 class="part" id="ex2">Exercise 2: The Oracle (to research)</h2>
+<p><strong>Files:</strong> <code>oracle.py</code>, <code>.env.example</code>, <code>.gitignore</code> &middot; <strong>Allowed:</strong> <code>os</code>, <code>sys</code>, <code>python-dotenv</code></p>
+<p>We have not studied this part yet. Here is the research checklist and the facts from the subject.</p>
+<ul class="checklist">
+  <li>What are environment variables and why do applications use them?</li>
+  <li>What is a <code>.env</code> file and how does <code>python-dotenv</code> load it (<code>load_dotenv()</code>)?</li>
+  <li>Priority: why real environment variables override <code>.env</code> values</li>
+  <li>What <code>.env.example</code> is for (a template without real secrets)</li>
+  <li>Why <code>.env</code> must be in <code>.gitignore</code> (secrets would leak into version control history)</li>
+  <li>Development vs production configuration: what will you show differently in the output?</li>
+  <li>Error handling when a variable is missing (<code>os.environ.get</code> returns <code>None</code>)</li>
+</ul>
+<table>
+  <tr><th>Variable</th><th>Purpose</th></tr>
+  <tr><td><code>MATRIX_MODE</code></td><td>"development" or "production"</td></tr>
+  <tr><td><code>DATABASE_URL</code></td><td>Connection string for data storage</td></tr>
+  <tr><td><code>API_KEY</code></td><td>Secret key for external services</td></tr>
+  <tr><td><code>LOG_LEVEL</code></td><td>Logging verbosity</td></tr>
+  <tr><td><code>ZION_ENDPOINT</code></td><td>URL of the resistance network</td></tr>
+</table>
+<pre><code>python3 oracle.py                                          <span class="c"># no config: warnings</span>
+cp .env.example .env  &amp;&amp;  python3 oracle.py                 <span class="c"># loads .env</span>
+MATRIX_MODE=production API_KEY=secret123 python3 oracle.py <span class="c"># env vars override .env</span></code></pre>
+
+<!-- ============ CHEAT SHEET ============ -->
+<h2 class="part" id="cheat">Cheat sheet</h2>
+<table>
+  <tr><th>Concept</th><th>One-line summary</th></tr>
+  <tr><td>Virtual environment</td><td>Isolated Python + packages per project</td></tr>
+  <tr><td>Activation</td><td>Prepends venv <code>bin/</code> to PATH, sets <code>VIRTUAL_ENV</code></td></tr>
+  <tr><td>Detect venv</td><td><code>sys.prefix != sys.base_prefix</code></td></tr>
+  <tr><td><code>site.getsitepackages()</code></td><td>Where packages are installed</td></tr>
+  <tr><td>pip</td><td>Installer only; <code>requirements.txt</code> maintained by hand</td></tr>
+  <tr><td>Poetry</td><td>Manages venv, dependencies, <code>pyproject.toml</code> and <code>poetry.lock</code></td></tr>
+  <tr><td><code>==</code> vs <code>^</code></td><td>Exact version vs compatible newer versions</td></tr>
+  <tr><td><code>importlib.util.find_spec</code></td><td>Is a package installed? (<code>None</code> = no) without importing it</td></tr>
+  <tr><td>numpy / pandas / matplotlib</td><td>Generate numbers / tabulate data / draw charts</td></tr>
+  <tr><td><code>.rolling(n).mean()</code></td><td>Moving average to smooth noise</td></tr>
+  <tr><td>Env variables + <code>.env</code></td><td>Config and secrets outside the code, never committed</td></tr>
+</table>
+
+<!-- ============ REVIEW ============ -->
+<h2 class="part" id="review">Likely peer-review questions</h2>
+<details><summary>Why use a virtual environment?</summary>To avoid dependency conflicts between projects and keep the global Python clean.</details>
+<details><summary>What does <code>activate</code> actually change?</summary>It puts the venv's <code>bin/</code> at the front of PATH (and sets <code>VIRTUAL_ENV</code>), so <code>python</code> and <code>pip</code> resolve to the venv's copies.</details>
+<details><summary>How does your script detect a venv?</summary>It compares <code>sys.prefix</code> with <code>sys.base_prefix</code>; if they differ, it is running inside a venv.</details>
+<details><summary>pip vs Poetry?</summary>pip only installs packages. Poetry also creates the environment, records dependencies in <code>pyproject.toml</code>, and pins exact versions in <code>poetry.lock</code>.</details>
+<details><summary>Why does your numpy data matter?</summary>The subject requires the dataset to come from numpy, not hardcoded lists or <code>range()</code>.</details>
+<details><summary>What does <code>^2.1.0</code> allow?</summary>Any compatible version from 2.1.0 up to, but not including, 3.0.0.</details>
+<details><summary>Why is <code>.env</code> in <code>.gitignore</code>?</summary>It holds real secrets; once committed they stay in git history and can leak. <code>.env.example</code> is committed instead as a safe template.</details>
+
+</main>
+</div>
+</body>
+</html>

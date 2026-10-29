@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Codex — Python Imports Study Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --paper: #f4ecd8;
+    --paper-2: #ebe0c4;
+    --ink: #2a2118;
+    --ink-soft: #5c4d3a;
+    --rule: #cdbd96;
+    --copper: #b5562b;
+    --verdigris: #2f7d6d;
+    --violet: #5b3f8c;
+    --gold: #b8892b;
+    --code-bg: #231c15;
+    --code-ink: #efe4cc;
+    --ok: #2f7d6d;
+    --bad: #a8321f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 10%, #f9f2df 0, transparent 40%),
+      radial-gradient(circle at 90% 80%, #e6d9b6 0, transparent 45%);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Sidebar ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    padding: 40px 24px;
+    border-right: 1px solid var(--rule);
+    overflow-y: auto;
+  }
+  nav .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    line-height: 1.15;
+    color: var(--copper);
+    margin-bottom: 4px;
+  }
+  nav .sub {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 28px;
+  }
+  nav a {
+    display: block;
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    padding: 6px 0 6px 12px;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+  }
+  nav a:hover { color: var(--copper); border-left-color: var(--copper); }
+  nav .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--gold);
+    margin-right: 6px;
+  }
+
+  /* ---------- Main ---------- */
+  main { padding: 56px 48px 96px; }
+
+  header.hero { margin-bottom: 56px; }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    line-height: 1.05;
+    font-weight: 700;
+  }
+  h1 em { color: var(--copper); font-style: italic; font-weight: 500; }
+  .lede {
+    margin-top: 18px;
+    max-width: 620px;
+    color: var(--ink-soft);
+    font-size: 1.08rem;
+  }
+
+  section { margin-top: 72px; scroll-margin-top: 24px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.15;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 24px;
+  }
+  h2 .no {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--gold);
+    font-weight: 500;
+  }
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    margin: 34px 0 10px;
+    color: var(--ink);
+  }
+  p { margin-bottom: 14px; }
+  ul, ol { margin: 0 0 16px 22px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 600; }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.84em;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--copper);
+  }
+
+  /* Code blocks */
+  .file {
+    margin: 18px 0 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 6px 0 -2px #00000012;
+  }
+  .file .tab {
+    background: #3a2f22;
+    color: #d9c9a3;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.74rem;
+    padding: 7px 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .file .tab .ln { color: #9c8a66; }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    padding: 16px 18px;
+    overflow-x: auto;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+  .k { color: #d7a0ff; }
+  .s { color: #9fd9a3; }
+  .c { color: #8b7d63; font-style: italic; }
+  .f { color: #f0c778; }
+  .hl { background: #b5562b44; display: inline-block; width: 100%; border-left: 3px solid var(--copper); padding-left: 8px; margin-left: -11px; }
+  .bad-line { background: #a8321f44; display: inline-block; width: 100%; border-left: 3px solid #e05a45; padding-left: 8px; margin-left: -11px; }
+
+  /* Callouts */
+  .callout {
+    border-left: 4px solid var(--verdigris);
+    background: #2f7d6d14;
+    padding: 14px 18px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .callout.warn { border-color: var(--gold); background: #b8892b18; }
+  .callout.danger { border-color: var(--bad); background: #a8321f14; }
+  .callout.idea { border-color: var(--violet); background: #5b3f8c12; }
+  .callout .t {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .callout.warn .t { color: var(--gold); }
+  .callout.danger .t { color: var(--bad); }
+  .callout.idea .t { color: var(--violet); }
+  .callout:not(.warn):not(.danger):not(.idea) .t { color: var(--verdigris); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0 24px;
+    font-size: 0.95rem;
+  }
+  th {
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+
+  /* Tree */
+  .tree {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px 22px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .tree b { color: var(--copper); font-weight: 600; }
+  .tree i { color: var(--ink-soft); font-style: normal; }
+
+  /* Timeline (circular import) */
+  .timeline { margin: 24px 0; counter-reset: step; }
+  .step {
+    position: relative;
+    padding: 12px 16px 12px 58px;
+    margin-bottom: 10px;
+    background: #fff8;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+  }
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 14px; top: 12px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--copper);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+  }
+  .step.boom { border-color: var(--bad); background: #a8321f12; }
+  .step.boom::before { background: var(--bad); content: '✕'; }
+  .step .where { font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; color: var(--ink-soft); }
+  .step p { margin: 2px 0 0; font-size: 0.97rem; }
+
+  /* Two-column compare */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 20px 0; }
+  .compare > div { background: #fff8; border: 1px solid var(--rule); border-radius: 8px; padding: 14px 18px; }
+  .compare h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .compare .good h4 { color: var(--ok); }
+  .compare .bad h4 { color: var(--bad); }
+
+  /* Q&A */
+  details {
+    background: #fff8;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  summary {
+    cursor: pointer;
+    padding: 14px 18px;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: '?';
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--violet);
+    color: #fff;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: inline-grid;
+    place-items: center;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+  }
+  details[open] summary { border-bottom: 1px dashed var(--rule); }
+  details .ans { padding: 14px 18px 4px; }
+
+  /* Glossary */
+  .gloss td:first-child {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--copper);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; }
+    nav { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--rule); padding: 20px 20px 8px; }
+    nav a { display: inline-block; padding: 4px 10px 4px 0; border: none; }
+    main { padding: 32px 20px 72px; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav>
+  <div class="brand">The Codex</div>
+  <div class="sub">Python import mysteries — study guide</div>
+  <a href="#map"><span class="num">00</span>The big picture</a>
+  <a href="#init"><span class="num">01</span>Packages &amp; __init__.py</a>
+  <a href="#paths"><span class="num">02</span>Import pathways</a>
+  <a href="#absrel"><span class="num">03</span>Absolute vs relative</a>
+  <a href="#circular"><span class="num">04</span>Circular imports</a>
+  <a href="#tools"><span class="num">05</span>mypy, flake8, runtime</a>
+  <a href="#quiz"><span class="num">06</span>Evaluation Q&amp;A</a>
+  <a href="#gloss"><span class="num">07</span>Glossary</a>
+  <a href="#cheat"><span class="num">08</span>Cheat sheet</a>
+</nav>
+
+<main>
+
+<header class="hero">
+  <div class="eyebrow">Module 06 · Python</div>
+  <h1>Mastering <em>Import</em> Mysteries</h1>
+  <p class="lede">Everything we went through, rebuilt step by step and tied to the exact lines of your own repository. Read it top to bottom once, then use the Q&amp;A section to test yourself before the defense.</p>
+</header>
+
+<!-- ============ MAP ============ -->
+<section id="map">
+  <h2><span class="no">00</span>The big picture</h2>
+  <p>The project is one question asked four ways: <strong>"When I write an <code>import</code>, how does Python find the thing, and when does it run?"</strong> Each part of the subject isolates one piece of that answer.</p>
+
+  <table>
+    <tr><th>Part</th><th>Mystery</th><th>The one-line idea</th></tr>
+    <tr><td>I · Alembic</td><td><code>__init__.py</code></td><td>A folder with <code>__init__.py</code> is a package, and that file decides what the package shows to the outside.</td></tr>
+    <tr><td>II · Distillation</td><td>Import pathways</td><td>A file can pull code from another file, which itself pulls from others. Python searches in a precise order.</td></tr>
+    <tr><td>III · Transmutation</td><td>Absolute vs relative</td><td>Two ways to write the same address: from the root, or from where you stand.</td></tr>
+    <tr><td>IV · Kaboom</td><td>Circular imports</td><td>Top-level imports run at load time, so two files importing each other at the top can never finish loading.</td></tr>
+  </table>
+
+  <div class="tree"><b>.</b>
+├── <b>alchemy/</b>                  <i># the package</i>
+│   ├── __init__.py          <i># public interface (re-exports)</i>
+│   ├── elements.py          <i># earth, air</i>
+│   ├── potions.py           <i># healing, strength</i>
+│   ├── grimoire/            <i># sub-package: light &amp; dark magic</i>
+│   │   ├── __init__.py
+│   │   ├── light_spellbook.py   light_validator.py
+│   │   └── dark_spellbook.py    dark_validator.py
+│   └── transmutation/       <i># sub-package</i>
+│       ├── __init__.py
+│       └── recipes.py       <i># lead_to_gold()</i>
+├── elements.py              <i># root level: fire, water</i>
+└── ft_*.py                  <i># the 13 test scripts</i></div>
+
+  <div class="callout warn">
+    <div class="t">Heads-up on line numbers</div>
+    <p>While we talked I quoted some line numbers that were off by a few lines. The ones in this guide are recounted from the files you sent, so trust these.</p>
+  </div>
+</section>
+
+<!-- ============ INIT ============ -->
+<section id="init">
+  <h2><span class="no">01</span>Packages &amp; <code>__init__.py</code></h2>
+
+  <h3>Module vs package</h3>
+  <ul>
+    <li>A <strong>module</strong> is a single <code>.py</code> file you can import (<code>elements.py</code>).</li>
+    <li>A <strong>package</strong> is a folder containing an <code>__init__.py</code>. It groups modules together (<code>alchemy/</code>).</li>
+  </ul>
+  <p>The <code>__init__.py</code> file runs <strong>once, the first time anything in the package is imported</strong>. Whatever names it defines become attributes of the package: after <code>import alchemy</code>, you can write <code>alchemy.something</code> only if <code>something</code> exists inside that file.</p>
+
+  <h3>Re-exporting: the public interface</h3>
+  <div class="file">
+    <div class="tab"><span>alchemy/__init__.py</span><span class="ln">lines 5–8</span></div>
+<pre><code><span class="k">from</span> alchemy.elements <span class="k">import</span> create_air  <span class="c"># noqa: F401</span>
+<span class="k">from</span> alchemy.potions <span class="k">import</span> healing_potion <span class="k">as</span> heal  <span class="c"># noqa: F401</span>
+<span class="k">from</span> alchemy.potions <span class="k">import</span> strength_potion  <span class="c"># noqa: F401</span>
+<span class="k">from</span> alchemy.transmutation <span class="k">import</span> lead_to_gold  <span class="c"># noqa: F401</span></code></pre>
+  </div>
+
+  <p>These lines pull names up to the package's top level, so users don't need to know your internal layout.</p>
+
+  <table>
+    <tr><th>Without re-export</th><th>With re-export</th></tr>
+    <tr><td><code>from alchemy.transmutation import lead_to_gold</code></td><td><code>from alchemy import lead_to_gold</code></td></tr>
+    <tr><td><code>from alchemy.potions import healing_potion</code></td><td><code>alchemy.heal()</code></td></tr>
+  </table>
+
+  <p>This is exactly what you worked out yourself with <code>lead_to_gold</code>: the sub-package's <code>__init__.py</code> does <code>from .recipes import lead_to_gold</code> (line 4 of <code>alchemy/transmutation/__init__.py</code>), so you can skip the <code>recipes</code> step.</p>
+
+  <h3>Aliasing with <code>as</code></h3>
+  <p><code>healing_potion as heal</code> doesn't copy anything. It adds a second name, <code>heal</code>, pointing at the same function. That is the "package alias" required by <code>ft_distillation_1.py</code>.</p>
+
+  <h3>Hiding things on purpose</h3>
+  <p><code>create_earth</code> lives in <code>alchemy/elements.py</code> but is <strong>not</strong> imported in <code>alchemy/__init__.py</code>, so it isn't an attribute of <code>alchemy</code>:</p>
+  <div class="file">
+    <div class="tab"><span>ft_alembic_4.py</span><span class="ln">line 21</span></div>
+<pre><code><span class="bad-line">print(f"Testing the hidden create_earth: {alchemy.create_earth()}")</span></code></pre>
+  </div>
+  <p>Result: <code>AttributeError: module 'alchemy' has no attribute 'create_earth'</code>. The function exists; it just isn't part of the public interface.</p>
+
+  <h3>Why <code># noqa: F401</code></h3>
+  <p>flake8 rule <strong>F401</strong> means "imported but unused". In <code>__init__.py</code> the imports are never used in the file itself; their whole purpose is to be re-exported. <code>noqa: F401</code> tells flake8 "I know, this is intentional."</p>
+
+  <div class="callout idea">
+    <div class="t">Concept you didn't use: <code>__all__</code></div>
+    <p>An alternative way to declare the public interface is a list in <code>__init__.py</code>:</p>
+    <p><code>__all__ = ["create_air", "heal", "strength_potion", "lead_to_gold"]</code></p>
+    <p>It controls what <code>from alchemy import *</code> exports, and it also tells flake8 the imports are deliberate, so the <code>noqa</code> comments would no longer be needed. Worth knowing the name in case the evaluator asks for an alternative.</p>
+  </div>
+</section>
+
+<!-- ============ PATHS ============ -->
+<section id="paths">
+  <h2><span class="no">02</span>Import pathways</h2>
+
+  <h3>The three import shapes</h3>
+  <table>
+    <tr><th>Syntax</th><th>What you get</th><th>How you call it</th></tr>
+    <tr><td><code>import elements</code></td><td>The whole module</td><td><code>elements.create_fire()</code></td></tr>
+    <tr><td><code>from elements import create_water</code></td><td>Just that name</td><td><code>create_water()</code></td></tr>
+    <tr><td><code>import alchemy.elements</code></td><td>Module inside a package, full path kept</td><td><code>alchemy.elements.create_earth()</code></td></tr>
+  </table>
+  <p>That's the difference between <code>ft_alembic_0</code> / <code>_1</code> / <code>_2</code> / <code>_3</code>. Same idea, different syntax.</p>
+
+  <h3>Where does Python look? <code>sys.path</code></h3>
+  <p>When you run <code>python3 ft_alembic_0.py</code>, Python builds a list of folders called <code>sys.path</code>. <strong>The first entry is the folder containing the script you ran</strong>, so here, your project root. For every bare <code>import X</code>, Python walks that list in order and takes the first match.</p>
+
+  <div class="callout">
+    <div class="t">That's the answer to "why does <code>import elements</code> give the root file?"</div>
+    <p>The root folder is on <code>sys.path</code>, so <code>elements.py</code> there is found. The file <code>alchemy/elements.py</code> is <em>not</em> on the path as a top-level name. Its real name is <code>alchemy.elements</code>.</p>
+  </div>
+
+  <div class="file">
+    <div class="tab"><span>alchemy/potions.py</span><span class="ln">lines 3–4</span></div>
+<pre><code><span class="hl"><span class="k">import</span> elements                                    <span class="c"># root elements.py  (fire, water)</span></span>
+<span class="hl"><span class="k">from</span> .elements <span class="k">import</span> create_earth, create_air   <span class="c"># alchemy/elements.py</span></span></code></pre>
+  </div>
+  <p>Two files with the same name, two different addresses: no dot means "search from <code>sys.path</code>", a dot means "start from my own package."</p>
+
+  <div class="callout warn">
+    <div class="t">Be honest about this in the evaluation</div>
+    <p><code>import elements</code> inside <code>alchemy/potions.py</code> only works because you launch scripts from the project root. It's a deliberate teaching trick from the subject (the subject forbids touching <code>sys.path</code>, so this is the allowed way to reach the root file). In real projects you'd avoid depending on the launch directory.</p>
+  </div>
+
+  <h3>Importing a submodule runs its parents first</h3>
+  <p><code>from alchemy.potions import strength_potion</code> makes Python load, in order: <code>alchemy/__init__.py</code>, then <code>alchemy/potions.py</code>. Parent <code>__init__.py</code> files always run first. This detail matters for the circular import in the next section.</p>
+
+  <h3>Nested imports (Part II)</h3>
+  <p><code>ft_distillation_0.py</code> imports <code>potions.py</code>, which imports <code>elements</code> files, which return strings. Python follows the chain automatically: each file runs its own imports when it is loaded.</p>
+
+  <h3>Imports are cached: <code>sys.modules</code></h3>
+  <p>The first time a module loads, Python stores it in a dictionary called <code>sys.modules</code>. Any later <code>import</code> of the same module reuses that object instead of running the file again. This cache is the hidden hero behind circular imports (section 04).</p>
+</section>
+
+<!-- ============ ABS / REL ============ -->
+<section id="absrel">
+  <h2><span class="no">03</span>Absolute vs relative imports</h2>
+
+  <p>Two ways to write the same address.</p>
+
+  <div class="compare">
+    <div>
+      <h4>Absolute</h4>
+      <p>Full path from the top of the project.</p>
+      <p><code>from alchemy.elements import create_air</code></p>
+    </div>
+    <div>
+      <h4>Relative</h4>
+      <p>Path from the current file, using dots.</p>
+      <p><code>from .elements import create_air</code></p>
+    </div>
+  </div>
+
+  <h3>The dots</h3>
+  <table>
+    <tr><th>Dots</th><th>Meaning</th><th>From inside <code>alchemy/transmutation/recipes.py</code></th></tr>
+    <tr><td><code>.</code></td><td>my own package</td><td><code>alchemy/transmutation/</code></td></tr>
+    <tr><td><code>..</code></td><td>my parent package</td><td><code>alchemy/</code></td></tr>
+    <tr><td><code>...</code></td><td>grandparent</td><td>the project root (not importable here)</td></tr>
+  </table>
+
+  <div class="file">
+    <div class="tab"><span>alchemy/transmutation/recipes.py</span><span class="ln">lines 3–5</span></div>
+<pre><code><span class="k">import</span> elements                          <span class="c"># absolute: root elements.py (fire)</span>
+<span class="k">from</span> ..elements <span class="k">import</span> create_air       <span class="c"># relative: alchemy/elements.py</span>
+<span class="k">from</span> ..potions <span class="k">import</span> strength_potion   <span class="c"># relative: alchemy/potions.py</span></code></pre>
+  </div>
+  <p>This file satisfies the subject's "at least one absolute and one relative import". You also correctly predicted that <code>from ..potions import healing_potion</code> would be the way to get the other potion.</p>
+
+  <h3>So what's the real difference?</h3>
+  <ul>
+    <li><strong>Portability:</strong> relative imports survive renaming the package. Rename <code>alchemy</code> to <code>lab</code> and <code>from .recipes import ...</code> still works, but <code>from alchemy.elements import ...</code> breaks.</li>
+    <li><strong>Clarity:</strong> an absolute import tells the reader exactly where something lives. PEP 8 recommends absolute imports as the default and accepts relative ones for imports inside the same package.</li>
+    <li><strong>Brevity:</strong> relative imports are shorter, but <code>....module</code> chains get hard to read quickly.</li>
+  </ul>
+
+  <div class="callout">
+    <div class="t">The question the subject asks: when to use which?</div>
+    <p><strong>Absolute</strong> for clarity, for imports across different packages, and for entry-point scripts. <strong>Relative</strong> for closely related files inside the same package, especially if the package might be renamed or moved.</p>
+  </div>
+
+  <div class="callout danger">
+    <div class="t">Gotcha to know</div>
+    <p>Relative imports only work when the file is imported <em>as part of a package</em>. If you run a package file directly (<code>python3 alchemy/potions.py</code>) you get <code>ImportError: attempted relative import with no known parent package</code>. That's why every test script lives at the root and imports <code>alchemy</code>, instead of running the package files directly.</p>
+  </div>
+</section>
+
+<!-- ============ CIRCULAR ============ -->
+<section id="circular">
+  <h2><span class="no">04</span>Circular imports</h2>
+
+  <h3>Rule #1 — the one that unlocks everything</h3>
+  <div class="callout danger">
+    <div class="t">Top-level imports execute immediately when the file is loaded</div>
+    <p>Not when you call a function. Python runs a file from line 1 downwards the moment it's imported, and an <code>import</code> line at the top is executed right then. Only an import <em>inside a function</em> waits until that function is called.</p>
+  </div>
+  <p>This was the one thing you had backwards early in our session, so make sure it sticks.</p>
+
+  <h3>The crash, one step at a time (dark magic)</h3>
+
+  <div class="file">
+    <div class="tab"><span>dark_spellbook.py</span><span class="ln">line 10</span></div>
+<pre><code><span class="k">from</span> .dark_validator <span class="k">import</span> validate_ingredients</code></pre>
+  </div>
+  <div class="file">
+    <div class="tab"><span>dark_validator.py</span><span class="ln">line 4</span></div>
+<pre><code><span class="k">from</span> .dark_spellbook <span class="k">import</span> dark_spell_allowed_ingredients</code></pre>
+  </div>
+
+  <div class="timeline">
+    <div class="step">
+      <div class="where">ft_kaboom_1.py · line 14</div>
+      <p>Imports <code>alchemy.grimoire.dark_spellbook</code>. Python first runs <code>alchemy/__init__.py</code> and <code>grimoire/__init__.py</code> (both fine), then starts executing <code>dark_spellbook.py</code> and registers it in <code>sys.modules</code> <strong>right away, still empty</strong>.</p>
+    </div>
+    <div class="step">
+      <div class="where">dark_spellbook.py · line 10</div>
+      <p>First real line: import <code>dark_validator</code>. Python pauses <code>dark_spellbook</code> here and goes to load <code>dark_validator.py</code>.</p>
+    </div>
+    <div class="step">
+      <div class="where">dark_validator.py · line 4</div>
+      <p>First real line: import <code>dark_spell_allowed_ingredients</code> from <code>dark_spellbook</code>. Python finds <code>dark_spellbook</code> in <code>sys.modules</code>, but it's only <em>partially initialized</em>.</p>
+    </div>
+    <div class="step boom">
+      <div class="where">The name doesn't exist yet</div>
+      <p><code>dark_spell_allowed_ingredients</code> is defined further down <code>dark_spellbook.py</code>, and Python never got past line 10. Result: <code>ImportError: cannot import name ... from partially initialized module ... (most likely due to a circular import)</code>.</p>
+    </div>
+  </div>
+
+  <div class="callout idea">
+    <div class="t">A refinement of "infinite loop"</div>
+    <p>You described it as a loop, which is a good mental picture. Technically Python doesn't spin forever: because modules are registered in <code>sys.modules</code> before they finish loading, the second visit finds a half-built module and fails immediately.</p>
+  </div>
+
+  <h3>The fix used for light magic</h3>
+  <div class="file">
+    <div class="tab"><span>light_spellbook.py</span><span class="ln">line 3</span></div>
+<pre><code><span class="k">from</span> .light_validator <span class="k">import</span> validate_ingredients   <span class="c"># top-level: fine</span></code></pre>
+  </div>
+  <div class="file">
+    <div class="tab"><span>light_validator.py</span><span class="ln">lines 3 &amp; 16–18</span></div>
+<pre><code><span class="k">def</span> <span class="f">validate_ingredients</span>(ingredients: str) -> str:
+    ...
+    <span class="c"># Late import: executed only when this function is called</span>
+    <span class="hl"><span class="k">from</span> .light_spellbook <span class="k">import</span> light_spell_allowed_ingredients</span></code></pre>
+  </div>
+
+  <p>At load time, <code>light_validator</code> imports nothing from the spellbook, so no cycle exists. By the time <code>validate_ingredients()</code> is actually called, both modules are fully loaded and sitting in <code>sys.modules</code>, so the import inside the function just grabs the finished one.</p>
+
+  <p>And your answer for the dark side, which was correct: move the import inside <code>validate_ingredients()</code> in <code>dark_validator.py</code> and the explosion is defused.</p>
+
+  <h3>Other ways to break a cycle</h3>
+  <p>The subject says "there are multiple ways, be prepared to explain." You used #1. Know all three:</p>
+  <ol>
+    <li><strong>Late (function-level) import</strong>: what you did. Simple, but hides the dependency inside the function.</li>
+    <li><strong>Restructure</strong>: move the shared piece (here, the allowed-ingredients list) into a third module that both files import. No cycle can exist when dependencies only point one way. Often the cleanest design.</li>
+    <li><strong>Import the module, not the name</strong>: write <code>from . import dark_spellbook</code> at the top and call <code>dark_spellbook.dark_spell_allowed_ingredients()</code> inside the function. The module object exists even while half-loaded, and the attribute is only looked up at call time.</li>
+  </ol>
+</section>
+
+<!-- ============ TOOLS ============ -->
+<section id="tools">
+  <h2><span class="no">05</span>mypy, flake8 and runtime errors</h2>
+
+  <table>
+    <tr><th>Tool</th><th>When it acts</th><th>What it checks</th></tr>
+    <tr><td><code>flake8</code></td><td>Before running (static)</td><td>Style and simple errors: line length, unused imports (F401), import position (E402)</td></tr>
+    <tr><td><code>mypy</code></td><td>Before running (static)</td><td>Type annotations and whether attributes exist</td></tr>
+    <tr><td>Python itself</td><td>While running</td><td>Everything else: the crash, <code>AttributeError</code>, <code>ImportError</code></td></tr>
+  </table>
+
+  <h3>The same line, caught twice (<code>ft_alembic_4.py</code>)</h3>
+  <p>You ran mypy and got:</p>
+  <div class="file">
+    <div class="tab"><span>terminal</span></div>
+<pre><code>ft_alembic_4.py:21: error: Module has no attribute "create_earth"; maybe "create_air"?  [attr-defined]</code></pre>
+  </div>
+  <ul>
+    <li><strong>mypy:</strong> reads the code without running it, sees <code>alchemy</code> has no <code>create_earth</code>, and reports it. The program is unaffected.</li>
+    <li><strong>Runtime:</strong> when execution reaches line 21, Python really looks up the attribute and crashes with <code>AttributeError</code>.</li>
+  </ul>
+  <p>Think of mypy as a spell-checker and the runtime error as the message actually failing to send.</p>
+
+  <h3><code># noqa: E402</code> in <code>ft_kaboom_1.py</code></h3>
+  <p>flake8 rule <strong>E402</strong> says imports belong at the top of the file. In <code>ft_kaboom_1.py</code> you print three lines before the import so the output matches the subject's example. That triggers E402, so the import needs a suppression.</p>
+
+  <div class="callout warn">
+    <div class="t">Check this in your file</div>
+    <p>In the version you sent, the <code># noqa: E402</code> appears in a comment on its own line (line 12), above the import. flake8 only honours <code>noqa</code> when it's on the <strong>same line</strong> as the error. Line 14 should end with <code># noqa: E402</code>. Run <code>flake8 ft_kaboom_1.py</code> to confirm before submitting.</p>
+  </div>
+
+  <div class="callout warn">
+    <div class="t">Another one: the dark files</div>
+    <p>Likewise, run <code>flake8</code> and <code>mypy</code> on the whole project once. The dark modules are intentionally broken at runtime, but they should still pass the static checks, apart from the mypy error in <code>ft_alembic_4.py</code> that the subject asks for.</p>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section id="quiz">
+  <h2><span class="no">06</span>Evaluation Q&amp;A — test yourself</h2>
+  <p>Try to answer out loud before opening each one. Explaining in your own words is what the evaluators are checking.</p>
+
+  <details><summary>What makes a folder a package?</summary>
+    <div class="ans"><p>The presence of an <code>__init__.py</code> file. It runs once on first import and defines what the package exposes. (Modern Python also tolerates folders without it, "namespace packages", but the subject uses the classic form.)</p></div>
+  </details>
+
+  <details><summary>Why does <code>alchemy.create_earth()</code> fail but <code>alchemy.create_air()</code> work?</summary>
+    <div class="ans"><p>Only <code>create_air</code> is imported in <code>alchemy/__init__.py</code>, so only it becomes an attribute of the package. <code>create_earth</code> still exists in <code>alchemy/elements.py</code>, but it isn't re-exported.</p></div>
+  </details>
+
+  <details><summary>In <code>alchemy/potions.py</code>, why two imports of "elements"?</summary>
+    <div class="ans"><p>There are two different files. <code>import elements</code> resolves through <code>sys.path</code> to the root file (fire, water). <code>from .elements import ...</code> uses the dot to mean "inside my own package," giving <code>alchemy/elements.py</code> (earth, air).</p></div>
+  </details>
+
+  <details><summary>What is <code>sys.path</code> and why is it forbidden to modify?</summary>
+    <div class="ans"><p>It's the ordered list of folders Python searches for modules. The first entry is the folder of the script you ran. Editing it would let you bend import resolution instead of using proper package structure, and the exercise is about understanding that structure.</p></div>
+  </details>
+
+  <details><summary>What do <code>.</code> and <code>..</code> mean in an import?</summary>
+    <div class="ans"><p>Current package and parent package, respectively. In <code>alchemy/transmutation/recipes.py</code>: <code>.</code> is <code>alchemy.transmutation</code>, <code>..</code> is <code>alchemy</code>.</p></div>
+  </details>
+
+  <details><summary>Absolute or relative: which is better?</summary>
+    <div class="ans"><p>Neither always. Absolute is clearer and PEP 8's default; relative is shorter and survives package renames. Use relative for tightly coupled files in one package, absolute elsewhere.</p></div>
+  </details>
+
+  <details><summary>When does a top-level import run, versus one inside a function?</summary>
+    <div class="ans"><p>Top-level: at the moment the file is first loaded. Inside a function: each time the function is called (and, thanks to <code>sys.modules</code>, it reuses the already-loaded module after the first load).</p></div>
+  </details>
+
+  <details><summary>Explain exactly why <code>ft_kaboom_1.py</code> crashes.</summary>
+    <div class="ans"><p><code>dark_spellbook</code> imports <code>dark_validator</code> on line 10 before defining anything. <code>dark_validator</code> immediately imports a name from <code>dark_spellbook</code>, which is registered but only partially initialized, so the name doesn't exist yet. Python raises <code>ImportError</code> mentioning a circular import.</p></div>
+  </details>
+
+  <details><summary>Name three ways to avoid a circular dependency.</summary>
+    <div class="ans"><p>(1) Move the import inside the function. (2) Restructure: put shared code in a third module. (3) Import the module rather than the name and access the attribute at call time.</p></div>
+  </details>
+
+  <details><summary>Why does <code>light_validator</code> work even though the two light files depend on each other?</summary>
+    <div class="ans"><p>The dependency is only needed when <code>validate_ingredients()</code> runs, not when the file loads. At load time there's no cycle; at call time everything is already loaded.</p></div>
+  </details>
+
+  <details><summary>mypy error vs runtime error: what's the difference?</summary>
+    <div class="ans"><p>mypy analyses code without running it and reports problems beforehand without stopping anything. A runtime error happens during execution and stops the program at that line.</p></div>
+  </details>
+
+  <details><summary>Why <code>noqa: F401</code> in <code>__init__.py</code>?</summary>
+    <div class="ans"><p>The imports are only there to re-export names, so flake8 sees them as "imported but unused." The comment silences that false alarm. <code>__all__</code> is the other standard way to declare the intent.</p></div>
+  </details>
+
+  <details><summary>What would you change to make <code>healing_potion</code> available as <code>alchemy.healing_potion</code> too?</summary>
+    <div class="ans"><p>Add <code>from alchemy.potions import healing_potion  # noqa: F401</code> to <code>alchemy/__init__.py</code>. An evaluator may ask you to modify the lab live, so practice small edits like this.</p></div>
+  </details>
+</section>
+
+<!-- ============ GLOSSARY ============ -->
+<section id="gloss">
+  <h2><span class="no">07</span>Glossary</h2>
+  <table class="gloss">
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td>module</td><td>A single <code>.py</code> file that can be imported.</td></tr>
+    <tr><td>package</td><td>A folder with <code>__init__.py</code> that groups modules.</td></tr>
+    <tr><td>sub-package</td><td>A package nested inside another (<code>grimoire</code>, <code>transmutation</code>).</td></tr>
+    <tr><td>__init__.py</td><td>Marks a package and runs on first import; defines its public interface.</td></tr>
+    <tr><td>re-export</td><td>Importing a name in <code>__init__.py</code> so it's reachable from the package itself.</td></tr>
+    <tr><td>alias</td><td>An extra name via <code>as</code> (<code>healing_potion as heal</code>).</td></tr>
+    <tr><td>__all__</td><td>List of names exported by <code>from package import *</code>.</td></tr>
+    <tr><td>absolute import</td><td>Full path from a <code>sys.path</code> root.</td></tr>
+    <tr><td>relative import</td><td>Path from the current package using <code>.</code> / <code>..</code>.</td></tr>
+    <tr><td>sys.path</td><td>Ordered list of folders searched for imports.</td></tr>
+    <tr><td>sys.modules</td><td>Cache of every module already loaded (or being loaded).</td></tr>
+    <tr><td>partially initialized module</td><td>A module that started loading but hasn't finished, so some names don't exist yet.</td></tr>
+    <tr><td>circular import</td><td>A imports B and B imports A at load time.</td></tr>
+    <tr><td>late import</td><td>An import placed inside a function body.</td></tr>
+    <tr><td>static analysis</td><td>Checking code without running it (mypy, flake8).</td></tr>
+    <tr><td>AttributeError</td><td>Runtime error: the name doesn't exist on that module/object.</td></tr>
+    <tr><td>ImportError</td><td>Runtime error: an import could not be completed.</td></tr>
+    <tr><td>F401 / E402</td><td>flake8 codes: unused import / import not at top of file.</td></tr>
+    <tr><td>noqa</td><td>Inline comment telling flake8 to skip a specific warning on that line.</td></tr>
+  </table>
+</section>
+
+<!-- ============ CHEAT ============ -->
+<section id="cheat">
+  <h2><span class="no">08</span>Cheat sheet</h2>
+  <ol>
+    <li>Folder + <code>__init__.py</code> = package. The file decides what's visible from outside.</li>
+    <li>Bare <code>import X</code> searches <code>sys.path</code>, which starts at the folder of the script you ran.</li>
+    <li><code>.</code> = this package, <code>..</code> = parent package.</li>
+    <li>Top-level imports run <strong>at load time</strong>. Imports inside functions run <strong>at call time</strong>.</li>
+    <li>Modules are registered in <code>sys.modules</code> as soon as loading starts. A second import mid-load sees a half-built module.</li>
+    <li>Cycle fixes: late import, restructure into a third module, import the module instead of the name.</li>
+    <li>mypy and flake8 run <em>before</em> execution; runtime errors happen <em>during</em> it.</li>
+    <li>Before the defense: run <code>flake8</code> and <code>mypy</code> on everything, run all 13 scripts, and be able to explain every import line out loud.</li>
+  </ol>
+
+  <footer>Built from our study session and the files in your repository. If any line number looks off after you edit your code, trust the code, not the guide.</footer>
+</section>
+
+</main>
+</div>
+</body>
+</html>

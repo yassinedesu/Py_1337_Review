@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Cultivation: Study Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,400&family=Newsreader:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --paper: #f4efe3;
+    --paper-2: #ebe4d2;
+    --ink: #1f2a1f;
+    --ink-soft: #4a5547;
+    --green: #2f5d3a;
+    --green-light: #dfe9d6;
+    --clay: #b5532f;
+    --clay-light: #f3ddd1;
+    --gold: #a9791c;
+    --gold-light: #f4e8c6;
+    --code-bg: #1d261e;
+    --code-ink: #e8e4d4;
+    --rule: #cfc7b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(47,93,58,0.05), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(181,83,47,0.05), transparent 40%);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.65;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    max-width: 1180px;
+    margin: 0 auto;
+    gap: 56px;
+    padding: 0 24px;
+  }
+
+  /* SIDEBAR */
+  nav {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    padding: 56px 0 24px;
+    overflow-y: auto;
+  }
+  nav .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.15;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+  nav .sub {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+  }
+  nav ol { list-style: none; border-left: 2px solid var(--rule); }
+  nav li a {
+    display: block;
+    padding: 7px 0 7px 16px;
+    margin-left: -2px;
+    border-left: 2px solid transparent;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 15px;
+    line-height: 1.3;
+    transition: all .15s;
+  }
+  nav li a:hover { color: var(--green); border-left-color: var(--green); background: rgba(47,93,58,0.06); }
+  nav li a span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--clay);
+    margin-right: 8px;
+  }
+
+  /* MAIN */
+  main { padding: 56px 0 96px; min-width: 0; }
+
+  .hero { margin-bottom: 56px; padding-bottom: 32px; border-bottom: 2px solid var(--ink); }
+  .hero .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(38px, 6vw, 62px);
+    line-height: 1.02;
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+  .hero h1 em { color: var(--green); font-weight: 400; }
+  .hero p { margin-top: 18px; color: var(--ink-soft); max-width: 56ch; }
+
+  section { margin-bottom: 72px; scroll-margin-top: 24px; }
+
+  .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; }
+  .sec-num {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--green-light);
+    -webkit-text-stroke: 1.5px var(--green);
+    font-weight: 700;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    line-height: 1.1;
+    font-weight: 700;
+  }
+  .sec-lead {
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+    padding-left: 80px;
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 21px;
+    margin: 32px 0 8px;
+    color: var(--green);
+  }
+
+  p { margin-bottom: 14px; }
+  ul, ol.plain { margin: 0 0 16px 22px; }
+  li { margin-bottom: 6px; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--clay);
+  }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin: 14px 0 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+    border-left: 4px solid var(--green);
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+  .k { color: #e5a864; }      /* keyword */
+  .s { color: #a8c98a; }      /* string */
+  .c { color: #7d8b78; font-style: italic; } /* comment */
+  .f { color: #8fc1d9; }      /* function/name */
+
+  /* callouts */
+  .box {
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-left: 5px solid;
+  }
+  .box .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .box p:last-child { margin-bottom: 0; }
+  .box.key  { background: var(--green-light); border-color: var(--green); }
+  .box.key .tag { color: var(--green); }
+  .box.warn { background: var(--clay-light); border-color: var(--clay); }
+  .box.warn .tag { color: var(--clay); }
+  .box.eval { background: var(--gold-light); border-color: var(--gold); }
+  .box.eval .tag { color: var(--gold); }
+
+  /* tables */
+  .table-wrap { overflow-x: auto; margin: 18px 0 24px; }
+  table { border-collapse: collapse; width: 100%; font-size: 16px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.35); }
+
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 20px;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+
+  footer {
+    border-top: 2px solid var(--ink);
+    padding-top: 20px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    nav { position: static; height: auto; padding: 32px 0 0; }
+    nav ol { display: none; }
+    nav .sub { margin-bottom: 0; }
+    .sec-lead { padding-left: 0; }
+    .sec-num { font-size: 44px; }
+    h2 { font-size: 26px; }
+    body { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav>
+    <div class="brand">Code<br>Cultivation</div>
+    <div class="sub">Object-Oriented Garden Systems</div>
+    <ol>
+      <li><a href="#ex0"><span>00</span>Program structure</a></li>
+      <li><a href="#ex1"><span>01</span>Classes &amp; objects</a></li>
+      <li><a href="#ex2"><span>02</span>State &amp; behavior</a></li>
+      <li><a href="#ex3"><span>03</span>__new__ vs __init__</a></li>
+      <li><a href="#ex4"><span>04</span>Encapsulation</a></li>
+      <li><a href="#ex5"><span>05</span>Inheritance &amp; super()</a></li>
+      <li><a href="#ex6"><span>06</span>Static, class &amp; nested</a></li>
+      <li><a href="#cheat"><span>★</span>Cheat sheet</a></li>
+      <li><a href="#eval"><span>✓</span>Before the evaluation</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <div class="hero">
+      <div class="kicker">Study guide · Python 3.10+</div>
+      <h1>Growing code,<br><em>layer by layer.</em></h1>
+      <p>Everything covered in our session, from how a Python file starts running to inheritance chains, with the corrections and the details that tend to come up during peer evaluation.</p>
+    </div>
+
+    <!-- EX 0 -->
+    <section id="ex0">
+      <div class="sec-head"><span class="sec-num">0</span><h2>Program structure</h2></div>
+      <p class="sec-lead">How a Python file starts, and how it can be made directly executable.</p>
+
+      <h3>The <code>__name__</code> variable</h3>
+      <p>Every Python file has a built-in variable called <code>__name__</code>. Its value depends on <em>how the file is being used</em>:</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Situation</th><th>Value of <code>__name__</code></th></tr>
+          <tr><td>Run directly: <code>python3 ft_garden_intro.py</code></td><td><code>"__main__"</code></td></tr>
+          <tr><td>Imported by another file</td><td><code>"ft_garden_intro"</code> (the module's own name, the filename without <code>.py</code>)</td></tr>
+        </table>
+      </div>
+
+      <pre><code><span class="k">def</span> <span class="f">ft_garden_intro</span>() -&gt; <span class="k">None</span>:
+    <span class="k">print</span>(<span class="s">"=== Welcome to My Garden ==="</span>)
+
+<span class="k">if</span> __name__ == <span class="s">"__main__"</span>:
+    ft_garden_intro()</code></pre>
+
+      <div class="box warn">
+        <span class="tag">Common mistake</span>
+        <p>When a file is imported, <code>__name__</code> is <strong>not</strong> the name of the file doing the importing. It is the name of the imported module itself.</p>
+      </div>
+
+      <div class="box key">
+        <span class="tag">Why it matters</span>
+        <p>When you <code>import</code> a file, Python runs all of its top-level code. The <code>if __name__ == "__main__":</code> guard keeps your test and demo code from running at import time. It only runs when the file is executed directly. This leads straight into the concept of imports in the next project.</p>
+      </div>
+
+      <h3>The shebang line</h3>
+      <p>The shebang is the first line of a script. It tells the <strong>operating system</strong> which interpreter should run the file.</p>
+      <pre><code><span class="c">#!/usr/bin/env python3</span></code></pre>
+      <p>To run the script directly (without typing <code>python3</code> in front), you need <strong>two</strong> things:</p>
+      <ol class="plain">
+        <li>The shebang as the very first line.</li>
+        <li>Execute permission on the file.</li>
+      </ol>
+      <pre><code>chmod +x ft_garden_intro.py
+./ft_garden_intro.py</code></pre>
+      <p>Without <code>chmod +x</code>, you get <code>Permission denied</code>, even with a perfect shebang.</p>
+      <div class="box eval">
+        <span class="tag">Evaluation</span>
+        <p>The subject says you will be asked to add the shebang to your script <em>live</em>. Practice it, including the <code>chmod</code>.</p>
+      </div>
+    </section>
+
+    <!-- EX 1 -->
+    <section id="ex1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>Classes &amp; objects</h2></div>
+      <p class="sec-lead">A class is the model; each instance is one concrete plant.</p>
+
+      <h3>Class, instance, attribute, method</h3>
+      <ul>
+        <li><strong>Class</strong>: the blueprint (<code>Plant</code>).</li>
+        <li><strong>Instance</strong>: one object built from it (<code>rose = Plant(...)</code>).</li>
+        <li><strong>Attributes</strong>: the data each instance holds (<code>name</code>, <code>height</code>, <code>age</code>).</li>
+        <li><strong>Methods</strong>: the behaviors (<code>show()</code>).</li>
+      </ul>
+
+      <pre><code><span class="k">class</span> <span class="f">Plant</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(self, name: str, height: float, age: int) -&gt; <span class="k">None</span>:
+        self.name = name
+        self.height = height
+        self.age = age
+
+    <span class="k">def</span> <span class="f">show</span>(self) -&gt; <span class="k">None</span>:
+        <span class="k">print</span>(<span class="s">f"{self.name}: {self.height}cm, {self.age} days old"</span>)
+
+rose = Plant(<span class="s">"Rose"</span>, 25, 30)
+rose.show()</code></pre>
+
+      <h3>Function vs method</h3>
+      <p>A <strong>method</strong> is a function defined inside a class. A function is called by its name alone (<code>print_info()</code>). A method is called through an instance with dot notation (<code>rose.show()</code>).</p>
+
+      <h3>What is <code>self</code>?</h3>
+      <p><code>self</code> is the instance that called the method. It is a naming convention (not a keyword), but everyone uses it.</p>
+      <div class="box key">
+        <span class="tag">Python passes it for you</span>
+        <p>You write <code>rose.show()</code> with zero arguments, yet <code>show(self)</code> expects one. Python silently translates the call into <code>Plant.show(rose)</code>: the object before the dot becomes the first argument.</p>
+      </div>
+    </section>
+
+    <!-- EX 2 -->
+    <section id="ex2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>State &amp; behavior</h2></div>
+      <p class="sec-lead">Methods that change the object, and per-instance data.</p>
+
+      <h3>Don't hardcode the growth</h3>
+      <p>If <code>grow()</code> does <code>self.height += 1</code>, <em>every</em> plant grows at the same speed. To let plants differ, store the rate as an attribute set at creation:</p>
+      <pre><code><span class="k">def</span> <span class="f">__init__</span>(self, name: str, height: float, age: int,
+             growth_rate: float) -&gt; <span class="k">None</span>:
+    self.name = name
+    self.height = height
+    self.age = age
+    self.growth_rate = growth_rate
+
+<span class="k">def</span> <span class="f">grow</span>(self) -&gt; <span class="k">None</span>:
+    self.height += self.growth_rate
+
+rose   = Plant(<span class="s">"Rose"</span>, 25, 30, 0.8)     <span class="c"># 0.8 cm/day</span>
+cactus = Plant(<span class="s">"Cactus"</span>, 15, 120, 0.1)  <span class="c"># 0.1 cm/day</span></code></pre>
+      <p>Each instance carries its own rate. <code>grow()</code> does not need to know the specific value.</p>
+
+      <h3>Simulating a week</h3>
+      <pre><code>start = rose.height
+<span class="k">for</span> day <span class="k">in</span> range(1, 8):          <span class="c"># 7 iterations: days 1..7</span>
+    rose.grow()
+    rose.age_one_day()
+    <span class="k">print</span>(<span class="s">f"=== Day {day} ==="</span>)
+    rose.show()
+<span class="k">print</span>(<span class="s">f"Growth this week: {round(rose.height - start, 1)}cm"</span>)</code></pre>
+
+      <div class="box warn">
+        <span class="tag">Off-by-one</span>
+        <p><code>range(6)</code> gives 6 iterations (0 to 5). For 7 days use <code>range(1, 8)</code>, which also gives you the day number directly.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="tag">Name clash to be aware of</span>
+        <p>The subject asks for a method called <code>age()</code>. If you also have an attribute called <code>self.age</code>, the instance attribute shadows the method and calling <code>plant.age()</code> fails. That is why your earlier version stored the number in <code>self.days</code>. Pick a different internal name (<code>self.days</code>, or <code>self._age</code> once you reach encapsulation) so that <code>age()</code> stays a method.</p>
+      </div>
+    </section>
+
+    <!-- EX 3 -->
+    <section id="ex3">
+      <div class="sec-head"><span class="sec-num">3</span><h2><code style="font-size:0.8em">__new__</code> vs <code style="font-size:0.8em">__init__</code></h2></div>
+      <p class="sec-lead">Creating an object and initializing it are two separate steps.</p>
+
+      <div class="table-wrap">
+        <table>
+          <tr><th>Method</th><th>Role</th><th>When</th></tr>
+          <tr><td><code>__new__</code></td><td>The true <strong>constructor</strong>: allocates memory, creates the object and returns it</td><td>Called first</td></tr>
+          <tr><td><code>__init__</code></td><td>The <strong>initializer</strong>: fills the already-created object with your values</td><td>Called second, on the object <code>__new__</code> returned</td></tr>
+        </table>
+      </div>
+
+      <p>Many people loosely call <code>__init__</code> "the constructor". It is technically the initializer. You almost never override <code>__new__</code>, but you should know it exists.</p>
+
+      <div class="box key">
+        <span class="tag">Why bother with __init__ at all?</span>
+        <p>Compare creating <em>and then</em> setting attributes line by line (<code>rose = Plant()</code>, <code>rose.name = ...</code>, <code>rose.height = ...</code>) with passing everything at creation. The second is shorter, less repetitive, and the object is <strong>ready to use immediately</strong>. It can never exist in a half-filled state.</p>
+      </div>
+    </section>
+
+    <!-- EX 4 -->
+    <section id="ex4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>Encapsulation</h2></div>
+      <p class="sec-lead">Protect data so it can't be corrupted from the outside.</p>
+
+      <p>Think of a coffee machine: you insert money and press a button, without touching the internals. Getters and setters are the buttons. The attributes are the internals.</p>
+
+      <h3>Three levels of naming</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Syntax</th><th>Meaning</th><th>What Python does</th></tr>
+          <tr><td><code>self.height</code></td><td>Public</td><td>Nothing</td></tr>
+          <tr><td><code>self._height</code></td><td>Protected (convention)</td><td>Nothing. It is a signal to other developers</td></tr>
+          <tr><td><code>self.__height</code></td><td>"Private" via name mangling</td><td>Renames it to <code>_Plant__height</code></td></tr>
+        </table>
+      </div>
+
+      <div class="box warn">
+        <span class="tag">Correction</span>
+        <p><code>__height</code> is <strong>not</strong> truly inaccessible. Python mangles the name, so <code>rose._Plant__height</code> still works. It only makes accidental access harder. The subject explicitly asks for the <strong>single underscore</strong>, not mangling.</p>
+      </div>
+
+      <div class="box key">
+        <span class="tag">Python's philosophy</span>
+        <p>"We're all consenting adults here." The underscore is a social contract between developers, not a technical lock. Python trusts you not to touch what is marked protected.</p>
+      </div>
+
+      <h3>Getters, setters, validation</h3>
+      <pre><code><span class="k">class</span> <span class="f">Plant</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(self, name: str, height: float, age: int) -&gt; <span class="k">None</span>:
+        self.name = name
+        self._height = 0.0
+        self._age = 0
+        self.set_height(height)
+        self.set_age(age)
+
+    <span class="k">def</span> <span class="f">set_height</span>(self, height: float) -&gt; <span class="k">None</span>:
+        <span class="k">if</span> height &lt; 0:
+            <span class="k">print</span>(<span class="s">f"{self.name}: Error, height can't be negative"</span>)
+            <span class="k">print</span>(<span class="s">"Height update rejected"</span>)
+        <span class="k">else</span>:
+            self._height = height
+            <span class="k">print</span>(<span class="s">f"Height updated: {height}cm"</span>)
+
+    <span class="k">def</span> <span class="f">get_height</span>(self) -&gt; float:
+        <span class="k">return</span> self._height</code></pre>
+      <p>The setter validates <em>before</em> storing. If the value is invalid, the data stays unchanged and an error message is printed from inside the class. <code>set_age</code> and <code>get_age</code> follow the same pattern.</p>
+    </section>
+
+    <!-- EX 5 -->
+    <section id="ex5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>Inheritance &amp; <code style="font-size:0.8em">super()</code></h2></div>
+      <p class="sec-lead">Specialized plants reuse everything a plant already knows how to do.</p>
+
+      <p><code>class Flower(Plant):</code> gives <code>Flower</code> automatic access to all of <code>Plant</code>'s methods (<code>grow()</code>, <code>age()</code>, <code>show()</code>, and so on). You only write what is <em>new</em>.</p>
+
+      <h3>What is <code>super()</code>?</h3>
+      <p><code>super()</code> is <strong>not</strong> a constructor. It is a built-in function that returns a proxy to the <strong>parent class</strong>. Through it you can call <em>any</em> parent method, not only <code>__init__</code>.</p>
+      <ul>
+        <li><code>super().__init__(...)</code> calls the parent's initializer</li>
+        <li><code>super().show()</code> calls the parent's <code>show()</code></li>
+        <li><code>super().grow()</code> calls the parent's <code>grow()</code></li>
+      </ul>
+
+      <h3>Overriding <code>show()</code> without duplicating code</h3>
+      <pre><code><span class="k">class</span> <span class="f">Flower</span>(Plant):
+    <span class="k">def</span> <span class="f">__init__</span>(self, name: str, height: float, age: int,
+                 color: str) -&gt; <span class="k">None</span>:
+        super().__init__(name, height, age)   <span class="c"># Plant's part</span>
+        self.color = color                    <span class="c"># Flower's part</span>
+
+    <span class="k">def</span> <span class="f">show</span>(self) -&gt; <span class="k">None</span>:
+        super().show()                        <span class="c"># Plant's output</span>
+        <span class="k">print</span>(<span class="s">f" Color: {self.color}"</span>)     <span class="c"># Flower's extra</span></code></pre>
+
+      <div class="box key">
+        <span class="tag">Why this design wins</span>
+        <p>The common display logic lives in <strong>one place</strong>. Copy-pasting it into every subclass wastes lines and makes every future change a multi-file edit. Subclasses just add what is unique to them.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="tag">Common mistake</span>
+        <p>Printing everything with manual <code>print()</code> calls outside the classes. The subject expects each class to own its display through a <code>show()</code> method, extended via <code>super()</code>.</p>
+      </div>
+
+      <div class="box eval">
+        <span class="tag">Evaluation</span>
+        <p>"Demonstrate inheritance relationships" is explicitly mentioned. Be ready to draw <code>Plant → Flower / Tree / Vegetable</code> and explain where each attribute is set.</p>
+      </div>
+    </section>
+
+    <!-- EX 6 -->
+    <section id="ex6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>Static, class &amp; nested</h2></div>
+      <p class="sec-lead">Three kinds of methods, plus classes living inside classes.</p>
+
+      <h3>The three kinds of methods</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th></th><th>Regular</th><th><code>@staticmethod</code></th><th><code>@classmethod</code></th></tr>
+          <tr><td><strong>First parameter</strong></td><td><code>self</code></td><td>none</td><td><code>cls</code></td></tr>
+          <tr><td><strong>Works on</strong></td><td>a specific instance</td><td>nothing, just logic</td><td>the class itself</td></tr>
+          <tr><td><strong>Typical use</strong></td><td>read or modify instance data</td><td>utility related to the class</td><td>alternative constructor</td></tr>
+          <tr><td><strong>Called as</strong></td><td><code>rose.grow()</code></td><td><code>Plant.is_older_than_a_year(400)</code></td><td><code>Plant.create_anonymous()</code></td></tr>
+        </table>
+      </div>
+
+      <h3>Static method</h3>
+      <p>A function that logically belongs to the class but needs no instance data. It could live outside the class; you put it inside to keep things organized.</p>
+      <pre><code><span class="k">@staticmethod</span>
+<span class="k">def</span> <span class="f">is_older_than_a_year</span>(age: int) -&gt; bool:
+    <span class="k">return</span> age &gt; 365
+
+Plant.is_older_than_a_year(400)   <span class="c"># True</span>
+Plant.is_older_than_a_year(30)    <span class="c"># False</span></code></pre>
+
+      <h3>Class method and <code>cls</code></h3>
+      <p><code>cls</code> is to the <strong>class</strong> what <code>self</code> is to the <strong>instance</strong>. When you call <code>Plant.create_anonymous()</code>, Python automatically passes <code>Plant</code> itself as <code>cls</code>. So <code>cls(...)</code> is the same as <code>Plant(...)</code>.</p>
+      <pre><code><span class="k">@classmethod</span>
+<span class="k">def</span> <span class="f">create_anonymous</span>(cls) -&gt; <span class="s">"Plant"</span>:
+    <span class="k">return</span> cls(<span class="s">"Unknown plant"</span>, 0, 0, 0)
+
+anon = Plant.create_anonymous()</code></pre>
+
+      <div class="box key">
+        <span class="tag">The key difference</span>
+        <p>A static method doesn't know about the class or any instance. A class method knows about the <strong>class</strong>, so it can create instances of it. This is also why it works well with inheritance: called on a subclass, <code>cls</code> is that subclass.</p>
+      </div>
+
+      <div class="box key">
+        <span class="tag">Self vs cls in one line</span>
+        <p><code>self</code> → the specific instance that called the method. <code>cls</code> → the class the method belongs to.</p>
+      </div>
+
+      <h3>Inheritance chain <span class="badge">not yet practiced</span></h3>
+      <p>Exercise 6 adds <code>Seed</code>, which inherits from <code>Flower</code>, which inherits from <code>Plant</code>. Each level calls <code>super()</code> on the level above, so <code>show()</code> output accumulates naturally: Plant line, then Color, then Seeds.</p>
+
+      <h3>Nested classes <span class="badge">preview only</span></h3>
+      <p>A class defined inside another class. In this exercise, each <code>Plant</code> owns a nested statistics class that counts its calls to <code>grow()</code>, <code>age()</code> and <code>show()</code>. We did not go deep on this yet; here is the shape to expect:</p>
+      <pre><code><span class="k">class</span> <span class="f">Plant</span>:
+    <span class="k">class</span> <span class="f">_Stats</span>:
+        <span class="k">def</span> <span class="f">__init__</span>(self) -&gt; <span class="k">None</span>:
+            self._grow_calls = 0
+
+        <span class="k">def</span> <span class="f">count_grow</span>(self) -&gt; <span class="k">None</span>:
+            self._grow_calls += 1
+
+    <span class="k">def</span> <span class="f">__init__</span>(self, ...) -&gt; <span class="k">None</span>:
+        self._stats = Plant._Stats()   <span class="c"># one Stats object per plant</span></code></pre>
+      <p>The idea: statistics are tightly tied to <code>Plant</code> and make no sense on their own, so grouping them inside the class keeps related logic together. Each instance gets its own counters, and encapsulation applies here too.</p>
+    </section>
+
+    <!-- CHEAT SHEET -->
+    <section id="cheat">
+      <div class="sec-head"><span class="sec-num">★</span><h2>Cheat sheet</h2></div>
+      <p class="sec-lead">The whole module in one table.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Concept</th><th>One-line summary</th></tr>
+          <tr><td><code>__name__ == "__main__"</code></td><td>Runs the block only when executed directly, not when imported</td></tr>
+          <tr><td>Shebang + <code>chmod +x</code></td><td>Tells the OS which interpreter to use; permission lets you run <code>./file.py</code></td></tr>
+          <tr><td>Class / instance</td><td>Blueprint / one object built from it</td></tr>
+          <tr><td>Method vs function</td><td>A method is a function inside a class, called on an instance</td></tr>
+          <tr><td><code>self</code></td><td>The calling instance, passed automatically by Python</td></tr>
+          <tr><td><code>__new__</code></td><td>Constructor: creates the object in memory</td></tr>
+          <tr><td><code>__init__</code></td><td>Initializer: fills the new object with values</td></tr>
+          <tr><td>Encapsulation</td><td>Hide internals; expose getters/setters with validation</td></tr>
+          <tr><td><code>_attr</code></td><td>Protected by convention, nothing enforced</td></tr>
+          <tr><td><code>__attr</code></td><td>Name-mangled to <code>_Class__attr</code>; still reachable</td></tr>
+          <tr><td>Inheritance</td><td>Child class automatically gets the parent's attributes and methods</td></tr>
+          <tr><td><code>super()</code></td><td>Proxy to the parent class; works for any method</td></tr>
+          <tr><td>Overriding</td><td>Redefine a parent method in the child, often calling <code>super()</code> inside</td></tr>
+          <tr><td><code>@staticmethod</code></td><td>No <code>self</code>/<code>cls</code>; pure utility logic</td></tr>
+          <tr><td><code>@classmethod</code></td><td>Receives <code>cls</code>; used as alternative constructor</td></tr>
+          <tr><td>Nested class</td><td>A class defined inside another to group tightly related logic</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- EVAL -->
+    <section id="eval">
+      <div class="sec-head"><span class="sec-num">✓</span><h2>Before the evaluation</h2></div>
+      <p class="sec-lead">Checklist drawn from the subject's requirements.</p>
+
+      <ul>
+        <li><strong>Type hints everywhere.</strong> Every function and method, including <code>-&gt; None</code>. Check with <code>mypy</code>.</li>
+        <li><strong>flake8 clean.</strong> Watch line length and blank lines.</li>
+        <li><strong>Naming.</strong> Classes in PascalCase, functions and variables in snake_case.</li>
+        <li><strong>One file, one directory per exercise</strong> (<code>ex0/</code>, <code>ex1/</code>, and so on) with the exact filename the subject gives.</li>
+        <li><strong>Programs must run without errors.</strong> Run each one before pushing.</li>
+        <li><strong>Only authorized functions.</strong> For example, Exercise 1 allows only <code>print()</code>; Exercise 5 adds <code>super()</code>.</li>
+        <li><strong>Be able to explain every line.</strong> You can be asked to explain concepts, show inheritance, or extend your code live.</li>
+        <li><strong>Practice the explanations out loud:</strong> why <code>__main__</code> matters, <code>__new__</code> vs <code>__init__</code>, protected vs mangling, what <code>super()</code> really is, static vs class method.</li>
+      </ul>
+
+      <div class="box eval">
+        <span class="tag">Rule from the AI chapter</span>
+        <p>Only submit code you fully understand and can take responsibility for. The subject's "bad practice" examples all end the same way: unable to justify the code during evaluation. Review with a peer before you push.</p>
+      </div>
+    </section>
+
+    <footer>Code Cultivation · Object-Oriented Garden Systems · Study guide</footer>
+
+  </main>
+</div>
+</body>
+</html>

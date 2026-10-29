@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Python Import Mysteries — Session Review</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0e0e12;
+    --surface: #16161d;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --gold: #f0c060;
+    --green: #5ddb8f;
+    --red: #f06060;
+    --blue: #60b8f0;
+    --purple: #a880f0;
+    --text: #d8d8e8;
+    --muted: #7070a0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 48px;
+    border-left: 4px solid var(--gold);
+    padding-left: 20px;
+  }
+  .header .label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .header h1 span { color: var(--gold); }
+  .header p {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Score bar */
+  .score-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .score-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid var(--gold);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--surface2);
+    box-shadow: 0 0 28px #f0c06022;
+  }
+  .score-circle .pct {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .score-circle .lbl {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .score-details h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .score-details p {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    max-width: 500px;
+  }
+  .bar-wrap {
+    width: 100%;
+    background: var(--border);
+    height: 6px;
+    border-radius: 99px;
+    margin-top: 12px;
+  }
+  .bar-fill {
+    height: 6px;
+    width: 72%;
+    background: linear-gradient(90deg, var(--gold), #f09030);
+    border-radius: 99px;
+  }
+
+  /* Section headers */
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    margin-top: 40px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .card.correct::before { background: var(--green); }
+  .card.wrong::before   { background: var(--red); }
+  .card.warn::before    { background: var(--gold); }
+  .card.info::before    { background: var(--blue); }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 99px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .badge.correct { background: #5ddb8f22; color: var(--green); border: 1px solid #5ddb8f44; }
+  .badge.wrong   { background: #f0606022; color: var(--red);   border: 1px solid #f0606044; }
+  .badge.warn    { background: #f0c06022; color: var(--gold);  border: 1px solid #f0c06044; }
+  .badge.info    { background: #60b8f022; color: var(--blue);  border: 1px solid #60b8f044; }
+
+  .card-head h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+  .card p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .card p + p { margin-top: 8px; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--blue);
+  }
+
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 12px;
+    overflow-x: auto;
+    line-height: 1.7;
+    color: #c8c8e8;
+  }
+  pre .comment { color: var(--muted); }
+  pre .kw      { color: var(--purple); }
+  pre .fn      { color: var(--gold); }
+  pre .str     { color: var(--green); }
+
+  /* Concepts table */
+  .concepts {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .concepts table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .concepts th {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 20px;
+    text-align: left;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .concepts td {
+    padding: 12px 20px;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .concepts tr:last-child td { border-bottom: none; }
+  .concepts td:first-child { color: var(--gold); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; white-space: nowrap; }
+  .concepts td:last-child { color: var(--muted); }
+
+  /* Footer */
+  .footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="label">Session Report</div>
+    <h1>Python <span>Import Mysteries</span><br/>Review</h1>
+    <p>Based on your live answers during the oral session — Module 06 / The Codex.</p>
+  </div>
+
+  <!-- Score -->
+  <div class="score-block">
+    <div class="score-circle">
+      <span class="pct">72%</span>
+      <span class="lbl">score</span>
+    </div>
+    <div class="score-details">
+      <h2>Solid foundations, theory gaps to fill</h2>
+      <p>You understood all the practical code — what it does, why it works, how to fix it. The gaps are in the naming of underlying mechanisms: <code>sys.path</code>, <code>sys.modules</code>, and the exact Python import sequence. Those are the things to review before evaluation.</p>
+      <div class="bar-wrap"><div class="bar-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- What you got right -->
+  <div class="section-title">✓ What you got right</div>
+
+  <div class="card correct">
+    <div class="card-head">
+      <span class="badge correct">Correct</span>
+      <h3><code>__init__.py</code> — package gateway & public interface</h3>
+    </div>
+    <p>You correctly explained that adding <code>__init__.py</code> is what turns a folder into a package, and that it controls what is exposed when someone imports the package. You also understood <code>noqa: F401</code> — flake8 flags re-export imports as "unused", and that comment silences it.</p>
+  </div>
+
+  <div class="card correct">
+    <div class="card-head">
+      <span class="badge correct">Correct</span>
+      <h3>Absolute vs relative imports — dots &amp; paths</h3>
+    </div>
+    <p>You correctly identified that <code>import elements</code> hits the root-level file, while <code>from .elements import ...</code> hits the package-level one. You also correctly understood that <code>..</code> goes up one folder, and you independently wrote <code>from ..potions import healing_potion</code> with no help.</p>
+  </div>
+
+  <div class="card correct">
+    <div class="card-head">
+      <span class="badge correct">Correct</span>
+      <h3>Circular dependency — the crash & the fix</h3>
+    </div>
+    <p>Once explained, you immediately understood the "infinite loop" analogy — two files importing each other at load time. You also correctly identified the fix: move the import inside the function body so it runs at call time, not load time.</p>
+  </div>
+
+  <div class="card correct">
+    <div class="card-head">
+      <span class="badge correct">Correct</span>
+      <h3>mypy vs runtime errors — when each fires</h3>
+    </div>
+    <p>You clearly separated the two: mypy catches <code>attr-defined</code> errors statically before running, while <code>AttributeError</code> crashes the program at the exact line during execution. You even ran mypy yourself to show the output.</p>
+  </div>
+
+  <div class="card correct">
+    <div class="card-head">
+      <span class="badge correct">Correct</span>
+      <h3><code>as</code> alias — renaming on import</h3>
+    </div>
+    <p><code>from alchemy.potions import healing_potion as heal</code> — you correctly explained this creates a shorter name <code>heal</code> that points to the same function.</p>
+  </div>
+
+  <!-- What you got wrong or incomplete -->
+  <div class="section-title">✗ What was wrong or incomplete</div>
+
+  <div class="card wrong">
+    <div class="card-head">
+      <span class="badge wrong">Wrong</span>
+      <h3>When do top-level imports execute?</h3>
+    </div>
+    <p>You said imports run "when a function/method is needed". That's only true for <strong>late imports</strong> (inside a function). Top-level imports run <strong>immediately when the file is loaded</strong> — Python reads the entire file top to bottom the moment it is first imported.</p>
+    <pre><span class="comment"># This runs the instant Python loads dark_spellbook.py</span>
+<span class="comment"># NOT when dark_spell_record() is called</span>
+<span class="kw">from</span> .dark_validator <span class="kw">import</span> validate_ingredients  <span class="comment"># line 10</span></pre>
+  </div>
+
+  <div class="card wrong">
+    <div class="card-head">
+      <span class="badge wrong">Incomplete</span>
+      <h3>Why absolute vs relative — the real difference</h3>
+    </div>
+    <p>Your first answer focused on what re-exporting achieves (convenience), not on the difference between the two import styles. The actual distinction: relative imports (<code>.</code>, <code>..</code>) are <strong>portable</strong> — if you rename the package, they still work. Absolute imports hardcode the package name and break on rename. PEP 8 recommends absolute imports for top-level code, relative for intra-package references.</p>
+  </div>
+
+  <!-- Things to be aware of -->
+  <div class="section-title">⚠ Things to review before evaluation</div>
+
+  <div class="card warn">
+    <div class="card-head">
+      <span class="badge warn">Review</span>
+      <h3><code>sys.path</code> — where Python searches for modules</h3>
+    </div>
+    <p>When you run <code>python3 ft_alembic_0.py</code> from the root, Python automatically adds that folder to a list called <code>sys.path</code>. That is the reason <code>import elements</code> finds the root <code>elements.py</code>. The subject explicitly forbids modifying <code>sys.path</code> — know why: it would let you fake import paths, which breaks reproducibility.</p>
+    <pre><span class="kw">import</span> sys
+<span class="fn">print</span>(sys.path)
+<span class="comment"># ['/your/project/root', '/usr/lib/python3.x', ...]</span></pre>
+  </div>
+
+  <div class="card warn">
+    <div class="card-head">
+      <span class="badge warn">Review</span>
+      <h3><code>sys.modules</code> — the module cache</h3>
+    </div>
+    <p>Every module Python loads gets cached in <code>sys.modules</code>. This is <em>why</em> the late import trick works: by the time <code>validate_ingredients()</code> is called, <code>light_spellbook</code> is already fully loaded and sitting in <code>sys.modules</code>. Python just reuses it — no re-loading, no crash.</p>
+    <pre><span class="kw">import</span> sys
+<span class="fn">print</span>(sys.modules.get(<span class="str">'alchemy.elements'</span>))
+<span class="comment"># &lt;module 'alchemy.elements' from '.../alchemy/elements.py'&gt;</span></pre>
+  </div>
+
+  <div class="card warn">
+    <div class="card-head">
+      <span class="badge warn">Review</span>
+      <h3>Other ways to fix circular dependencies</h3>
+    </div>
+    <p>You used the <strong>late import</strong> approach. The evaluator may ask you to name the others:</p>
+    <p><strong>1. Restructure</strong> — extract shared logic into a third module that neither file imports from the other.</p>
+    <p><strong>2. Late import</strong> — move the import inside the function (what you did in <code>light_validator.py</code>).</p>
+    <p><strong>3. Import the module, not the name</strong> — <code>import module</code> instead of <code>from module import name</code>; access the name at call time via <code>module.name()</code>.</p>
+  </div>
+
+  <div class="card warn">
+    <div class="card-head">
+      <span class="badge warn">Review</span>
+      <h3>The <code>__all__</code> variable</h3>
+    </div>
+    <p>You didn't use it in your project, but evaluators may ask about it. <code>__all__</code> is a list you can define in <code>__init__.py</code> to explicitly declare what gets exported when someone does <code>from alchemy import *</code>. Without it, everything that doesn't start with <code>_</code> is exported. It's the explicit alternative to selective re-exports.</p>
+    <pre><span class="comment"># alchemy/__init__.py</span>
+__all__ = [<span class="str">"create_air"</span>, <span class="str">"heal"</span>, <span class="str">"strength_potion"</span>, <span class="str">"lead_to_gold"</span>]</pre>
+  </div>
+
+  <!-- Vocabulary table -->
+  <div class="section-title">📖 Concepts & their official names</div>
+
+  <div class="concepts">
+    <table>
+      <thead>
+        <tr>
+          <th>Term</th>
+          <th>What it means</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Package</td>
+          <td>A folder containing an <code>__init__.py</code> — tells Python it's importable as a module.</td>
+        </tr>
+        <tr>
+          <td>Module</td>
+          <td>Any single <code>.py</code> file that can be imported.</td>
+        </tr>
+        <tr>
+          <td>Absolute import</td>
+          <td>Full path from project root: <code>from alchemy.elements import create_air</code>.</td>
+        </tr>
+        <tr>
+          <td>Relative import</td>
+          <td>Path relative to current file using dots: <code>from .elements import create_air</code>.</td>
+        </tr>
+        <tr>
+          <td>Re-export</td>
+          <td>Importing in <code>__init__.py</code> so users can access it directly from the package.</td>
+        </tr>
+        <tr>
+          <td>Circular import</td>
+          <td>Module A imports B, and B imports A — crash at load time.</td>
+        </tr>
+        <tr>
+          <td>Late import</td>
+          <td>Import placed inside a function body — runs at call time, not load time. Fixes circular imports.</td>
+        </tr>
+        <tr>
+          <td>sys.path</td>
+          <td>List of folders Python searches when resolving <code>import X</code>.</td>
+        </tr>
+        <tr>
+          <td>sys.modules</td>
+          <td>Cache of all already-loaded modules. Prevents re-loading and enables the late import fix.</td>
+        </tr>
+        <tr>
+          <td>__all__</td>
+          <td>Optional list in a module declaring what <code>from module import *</code> exports.</td>
+        </tr>
+        <tr>
+          <td>Static analysis</td>
+          <td>Checking code without running it — what mypy and flake8 do.</td>
+        </tr>
+        <tr>
+          <td>noqa: F401</td>
+          <td>Flake8 inline comment to suppress "imported but unused" on re-export lines.</td>
+        </tr>
+        <tr>
+          <td>AttributeError</td>
+          <td>Runtime crash when accessing a name that doesn't exist on a module or object.</td>
+        </tr>
+        <tr>
+          <td>ImportError</td>
+          <td>Runtime crash when Python cannot complete an import — e.g. circular dependency.</td>
+        </tr>
+        <tr>
+          <td>Type annotation</td>
+          <td>Hints like <code>def f(x: str) -> list[str]</code> — checked by mypy, ignored at runtime.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    Python Module 06 — The Codex &nbsp;·&nbsp; Session review generated after oral Q&A
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PY_09 Pydantic Study Guide</title>
+<style>
+  :root {
+    --bg: #fafaf7; --panel: #ffffff; --text: #1f2328; --muted: #5b6470;
+    --line: #e3e3dc; --accent: #3b5bdb; --accent-soft: #e7ecff;
+    --code-bg: #f3f3ee; --good: #1b7f3b; --good-soft: #e3f4e8;
+    --bad: #b42318; --bad-soft: #fdeceb; --warn: #8a5a00; --warn-soft: #fff3d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --panel: #1b1e24; --text: #e6e8eb; --muted: #9aa3af;
+      --line: #2b2f37; --accent: #8fa8ff; --accent-soft: #232b4a;
+      --code-bg: #101216; --good: #5fd38a; --good-soft: #17301f;
+      --bad: #ff8f85; --bad-soft: #3a1c1a; --warn: #f2c36b; --warn-soft: #3a2f14;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; }
+  nav {
+    position: sticky; top: 0; align-self: flex-start; height: 100vh;
+    width: 270px; flex-shrink: 0; overflow-y: auto; padding: 24px 16px 24px 20px;
+    border-right: 1px solid var(--line);
+  }
+  nav h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 12px; }
+  nav a { display: block; padding: 4px 8px; margin: 1px 0; color: var(--text); text-decoration: none; border-radius: 6px; font-size: 14px; }
+  nav a:hover { background: var(--accent-soft); }
+  nav a.sub { padding-left: 22px; color: var(--muted); font-size: 13px; }
+  main { flex: 1; min-width: 0; padding: 32px 32px 80px; }
+  h1 { font-size: 32px; margin: 0 0 6px; line-height: 1.2; }
+  .lead { color: var(--muted); margin: 0 0 28px; }
+  section { margin-bottom: 56px; scroll-margin-top: 16px; }
+  h2 { font-size: 26px; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 20px; margin: 32px 0 8px; scroll-margin-top: 16px; }
+  h4 { font-size: 16px; margin: 20px 0 6px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin: 3px 0; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px;
+  }
+  .codewrap { position: relative; margin: 0 0 16px; }
+  pre {
+    margin: 0; background: var(--code-bg); border: 1px solid var(--line);
+    border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.55;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .copy {
+    position: absolute; top: 8px; right: 8px; font-size: 12px; padding: 3px 9px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    border-radius: 6px; cursor: pointer;
+  }
+  .copy:hover { color: var(--text); }
+  .cap { font-size: 12px; color: var(--muted); margin: 0 0 4px; font-family: ui-monospace, Menlo, monospace; }
+  .box { border-radius: 8px; padding: 12px 16px; margin: 0 0 16px; border-left: 4px solid; }
+  .box p:last-child, .box ul:last-child { margin-bottom: 0; }
+  .box .t { font-weight: 700; display: block; margin-bottom: 2px; }
+  .info { background: var(--accent-soft); border-color: var(--accent); }
+  .tip { background: var(--good-soft); border-color: var(--good); }
+  .warn { background: var(--warn-soft); border-color: var(--warn); }
+  .bad { background: var(--bad-soft); border-color: var(--bad); }
+  .analogy { background: var(--panel); border: 1px dashed var(--line); border-left: 4px solid var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 14.5px; background: var(--panel); }
+  th, td { text-align: left; padding: 8px 10px; border: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--code-bg); font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .tag { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid2 > div > .codewrap { margin-bottom: 0; }
+  .ok { color: var(--good); font-weight: 600; }
+  .ko { color: var(--bad); font-weight: 600; }
+  @media (max-width: 860px) {
+    nav { display: none; }
+    main { padding: 20px 16px 60px; }
+    .grid2 { grid-template-columns: 1fr; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav>
+  <h2>Contents</h2>
+  <a href="#roadmap">0. Roadmap</a>
+  <a href="#rules">1. Subject rules &amp; tooling</a>
+  <a href="#why">2. Why Pydantic exists</a>
+  <a href="#ex0">3. Exercise 0: Space Station</a>
+  <a class="sub" href="#basemodel">BaseModel</a>
+  <a class="sub" href="#field">Field() &amp; constraints</a>
+  <a class="sub" href="#required">Required vs default</a>
+  <a class="sub" href="#optional">Optional fields</a>
+  <a class="sub" href="#datetime">datetime &amp; coercion</a>
+  <a class="sub" href="#valerror">ValidationError</a>
+  <a class="sub" href="#ex0-solution">Solution</a>
+  <a href="#ex1">4. Exercise 1: Alien Contact</a>
+  <a class="sub" href="#enum">Enum</a>
+  <a class="sub" href="#modelvalidator">@model_validator</a>
+  <a class="sub" href="#prefix">The "Value error," prefix</a>
+  <a class="sub" href="#ex1-solution">Solution</a>
+  <a href="#ex2">5. Exercise 2: Space Crew</a>
+  <a class="sub" href="#nested">Nested models</a>
+  <a class="sub" href="#listfield">List fields</a>
+  <a class="sub" href="#cascade">Validation cascade</a>
+  <a class="sub" href="#ex2-rules">Mission rules</a>
+  <a class="sub" href="#ex2-solution">Solution</a>
+  <a href="#python">6. Python skills used</a>
+  <a href="#tools">7. Provided tools</a>
+  <a href="#grading">8. Correction sheet</a>
+  <a href="#bugs">9. Bugs we hit</a>
+  <a href="#table">10. Quick reference</a>
+  <a href="#further">11. Go further</a>
+</nav>
+
+<main>
+<h1>PY_09: Cosmic Data</h1>
+<p class="lead">Pydantic v2 models and validation, explained from the ground up. Everything the three exercises touch, plus the problems we ran into while solving them.</p>
+
+<!-- ============================ 0 ============================ -->
+<section id="roadmap">
+<h2>0. Roadmap</h2>
+<p>The module has one theme: <strong>never trust incoming data</strong>. Each exercise adds one layer of validation on top of the last.</p>
+<div class="scroll">
+<table>
+  <tr><th>Exercise</th><th>File</th><th>Layer of validation</th><th>New tools</th></tr>
+  <tr><td>0: Space Station</td><td><code>ex0/space_station.py</code></td><td>One field at a time (type, range, length)</td><td><code>BaseModel</code>, <code>Field</code>, <code>Optional</code>, <code>datetime</code>, <code>ValidationError</code></td></tr>
+  <tr><td>1: Alien Contact</td><td><code>ex1/alien_contact.py</code></td><td>Several fields together (business rules)</td><td><code>Enum</code>, <code>@model_validator(mode="after")</code></td></tr>
+  <tr><td>2: Space Crew</td><td><code>ex2/space_crew.py</code></td><td>Models inside models (trees of data)</td><td>Nested models, <code>List[Model]</code>, list length limits</td></tr>
+</table>
+</div>
+<div class="box info"><span class="t">How to read this page</span>
+<p>Sections 3 to 5 follow the exercises in order. Each concept has: what it is, the problem it solves, how it works, a mini example, and the common mistakes. Full solutions are at the end of each exercise section.</p></div>
+</section>
+
+<!-- ============================ 1 ============================ -->
+<section id="rules">
+<h2>1. Subject rules &amp; tooling</h2>
+<p>These come from the "General Instructions" chapter. They are graded, so they count as much as the Pydantic itself.</p>
+
+<h3>Python and environment</h3>
+<ul>
+  <li><strong>Python 3.10 or later.</strong> 3.10 added the <code>X | None</code> union syntax and better error messages.</li>
+  <li><strong>pip + a virtual environment</strong> (venv, virtualenv or conda). A virtual environment is an isolated folder of installed packages, so this project's Pydantic version cannot collide with another project's.</li>
+  <li><strong>Pydantic 2.x only</strong>, installed with pip. Pydantic 1 has a different API; most online tutorials you find may still show v1 code.</li>
+  <li>Only standard-library modules are allowed besides Pydantic. Each exercise lists <em>Authorized: None</em>, which means no extra imports beyond Pydantic and the standard library.</li>
+</ul>
+<pre><code>python3 -m venv .venv
+source .venv/bin/activate
+pip install pydantic flake8 mypy</code></pre>
+
+<h3>flake8 (code style)</h3>
+<p><strong>flake8</strong> is a linter: a program that reads your code without running it and reports style problems and likely bugs. The classic ones:</p>
+<ul>
+  <li><code>E501</code>: line longer than 79 characters. This is the one that bit us.</li>
+  <li><code>F401</code>: imported but unused.</li>
+  <li><code>E302</code> / <code>E305</code>: need two blank lines around top-level functions and classes.</li>
+  <li><code>W291</code> / <code>W293</code>: trailing whitespace.</li>
+</ul>
+<p>Run it with <code>flake8 ex0 ex1 ex2</code>. No output means no problems.</p>
+
+<h3>mypy (type checking)</h3>
+<p><strong>mypy</strong> reads your type hints and checks that they are consistent, without running the code. If you declare <code>def f(x: int) -> str</code> and then return an int, mypy complains. The subject requires "comprehensive type annotations": every parameter, every return value, and (in our solutions) local variables too.</p>
+
+<h3>Exception handling</h3>
+<p>"Exception handling should protect the data streams from corruption." In this module that means: invalid data is caught with <code>try / except ValidationError</code> and reported, instead of crashing the program or silently getting through.</p>
+
+<h3>Docstrings and comments</h3>
+<p>The subject asks for clear comments and meaningful names. The correction sheet states <strong>docstrings are not required</strong> for this module, but they are still good practice, and type hints on every function <em>are</em> required.</p>
+
+<h3>Project structure</h3>
+<pre><code>your-repo/
+  ex0/space_station.py
+  ex1/alien_contact.py
+  ex2/space_crew.py</code></pre>
+<p>Submit <strong>only</strong> the requested files. If a required file is missing, peer-review stops immediately.</p>
+
+<h3>The AI-usage rules</h3>
+<p>The subject's AI chapter boils down to: use AI to speed up tedious work, but only submit code you can explain line by line in defense. Peer review is your safety net. This is why this page explains the <em>why</em> behind every line.</p>
+</section>
+
+<!-- ============================ 2 ============================ -->
+<section id="why">
+<h2>2. Why Pydantic exists</h2>
+<p>Python type hints are only <em>documentation</em> at runtime. This runs happily:</p>
+<pre><code>class Station:
+    crew_size: int = 0
+
+s = Station()
+s.crew_size = "banana"   # Python does not care
+s.crew_size = -500       # Python does not care</code></pre>
+<p>Data coming from outside your program (an API, a JSON file, a CSV, a form) is exactly where garbage arrives. Pydantic turns type hints into <strong>enforced rules</strong>: when you build an object, every value is checked and converted. If anything is wrong you get a precise error, and you never end up holding a half-valid object.</p>
+
+<div class="box analogy"><span class="t">Analogy: the customs officer</span>
+<p>Your model is a customs form. Pydantic is the officer who checks every box before letting the data into the country (your program). Inside the country, you can trust the data completely, because nothing unchecked ever crossed the border.</p></div>
+
+<h4>"Parse, don't just validate"</h4>
+<p>Pydantic does two jobs in one step: it <strong>checks</strong> the data and it <strong>converts</strong> it into the right Python type. You hand it the string <code>"2024-01-15T10:30:00"</code> and get back a real <code>datetime</code>. That is why the subject's tip says it "automatically converts compatible types".</p>
+</section>
+
+<!-- ============================ 3 ============================ -->
+<section id="ex0">
+<h2>3. Exercise 0: Space Station Data</h2>
+<p><span class="tag">Objective</span> Learn basic Pydantic model creation with <code>BaseModel</code> and <code>Field</code> validation.</p>
+
+<h3 id="basemodel">3.1 BaseModel</h3>
+<h4>What it is</h4>
+<p>The class every Pydantic model inherits from. You declare fields as annotated class attributes, and Pydantic generates an <code>__init__</code> that validates them.</p>
+<h4>How it works</h4>
+<ol>
+  <li>When Python defines your class, Pydantic reads the annotations (<code>crew_size: int</code>) and builds a <em>schema</em> (a validation plan) for each field.</li>
+  <li>When you call <code>SpaceStation(crew_size=6, ...)</code>, the values are passed through that plan field by field.</li>
+  <li>If all pass, you get an object with typed attributes. If any fail, <strong>no object is created</strong> and a <code>ValidationError</code> is raised.</li>
+</ol>
+<pre><code>from pydantic import BaseModel
+
+class Point(BaseModel):
+    x: int
+    y: int
+
+p = Point(x=1, y="2")   # "2" is converted to 2
+print(p.y + 1)          # 3, a real int
+Point(x=1, y="abc")     # ValidationError</code></pre>
+<h4>Things to remember</h4>
+<ul>
+  <li>Models are created with <strong>keyword arguments</strong>: <code>Point(x=1)</code>, not <code>Point(1)</code>.</li>
+  <li>You access validated data as attributes: <code>station.crew_size</code>.</li>
+  <li>A field with only an annotation and no default is <strong>required</strong>.</li>
+</ul>
+
+<h3 id="field">3.2 Field() and constraints</h3>
+<h4>What it is</h4>
+<p><code>Field(...)</code> attaches rules and metadata to one attribute. It answers "what values are acceptable?" beyond just the type.</p>
+<h4>The constraint parameters used in this module</h4>
+<div class="scroll">
+<table>
+  <tr><th>Parameter</th><th>Meaning</th><th>Applies to</th><th>Example in the subject</th></tr>
+  <tr><td><code>ge</code></td><td>greater than or equal (&ge;)</td><td>numbers</td><td><code>crew_size</code> &ge; 1</td></tr>
+  <tr><td><code>le</code></td><td>less than or equal (&le;)</td><td>numbers</td><td><code>crew_size</code> &le; 20</td></tr>
+  <tr><td><code>gt</code> / <code>lt</code></td><td>strictly greater / less than</td><td>numbers</td><td>(not required here, but good to know)</td></tr>
+  <tr><td><code>min_length</code></td><td>minimum length</td><td>strings, lists</td><td><code>station_id</code> &ge; 3 chars; <code>crew</code> &ge; 1 member</td></tr>
+  <tr><td><code>max_length</code></td><td>maximum length</td><td>strings, lists</td><td><code>notes</code> &le; 200 chars; <code>crew</code> &le; 12 members</td></tr>
+  <tr><td><code>default</code></td><td>value used when omitted</td><td>any</td><td><code>is_operational</code> defaults to <code>True</code></td></tr>
+  <tr><td><code>description</code></td><td>documentation text</td><td>any</td><td>Shows up in generated schemas</td></tr>
+</table>
+</div>
+<div class="box warn"><span class="t">Common mistake</span>
+<p>Using <code>min_length</code> on a number or <code>ge</code> on a string. Rule of thumb: <strong>numbers</strong> use <code>ge / le / gt / lt</code>; <strong>strings and lists</strong> use <code>min_length / max_length</code>. The names <code>min</code> and <code>max</code> do not exist.</p></div>
+
+<h4>Mapping the subject to code</h4>
+<div class="scroll">
+<table>
+  <tr><th>Subject says</th><th>Code</th></tr>
+  <tr><td><code>station_id</code>: String, 3-10 characters</td><td><code>Field(..., min_length=3, max_length=10)</code></td></tr>
+  <tr><td><code>crew_size</code>: Integer, 1-20</td><td><code>Field(..., ge=1, le=20)</code></td></tr>
+  <tr><td><code>power_level</code>: Float, 0.0-100.0</td><td><code>Field(..., ge=0.0, le=100.0)</code></td></tr>
+  <tr><td><code>is_operational</code>: Boolean, defaults to True</td><td><code>Field(default=True)</code></td></tr>
+  <tr><td><code>notes</code>: Optional string, max 200</td><td><code>Optional[str] = Field(default=None, max_length=200)</code></td></tr>
+</table>
+</div>
+
+<h3 id="required">3.3 Required vs default: the <code>...</code> (Ellipsis)</h3>
+<p>The first argument of <code>Field</code> is the default value. Passing <code>...</code> (the literal Python <code>Ellipsis</code>) is a convention that means <strong>"no default, this field is required"</strong>.</p>
+<pre><code>crew_size: int = Field(..., ge=1, le=20)   # required
+is_operational: bool = Field(default=True)  # optional, defaults to True</code></pre>
+<p>In Pydantic v2, <code>Field(ge=1)</code> without a default is also required, but writing <code>...</code> makes the intent obvious to a reader and is the style the subject follows.</p>
+
+<h3 id="optional">3.4 Optional fields</h3>
+<p><code>Optional[str]</code> means "a string <em>or</em> <code>None</code>". It is exactly the same as <code>str | None</code> (the 3.10+ spelling).</p>
+<div class="box warn"><span class="t">Optional does not mean "can be omitted"</span>
+<p><code>Optional[str]</code> only says <code>None</code> is an allowed <em>value</em>. To also let the caller leave it out entirely, give it a default: <code>Optional[str] = Field(default=None, ...)</code>. That combination is what <code>notes</code> uses.</p></div>
+<p>Constraints such as <code>max_length=200</code> apply only when a string is actually provided; <code>None</code> skips them.</p>
+
+<h3 id="datetime">3.5 datetime and automatic type coercion</h3>
+<p>A field annotated <code>datetime</code> accepts a real <code>datetime</code> object <strong>or</strong> a string in ISO 8601 format, and converts it:</p>
+<pre><code>from datetime import datetime
+from pydantic import BaseModel
+
+class Event(BaseModel):
+    when: datetime
+
+e = Event(when="2024-01-15T10:30:00")
+print(type(e.when))   # &lt;class 'datetime.datetime'&gt;
+print(e.when.year)    # 2024</code></pre>
+<h4>The subject's "Think About" question, answered</h4>
+<p><em>"What happens when you pass a string timestamp to a datetime field?"</em> Pydantic parses the string and builds a <code>datetime</code>. If the string is not a valid date (<code>"hello"</code>, <code>"2024-13-45"</code>), validation fails with a clear error.</p>
+<h4>How far does coercion go?</h4>
+<p>By default Pydantic is in <strong>lax mode</strong>: it converts sensible things (<code>"42"</code> to <code>42</code>, <code>"true"</code> to <code>True</code>, an ISO string to a datetime) but still rejects nonsense (<code>"abc"</code> as an int). There is also a <strong>strict mode</strong> (no conversion) which is beyond this module but a good research topic.</p>
+<div class="box info"><span class="t">Why <code># type: ignore[arg-type]</code> in our solutions?</span>
+<p>At runtime passing a string is fine. But mypy reads the annotation <code>last_maintenance: datetime</code> and thinks a <code>str</code> is a type error. The comment tells mypy "I know, ignore this one line". Alternative: pass <code>datetime(2024, 1, 15, 10, 30)</code> and no ignore is needed.</p></div>
+
+<h3 id="valerror">3.6 ValidationError</h3>
+<h4>What it is</h4>
+<p>The exception Pydantic raises when validation fails. It lives in <code>pydantic</code> and is a subclass of <code>ValueError</code>.</p>
+<h4>Why it is better than a normal exception</h4>
+<p>It collects <strong>all</strong> problems, not just the first. Each problem is a dictionary you can inspect with <code>error.errors()</code>:</p>
+<pre><code>try:
+    SpaceStation(station_id="X", name="", crew_size=25, ...)
+except ValidationError as error:
+    for problem in error.errors():
+        print(problem["loc"], problem["msg"], problem["type"])</code></pre>
+<div class="scroll">
+<table>
+  <tr><th>Key</th><th>Contains</th><th>Example</th></tr>
+  <tr><td><code>loc</code></td><td>path to the failing field</td><td><code>('crew_size',)</code></td></tr>
+  <tr><td><code>msg</code></td><td>human-readable message</td><td><code>Input should be less than or equal to 20</code></td></tr>
+  <tr><td><code>type</code></td><td>machine-readable error code</td><td><code>less_than_equal</code></td></tr>
+  <tr><td><code>input</code></td><td>the offending value</td><td><code>25</code></td></tr>
+</table>
+</div>
+<p>The expected output in the subject, <code>Input should be less than or equal to 20</code>, is exactly <code>error.errors()[0]["msg"]</code>. Printing the whole <code>error</code> object would show a much longer multi-line report.</p>
+
+<h3>3.7 The demonstration function</h3>
+<p><code>main()</code> must (1) create a valid station, (2) display it, (3) try an invalid one such as <code>crew_size=25</code>, and (4) show the error. The guard at the bottom runs it only when the file is executed directly:</p>
+<pre><code>if __name__ == "__main__":
+    main()</code></pre>
+
+<h3 id="ex0-solution">3.8 Solution: <code>ex0/space_station.py</code></h3>
+<div class="codewrap"><button class="copy">Copy</button><pre><code>#!/usr/bin/env python3
+"""Exercise 0: Space Station Data Validation."""
+
+from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field, ValidationError
+
+
+class SpaceStation(BaseModel):
+    """A monitored space station with validated telemetry."""
+
+    station_id: str = Field(..., min_length=3, max_length=10)
+    name: str = Field(..., min_length=1, max_length=50)
+    crew_size: int = Field(..., ge=1, le=20)
+    power_level: float = Field(..., ge=0.0, le=100.0)
+    oxygen_level: float = Field(..., ge=0.0, le=100.0)
+    last_maintenance: datetime = Field(...)
+    is_operational: bool = Field(default=True)
+    notes: Optional[str] = Field(default=None, max_length=200)
+
+
+def display_station(station: SpaceStation) -> None:
+    """Print the station information in a readable format."""
+    status_label: str = "Operational" if station.is_operational else "Offline"
+    print(f"ID: {station.station_id}")
+    print(f"Name: {station.name}")
+    print(f"Crew: {station.crew_size} people")
+    print(f"Power: {station.power_level}%")
+    print(f"Oxygen: {station.oxygen_level}%")
+    print(f"Status: {status_label}")
+    if station.notes:
+        print(f"Notes: {station.notes}")
+
+
+def main() -> None:
+    """Show one valid station and one invalid station."""
+    print("Space Station Data Validation")
+    print("=" * 40)
+
+    valid_station: SpaceStation = SpaceStation(
+        station_id="ISS001",
+        name="International Space Station",
+        crew_size=6,
+        power_level=85.5,
+        oxygen_level=92.3,
+        last_maintenance="2024-01-15T10:30:00",  # type: ignore[arg-type]
+        is_operational=True,
+        notes="All systems nominal",
+    )
+    print("Valid station created:")
+    display_station(valid_station)
+    print("=" * 40)
+
+    print("Expected validation error:")
+    try:
+        SpaceStation(
+            station_id="BAD001",
+            name="Overcrowded Station",
+            crew_size=25,  # invalid: maximum is 20
+            power_level=80.0,
+            oxygen_level=90.0,
+            last_maintenance="2024-01-15T10:30:00",  # type: ignore[arg-type]
+        )
+    except ValidationError as error:
+        print(error.errors()[0]["msg"])
+
+
+if __name__ == "__main__":
+    main()</code></pre></div>
+</section>
+
+<!-- ============================ 4 ============================ -->
+<section id="ex1">
+<h2>4. Exercise 1: Alien Contact Logs</h2>
+<p><span class="tag">Objective</span> Master custom validation using <code>@model_validator</code> for complex business rules.</p>
+<p>New concepts here: <strong>Enum</strong> and <strong>@model_validator(mode="after")</strong>. Everything from Exercise 0 (<code>BaseModel</code>, <code>Field</code>, <code>Optional</code>, <code>ValidationError</code>) is reused.</p>
+
+<h3 id="enum">4.1 Enum</h3>
+<h4>What it is</h4>
+<p>A class that defines a <strong>closed list of allowed values</strong>, each with a name.</p>
+<pre><code>from enum import Enum
+
+class ContactType(Enum):
+    RADIO = "radio"
+    VISUAL = "visual"
+    PHYSICAL = "physical"
+    TELEPATHIC = "telepathic"</code></pre>
+<h4>The problem it solves</h4>
+<p>With a plain <code>str</code> field, <code>"radio"</code>, <code>"Radio"</code>, <code>"raido"</code> and <code>"banana"</code> are all accepted. With an Enum field, only the four listed values pass. It also prevents typos in your own code: <code>ContactType.RADIOO</code> fails immediately.</p>
+<h4>How it works with Pydantic</h4>
+<ul>
+  <li>Input can be the member itself (<code>ContactType.RADIO</code>) <strong>or</strong> its value (<code>"radio"</code>). Pydantic converts the string into the member. This is what makes loading JSON data work.</li>
+  <li>Each member has <code>.name</code> (<code>"RADIO"</code>) and <code>.value</code> (<code>"radio"</code>). The expected output prints <code>radio</code>, so use <code>.value</code>.</li>
+  <li>Compare with members, not strings: <code>contact.contact_type == ContactType.PHYSICAL</code>. Comparing to <code>"physical"</code> is always <code>False</code>.</li>
+</ul>
+<div class="box analogy"><span class="t">Analogy</span><p>A dropdown menu instead of a free text box.</p></div>
+
+<h3 id="modelvalidator">4.2 @model_validator(mode="after")</h3>
+<h4>The problem</h4>
+<p><code>Field()</code> constraints look at <strong>one field in isolation</strong>. But the business rules in this exercise compare fields with each other:</p>
+<ul>
+  <li>"If <code>contact_type</code> is physical, then <code>is_verified</code> must be true" (two fields)</li>
+  <li>"If <code>contact_type</code> is telepathic, then <code>witness_count</code> must be at least 3" (two fields)</li>
+  <li>"If <code>signal_strength</code> &gt; 7.0, then <code>message_received</code> must exist" (two fields)</li>
+</ul>
+<p>No single-field constraint can express these.</p>
+
+<h4>How it works</h4>
+<ol>
+  <li>Pydantic validates every field first (types, <code>Field</code> constraints).</li>
+  <li>If all fields passed, it builds the object and calls your decorated method, passing the finished object as <code>self</code>.</li>
+  <li>You inspect any attributes you want. To reject, <code>raise ValueError("message")</code>. To accept, <code>return self</code>.</li>
+  <li>Pydantic wraps your <code>ValueError</code> into a <code>ValidationError</code> for the caller.</li>
+</ol>
+<pre><code>@model_validator(mode="after")
+def apply_business_rules(self) -&gt; "AlienContact":
+    if self.contact_type == ContactType.PHYSICAL and not self.is_verified:
+        raise ValueError("Physical contact reports must be verified")
+    return self</code></pre>
+
+<h4>mode="after" vs mode="before"</h4>
+<div class="scroll">
+<table>
+  <tr><th></th><th><code>mode="after"</code> (this module)</th><th><code>mode="before"</code></th></tr>
+  <tr><td>Runs</td><td>After all fields are validated</td><td>Before any field validation</td></tr>
+  <tr><td>What <code>self</code> / input is</td><td>A real model instance with typed attributes</td><td>The raw input (usually a dict)</td></tr>
+  <tr><td>Typical use</td><td>Cross-field business rules</td><td>Reshaping or cleaning raw input</td></tr>
+</table>
+</div>
+<p>Consequence: if a field fails its own constraint (say <code>signal_strength=15</code>), the "after" validator <strong>never runs</strong>, because there is no valid object to inspect.</p>
+
+<h4>Why the return type is the string <code>"AlienContact"</code></h4>
+<p>Inside the class body, the name <code>AlienContact</code> does not exist yet, so the annotation is written as a string (a <em>forward reference</em>). mypy understands it.</p>
+
+<h4>Pydantic v1 vs v2 (the subject warns about this)</h4>
+<div class="scroll">
+<table>
+  <tr><th>Pydantic v1 (deprecated, forbidden)</th><th>Pydantic v2 (required)</th></tr>
+  <tr><td><code>@validator("field")</code></td><td><code>@field_validator("field")</code> for one field, or <code>@model_validator</code> for whole-model rules</td></tr>
+  <tr><td><code>@root_validator</code></td><td><code>@model_validator</code></td></tr>
+  <tr><td>Receives <code>cls, value, values</code></td><td><code>mode="after"</code> receives <code>self</code></td></tr>
+</table>
+</div>
+
+<h4>Common mistakes</h4>
+<ul>
+  <li>Forgetting <code>return self</code>. The model would come back as <code>None</code>.</li>
+  <li>Raising <code>Exception</code> instead of <code>ValueError</code> (or <code>AssertionError</code>). Only those become a clean <code>ValidationError</code>.</li>
+  <li>Using the deprecated <code>@validator</code>. The correction sheet explicitly checks this.</li>
+  <li>Writing the condition wrongly (see the bug in <a href="#bugs">section 9</a>).</li>
+</ul>
+
+<h4>The four business rules</h4>
+<div class="scroll">
+<table>
+  <tr><th>Rule</th><th>Check</th></tr>
+  <tr><td>Contact ID starts with <code>"AC"</code></td><td><code>self.contact_id.startswith("AC")</code></td></tr>
+  <tr><td>Physical contacts must be verified</td><td><code>contact_type == PHYSICAL and not is_verified</code> is an error</td></tr>
+  <tr><td>Telepathic needs 3+ witnesses</td><td><code>contact_type == TELEPATHIC and witness_count &lt; 3</code> is an error</td></tr>
+  <tr><td>Strong signal (&gt; 7.0) needs a message</td><td><code>signal_strength &gt; 7.0 and message_received is None</code> is an error</td></tr>
+</table>
+</div>
+<p>Notice the pattern: each rule is written as <em>"the bad situation"</em>, and when it is true, we raise. Think of it as describing what is wrong, not what is right.</p>
+
+<h3 id="prefix">4.3 The <code>"Value error, "</code> prefix</h3>
+<p>When your validator raises <code>ValueError("Telepathic contact requires at least 3 witnesses")</code>, Pydantic stores the message as:</p>
+<pre><code>Value error, Telepathic contact requires at least 3 witnesses</code></pre>
+<p>The expected output in the subject shows the message <em>without</em> that prefix, so the demonstration strips it:</p>
+<pre><code>raw_msg: str = error.errors()[0]["msg"]
+prefix: str = "Value error, "
+if raw_msg.startswith(prefix):
+    clean_message: str = raw_msg[len(prefix):]
+else:
+    clean_message = raw_msg
+print(clean_message)</code></pre>
+<p><code>raw_msg[len(prefix):]</code> is <strong>string slicing</strong>: take everything from index <code>len(prefix)</code> to the end, which removes the first 13 characters.</p>
+
+<h3 id="ex1-solution">4.4 Solution: <code>ex1/alien_contact.py</code></h3>
+<div class="codewrap"><button class="copy">Copy</button><pre><code>#!/usr/bin/env python3
+"""Exercise 1: Alien Contact Log Validation."""
+
+from datetime import datetime
+from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, Field, ValidationError, model_validator
+
+
+class ContactType(Enum):
+    """Recognised alien contact categories."""
+
+    RADIO = "radio"
+    VISUAL = "visual"
+    PHYSICAL = "physical"
+    TELEPATHIC = "telepathic"
+
+
+class AlienContact(BaseModel):
+    """A single alien contact report."""
+
+    contact_id: str = Field(..., min_length=5, max_length=15)
+    timestamp: datetime = Field(...)
+    location: str = Field(..., min_length=3, max_length=100)
+    contact_type: ContactType = Field(...)
+    signal_strength: float = Field(..., ge=0.0, le=10.0)
+    duration_minutes: int = Field(..., ge=1, le=1440)
+    witness_count: int = Field(..., ge=1, le=100)
+    message_received: Optional[str] = Field(default=None, max_length=500)
+    is_verified: bool = Field(default=False)
+
+    @model_validator(mode="after")
+    def apply_business_rules(self) -&gt; "AlienContact":
+        """Check the cross-field business rules; return self if valid."""
+        if not self.contact_id.startswith("AC"):
+            raise ValueError(
+                "Contact ID must start with 'AC' (Alien Contact)"
+            )
+
+        if self.contact_type == ContactType.PHYSICAL and not self.is_verified:
+            raise ValueError("Physical contact reports must be verified")
+
+        if (
+            self.contact_type == ContactType.TELEPATHIC
+            and self.witness_count &lt; 3
+        ):
+            raise ValueError(
+                "Telepathic contact requires at least 3 witnesses"
+            )
+
+        if self.signal_strength &gt; 7.0 and self.message_received is None:
+            raise ValueError(
+                "Strong signal (&gt; 7.0) should include a received message"
+            )
+
+        return self
+
+
+def display_contact(contact: AlienContact) -&gt; None:
+    """Print the contact report in a readable format."""
+    print(f"ID: {contact.contact_id}")
+    print(f"Type: {contact.contact_type.value}")
+    print(f"Location: {contact.location}")
+    print(f"Signal: {contact.signal_strength}/10")
+    print(f"Duration: {contact.duration_minutes} minutes")
+    print(f"Witnesses: {contact.witness_count}")
+    if contact.message_received:
+        print(f"Message: '{contact.message_received}'")
+
+
+def main() -&gt; None:
+    """Show one valid contact report and one invalid one."""
+    print("Alien Contact Log Validation")
+    print("=" * 38)
+
+    valid_contact: AlienContact = AlienContact(
+        contact_id="AC_2024_001",
+        timestamp="2024-01-15T14:30:00",  # type: ignore[arg-type]
+        location="Area 51, Nevada",
+        contact_type=ContactType.RADIO,
+        signal_strength=8.5,
+        duration_minutes=45,
+        witness_count=5,
+        message_received="Greetings from Zeta Reticuli",
+        is_verified=False,
+    )
+    print("Valid contact report:")
+    display_contact(valid_contact)
+    print("=" * 38)
+
+    print("Expected validation error:")
+    try:
+        AlienContact(
+            contact_id="AC_2024_002",
+            timestamp="2024-01-16T09:15:00",  # type: ignore[arg-type]
+            location="Roswell, New Mexico",
+            contact_type=ContactType.TELEPATHIC,
+            signal_strength=6.2,
+            duration_minutes=30,
+            witness_count=1,  # invalid: telepathic needs 3 or more
+            is_verified=False,
+        )
+    except ValidationError as error:
+        raw_msg: str = error.errors()[0]["msg"]
+        prefix: str = "Value error, "
+        if raw_msg.startswith(prefix):
+            clean_message: str = raw_msg[len(prefix):]
+        else:
+            clean_message = raw_msg
+        print(clean_message)
+
+
+if __name__ == "__main__":
+    main()</code></pre></div>
+</section>
+
+<!-- ============================ 5 ============================ -->
+<section id="ex2">
+<h2>5. Exercise 2: Space Crew Management</h2>
+<p><span class="tag">Objective</span> Master nested Pydantic models and complex data relationships.</p>
+<p>New concepts: <strong>nested models</strong>, <strong>lists of models</strong>, <strong>list length constraints</strong>, and the <strong>validation cascade</strong>. A second Enum (<code>Rank</code>) reuses what you learned in Exercise 1.</p>
+
+<h3 id="nested">5.1 Nested models</h3>
+<h4>What it is</h4>
+<p>Using one model as the <em>type</em> of a field in another model.</p>
+<pre><code>class CrewMember(BaseModel):
+    name: str
+    rank: Rank
+
+class SpaceMission(BaseModel):
+    mission_id: str
+    crew: List[CrewMember]   # a list of CrewMember models</code></pre>
+<h4>The problem it solves</h4>
+<p>Real data is a tree, not a flat table: a mission <em>has</em> crew members, each with their own rules. Nesting lets one call validate the entire tree.</p>
+<h4>Two ways to feed it data</h4>
+<pre><code># 1. Already-built objects (what our solution does)
+mission = SpaceMission(crew=[sarah, john], ...)
+
+# 2. Raw dictionaries (e.g. straight from JSON). Pydantic builds the CrewMember for you
+mission = SpaceMission(crew=[{"member_id": "CM001", "name": "Sarah Connor", ...}], ...)</code></pre>
+<div class="box analogy"><span class="t">Analogy: Russian dolls</span><p>Before the outer doll can be closed, every inner doll must be complete and intact.</p></div>
+
+<h3 id="listfield">5.2 List fields and length limits</h3>
+<p><code>List[CrewMember]</code> says "a list whose every element is a valid <code>CrewMember</code>". On Python 3.9+ you may also write <code>list[CrewMember]</code> (lowercase), which is equivalent.</p>
+<pre><code>crew: List[CrewMember] = Field(..., min_length=1, max_length=12)</code></pre>
+<p>Here <code>min_length</code> and <code>max_length</code> limit <strong>how many items</strong> the list has (1 to 12), exactly like they limit characters in a string. This also means you do not need to check "is the crew empty?" in your validator, because the Field already rejected it.</p>
+
+<h3 id="cascade">5.3 The validation cascade</h3>
+<p>This answers the subject's question: <em>"What happens when a CrewMember fails validation within a SpaceMission?"</em></p>
+<ol>
+  <li>Pydantic validates the simple fields of <code>SpaceMission</code>.</li>
+  <li>For <code>crew</code>, it validates <strong>each element</strong> against <code>CrewMember</code>, including that model's own constraints.</li>
+  <li>If any crew member is invalid, <code>SpaceMission</code> fails with a <code>ValidationError</code> whose <code>loc</code> points at the exact spot, for example <code>('crew', 1, 'age')</code> meaning "second crew member, field age".</li>
+  <li><strong>Only if everything above passed</strong> does your <code>@model_validator</code> run.</li>
+</ol>
+<pre><code>SpaceMission(crew=[{"member_id": "CM1", "name": "A", ...}], ...)
+# ValidationError: crew.0.name  String should have at least 2 characters</code></pre>
+<p>So the mission-level rules can safely assume every crew member is individually valid.</p>
+
+<h3 id="ex2-rules">5.4 The four mission rules, explained</h3>
+<h4>Rule 1: Mission ID starts with "M"</h4>
+<p>Same <code>startswith</code> pattern as Exercise 1.</p>
+
+<h4>Rule 2: At least one Commander or Captain</h4>
+<pre><code>high_ranking_roles = {Rank.CAPTAIN, Rank.COMMANDER}
+has_senior_officer: bool = any(
+    member.rank in high_ranking_roles for member in self.crew
+)
+if not has_senior_officer:
+    raise ValueError("Mission must have at least one Commander or Captain")</code></pre>
+<ul>
+  <li>The <code>{...}</code> is a <strong>set</strong>; <code>x in some_set</code> is a fast membership test.</li>
+  <li><code>any(...)</code> returns <code>True</code> as soon as one element satisfies the condition.</li>
+  <li><code>(member.rank in ... for member in self.crew)</code> is a <strong>generator expression</strong>: a lazy loop that produces one boolean per crew member.</li>
+</ul>
+
+<h4>Rule 3: Long missions (&gt; 365 days) need 50% experienced crew (5+ years)</h4>
+<pre><code>if self.duration_days &gt; 365:
+    experienced_count: int = sum(
+        1 for member in self.crew if member.years_experience &gt;= 5
+    )
+    required_count: int = len(self.crew) // 2
+    if experienced_count &lt; required_count:
+        raise ValueError("...")</code></pre>
+<ul>
+  <li><code>sum(1 for ... if ...)</code> is the idiom for <strong>counting</strong> elements that match a condition.</li>
+  <li><code>//</code> is integer (floor) division. With 3 crew, <code>3 // 2 = 1</code>, so 1 experienced member is required.</li>
+</ul>
+<div class="box warn"><span class="t">Know your rounding</span>
+<p>"50%" of 3 people is 1.5. Floor division requires 1; rounding up would require 2. Our solution uses floor division, which is what makes the subject's example (Sarah 18 yrs, John 10 yrs, Alice 6 yrs, all experienced anyway) pass. Be ready to explain this choice in defense. A stricter alternative is <code>experienced_count * 2 &lt; len(self.crew)</code>, which means "less than half".</p></div>
+
+<h4>Rule 4: All crew members must be active</h4>
+<pre><code>inactive_names: List[str] = [
+    member.name for member in self.crew if not member.is_active
+]
+if inactive_names:
+    raise ValueError(f"Inactive crew members cannot be assigned: {', '.join(inactive_names)}")</code></pre>
+<ul>
+  <li>A <strong>list comprehension</strong> collects the names of inactive members.</li>
+  <li>An empty list is falsy, so <code>if inactive_names:</code> is true only when at least one name was found.</li>
+  <li><code>', '.join(names)</code> glues the names into one readable string.</li>
+</ul>
+
+<h4>Order of rules matters for the demo</h4>
+<p>The validator stops at the <em>first</em> <code>raise</code>. The subject's invalid example must show <code>Mission must have at least one Commander or Captain</code>, so that mission must pass rule 1 and fail on rule 2 (a short mission with a lone cadet does exactly that).</p>
+
+<h3 id="ex2-solution">5.5 Solution: <code>ex2/space_crew.py</code></h3>
+<div class="codewrap"><button class="copy">Copy</button><pre><code>#!/usr/bin/env python3
+"""Exercise 2: Space Crew Management Validation."""
+
+from datetime import datetime
+from enum import Enum
+from typing import List
+
+from pydantic import BaseModel, Field, ValidationError, model_validator
+
+
+class Rank(Enum):
+    """Official crew ranks."""
+
+    CADET = "cadet"
+    OFFICER = "officer"
+    LIEUTENANT = "lieutenant"
+    CAPTAIN = "captain"
+    COMMANDER = "commander"
+
+
+class CrewMember(BaseModel):
+    """A single crew member (nested inside SpaceMission)."""
+
+    member_id: str = Field(..., min_length=3, max_length=10)
+    name: str = Field(..., min_length=2, max_length=50)
+    rank: Rank = Field(...)
+    age: int = Field(..., ge=18, le=80)
+    specialization: str = Field(..., min_length=3, max_length=30)
+    years_experience: int = Field(..., ge=0, le=50)
+    is_active: bool = Field(default=True)
+
+
+class SpaceMission(BaseModel):
+    """A mission with its crew; applies safety rules to the whole team."""
+
+    mission_id: str = Field(..., min_length=5, max_length=15)
+    mission_name: str = Field(..., min_length=3, max_length=100)
+    destination: str = Field(..., min_length=3, max_length=50)
+    launch_date: datetime = Field(...)
+    duration_days: int = Field(..., ge=1, le=3650)
+    crew: List[CrewMember] = Field(..., min_length=1, max_length=12)
+    mission_status: str = Field(default="planned")
+    budget_millions: float = Field(..., ge=1.0, le=10000.0)
+
+    @model_validator(mode="after")
+    def apply_safety_requirements(self) -&gt; "SpaceMission":
+        """Check the mission safety rules; return self if all pass."""
+        # Rule 1: mission ID prefix
+        if not self.mission_id.startswith("M"):
+            raise ValueError("Mission ID must start with 'M'")
+
+        # Rule 2: at least one Captain or Commander
+        high_ranking_roles = {Rank.CAPTAIN, Rank.COMMANDER}
+        has_senior_officer: bool = any(
+            member.rank in high_ranking_roles for member in self.crew
+        )
+        if not has_senior_officer:
+            raise ValueError(
+                "Mission must have at least one Commander or Captain"
+            )
+
+        # Rule 3: long missions need experienced crew
+        if self.duration_days &gt; 365:
+            experienced_count: int = sum(
+                1 for member in self.crew if member.years_experience &gt;= 5
+            )
+            required_count: int = len(self.crew) // 2
+            if experienced_count &lt; required_count:
+                raise ValueError(
+                    "Long missions (&gt; 365 days) require at least 50% "
+                    "of crew to have 5+ years of experience"
+                )
+
+        # Rule 4: every crew member must be active
+        inactive_names: List[str] = [
+            member.name for member in self.crew if not member.is_active
+        ]
+        if inactive_names:
+            raise ValueError(
+                "Inactive crew members cannot be assigned: "
+                + ", ".join(inactive_names)
+            )
+
+        return self
+
+
+def display_mission(mission: SpaceMission) -&gt; None:
+    """Print the mission details and its crew roster."""
+    print(f"Mission: {mission.mission_name}")
+    print(f"ID: {mission.mission_id}")
+    print(f"Destination: {mission.destination}")
+    print(f"Duration: {mission.duration_days} days")
+    print(f"Budget: ${mission.budget_millions}M")
+    print(f"Crew size: {len(mission.crew)}")
+    print("Crew members:")
+    for member in mission.crew:
+        print(
+            f"  - {member.name} ({member.rank.value})"
+            f" - {member.specialization}"
+        )
+
+
+def main() -&gt; None:
+    """Show one valid mission and one invalid mission."""
+    print("Space Mission Crew Validation")
+    print("=" * 41)
+
+    sarah: CrewMember = CrewMember(
+        member_id="CM001", name="Sarah Connor", rank=Rank.COMMANDER,
+        age=42, specialization="Mission Command", years_experience=18,
+    )
+    john: CrewMember = CrewMember(
+        member_id="CM002", name="John Smith", rank=Rank.LIEUTENANT,
+        age=35, specialization="Navigation", years_experience=10,
+    )
+    alice: CrewMember = CrewMember(
+        member_id="CM003", name="Alice Johnson", rank=Rank.OFFICER,
+        age=29, specialization="Engineering", years_experience=6,
+    )
+
+    valid_mission: SpaceMission = SpaceMission(
+        mission_id="M2024_MARS",
+        mission_name="Mars Colony Establishment",
+        destination="Mars",
+        launch_date="2024-06-01T08:00:00",  # type: ignore[arg-type]
+        duration_days=900,
+        crew=[sarah, john, alice],
+        budget_millions=2500.0,
+    )
+    print("Valid mission created:")
+    display_mission(valid_mission)
+    print("=" * 41)
+
+    print("Expected validation error:")
+    try:
+        cadet: CrewMember = CrewMember(
+            member_id="CM010", name="Bob Lee", rank=Rank.CADET,
+            age=22, specialization="Maintenance", years_experience=1,
+        )
+        SpaceMission(
+            mission_id="M2024_FAIL",
+            mission_name="Underprepared Expedition",
+            destination="Moon",
+            launch_date="2024-07-01T08:00:00",  # type: ignore[arg-type]
+            duration_days=30,
+            crew=[cadet],  # no Captain or Commander
+            budget_millions=100.0,
+        )
+    except ValidationError as error:
+        raw_msg: str = error.errors()[0]["msg"]
+        prefix: str = "Value error, "
+        if raw_msg.startswith(prefix):
+            print(raw_msg[len(prefix):])
+        else:
+            print(raw_msg)
+
+
+if __name__ == "__main__":
+    main()</code></pre></div>
+</section>
+
+<!-- ============================ 6 ============================ -->
+<section id="python">
+<h2>6. Python skills used along the way</h2>
+<p>These are not Pydantic, but the solutions rely on them, and you can be asked about them in defense.</p>
+
+<div class="scroll">
+<table>
+  <tr><th>Skill</th><th>What it is</th><th>Where it appears</th></tr>
+  <tr><td>Type hints</td><td>Annotations like <code>x: int</code> and <code>-&gt; None</code>. Not enforced by Python itself; checked by mypy and used by Pydantic.</td><td>Everywhere</td></tr>
+  <tr><td><code>typing.Optional</code>, <code>typing.List</code></td><td>Generic type helpers. <code>Optional[X]</code> = <code>X | None</code>. <code>List[X]</code> = <code>list[X]</code> on modern Python.</td><td>Ex0, Ex2</td></tr>
+  <tr><td>Forward reference (string annotation)</td><td>Writing <code>"AlienContact"</code> in quotes when the class is not defined yet.</td><td>Validator return types</td></tr>
+  <tr><td><code>try / except</code></td><td>Run risky code; handle a specific exception type instead of crashing.</td><td>All <code>main()</code> functions</td></tr>
+  <tr><td><code>raise ValueError(...)</code></td><td>Deliberately signal that a value is unacceptable.</td><td>Validators</td></tr>
+  <tr><td>f-strings</td><td><code>f"Crew: {n} people"</code> embeds values in text.</td><td>Display functions</td></tr>
+  <tr><td>Ternary expression</td><td><code>"Operational" if flag else "Offline"</code></td><td>Ex0 display</td></tr>
+  <tr><td><code>str.startswith()</code></td><td>Checks a string's beginning.</td><td>ID prefix rules</td></tr>
+  <tr><td>String slicing</td><td><code>text[n:]</code> returns text from index n onward.</td><td>Removing the error prefix</td></tr>
+  <tr><td><code>any()</code> / <code>sum()</code></td><td>Reduce an iterable to one boolean / one number.</td><td>Ex2 rules 2 and 3</td></tr>
+  <tr><td>Generator expression</td><td><code>(x for x in items if cond)</code>: a lazy loop without building a list.</td><td>Ex2</td></tr>
+  <tr><td>List comprehension</td><td><code>[x for x in items if cond]</code>: builds a new list.</td><td>Ex2 rule 4</td></tr>
+  <tr><td>Set literal and <code>in</code></td><td><code>{A, B}</code> and <code>x in {A, B}</code> for fast membership.</td><td>Ex2 rule 2</td></tr>
+  <tr><td><code>//</code> floor division</td><td>Integer division that rounds down.</td><td>Ex2 rule 3</td></tr>
+  <tr><td><code>"sep".join(list)</code></td><td>Join strings with a separator.</td><td>Ex2 rule 4</td></tr>
+  <tr><td><code>if __name__ == "__main__":</code></td><td>Runs code only when the file is run directly, not when imported.</td><td>Every exercise</td></tr>
+  <tr><td>Multi-line conditions</td><td>Wrap in parentheses to break a long <code>if</code> across lines and satisfy flake8's 79-char limit.</td><td>Ex1 telepathic rule</td></tr>
+  <tr><td><code># type: ignore[arg-type]</code></td><td>Tells mypy to skip one specific error on that line.</td><td>String-to-datetime arguments</td></tr>
+  <tr><td>Shebang <code>#!/usr/bin/env python3</code></td><td>Lets the file run as a script on Unix.</td><td>Top of each file</td></tr>
+</table>
+</div>
+
+<h3>Fixing long lines the flake8 way</h3>
+<div class="grid2">
+  <div>
+    <p class="cap">too long (E501)</p>
+    <div class="codewrap"><pre><code>if self.contact_type == ContactType.TELEPATHIC and self.witness_count &lt; 3:
+    raise ValueError("...")</code></pre></div>
+  </div>
+  <div>
+    <p class="cap">wrapped in parentheses</p>
+    <div class="codewrap"><pre><code>if (
+    self.contact_type == ContactType.TELEPATHIC
+    and self.witness_count &lt; 3
+):
+    raise ValueError("...")</code></pre></div>
+  </div>
+</div>
+<p>The parentheses let Python continue the expression across lines. Never "fix" it by splitting the logic into a separate variable unless you are sure the logic is still identical (see <a href="#bugs">section 9</a> for what goes wrong).</p>
+</section>
+
+<!-- ============================ 7 ============================ -->
+<section id="tools">
+<h2>7. The provided tools: <code>data_generator.py</code> and <code>data_exporter.py</code></h2>
+<p>These two files are helpers to produce test data. You do not submit them, but they use more standard-library concepts worth understanding. They also show you what "realistic" data looks like for your models.</p>
+
+<h3>data_generator.py</h3>
+<ul>
+  <li><strong><code>@dataclass</code></strong> (<code>DataConfig</code>): a decorator that auto-writes <code>__init__</code> and friends from annotated attributes. It is Python's built-in, validation-free cousin of <code>BaseModel</code>. Comparing the two is a good research topic.</li>
+  <li><strong><code>random.seed(n)</code></strong>: makes "random" numbers repeatable. Same seed gives the same data every run, which is essential for reproducible tests. Each generator uses <code>seed</code>, <code>seed + 1</code>, <code>seed + 2</code> so they do not mirror each other.</li>
+  <li><strong><code>random.choice</code>, <code>randint</code>, <code>uniform</code></strong>: pick from a list, an integer in a range, a float in a range.</li>
+  <li><strong><code>datetime</code> and <code>timedelta</code></strong>: date arithmetic. <code>base_date - timedelta(days=30)</code> is "30 days earlier". <code>.isoformat()</code> converts to the ISO string that Pydantic can parse back.</li>
+  <li><strong>Three generator classes</strong> (<code>SpaceStationGenerator</code>, <code>AlienContactGenerator</code>, <code>CrewMissionGenerator</code>): each builds plain dictionaries modelled on your exercises. For example, physical contacts are generated as verified and telepathic contacts get at least 3 witnesses.</li>
+  <li>The generator is <em>not</em> perfectly aligned with your rules. It adds a message to signals above 6.0 only 70% of the time, so a signal above 7.0 can come out with no message, which your Exercise 1 validator rejects. Real data often breaks strict rules, which is exactly why validation exists.</li>
+</ul>
+
+<h3>data_exporter.py</h3>
+<ul>
+  <li><strong><code>pathlib.Path</code></strong>: object-oriented file paths. <code>Path("a") / "b.json"</code> joins path parts; <code>mkdir(exist_ok=True)</code> creates a folder safely.</li>
+  <li><strong><code>json.dump(data, f, indent=2, ensure_ascii=False)</code></strong>: write Python data as JSON. <code>indent</code> pretty-prints; <code>ensure_ascii=False</code> keeps non-ASCII characters readable.</li>
+  <li><strong><code>csv.DictWriter</code></strong>: writes a list of dictionaries to CSV, using dictionary keys as the header row.</li>
+  <li><strong>Recursive flattening</strong> (<code>_flatten_dict</code>): CSV is flat, but a mission contains a nested crew list. The function walks the structure and builds keys like <code>crew_0_name</code>. A function calling itself to handle nested structure is called <strong>recursion</strong>.</li>
+  <li><strong>Python-literal export</strong> (<code>_format_python_data</code>): JSON writes <code>true/false/null</code>, but Python needs <code>True/False/None</code>, so it writes valid Python source by hand.</li>
+  <li><strong><code>create_test_scenarios()</code></strong>: deliberately builds <em>invalid</em> data (station ID too long, negative power, <code>"WRONG_FORMAT"</code> contact ID, telepathic with 1 witness). These are perfect inputs to try against your models.</li>
+</ul>
+
+<div class="box tip"><span class="t">Use them for self-testing</span>
+<p>Load <code>generated_data/invalid_stations.json</code> and <code>invalid_contacts.json</code>, feed each dictionary to your model with <code>Model(**item)</code> (the <code>**</code> unpacks a dict into keyword arguments), and confirm each one raises a <code>ValidationError</code>.</p></div>
+<pre><code>import json
+from pydantic import ValidationError
+
+with open("generated_data/invalid_contacts.json") as f:
+    items = json.load(f)
+
+for item in items:
+    try:
+        AlienContact(**item)
+        print("UNEXPECTEDLY VALID:", item["contact_id"])
+    except ValidationError as error:
+        print("rejected:", error.errors()[0]["msg"])</code></pre>
+</section>
+
+<!-- ============================ 8 ============================ -->
+<section id="grading">
+<h2>8. What the correction sheet checks</h2>
+<p>The peer reviewer follows the "PY_09" sheet. Here it is as a checklist.</p>
+
+<h3>Basics</h3>
+<ul>
+  <li>Only the Git repository content is graded.</li>
+  <li>Files must exist: <code>ex0/space_station.py</code>, <code>ex1/alien_contact.py</code>, <code>ex2/space_crew.py</code>. Missing files stop the review.</li>
+</ul>
+
+<h3>Exercise 0 (25 points)</h3>
+<ul>
+  <li><code>python3 ex0/space_station.py</code> runs and shows both a success and a validation error.</li>
+  <li><code>SpaceStation</code> inherits from <code>BaseModel</code>.</li>
+  <li>All fields use <code>Field()</code> with proper constraints (crew 1-20, power 0-100, ...).</li>
+  <li>Optional <code>notes</code> exists; the datetime field is handled properly.</li>
+</ul>
+
+<h3>Exercise 1 (35 points)</h3>
+<ul>
+  <li><code>@model_validator</code> used; <code>ContactType</code> enum defined and used.</li>
+  <li>Test live: ID not starting with "AC" fails; telepathic with fewer than 3 witnesses fails; strong signal without message fails; error messages are clear.</li>
+  <li><strong>No deprecated <code>@validator</code>.</strong></li>
+</ul>
+
+<h3>Exercise 2 (40 points)</h3>
+<ul>
+  <li><code>CrewMember</code> and <code>SpaceMission</code> defined; <code>crew</code> is a list of <code>CrewMember</code> (nested).</li>
+  <li>Rules work: needs commander/captain, experience requirement, etc.</li>
+  <li>The demo shows a valid mission with crew details and rejects an invalid one.</li>
+  <li>Edge cases handled appropriately.</li>
+</ul>
+
+<h3>Overall quality</h3>
+<ul>
+  <li>Python 3.10+, <strong>flake8 clean</strong>, <strong>type hints on all functions and methods (parameters and return values)</strong>.</li>
+  <li>Docstrings are <em>not</em> required for this module.</li>
+  <li>Python naming conventions: <code>snake_case</code> for variables and functions, <code>PascalCase</code> for classes, <code>UPPER_CASE</code> for constants and Enum members.</li>
+  <li>Pydantic: <code>Field()</code> used well, <code>@model_validator</code> used correctly, enums where appropriate, no v1 features.</li>
+</ul>
+
+<h3>Defense questions to prepare</h3>
+<ol>
+  <li>What does <code>Field(...)</code> mean, and what is the <code>...</code>?</li>
+  <li>What happens when you pass a string to a <code>datetime</code> field?</li>
+  <li>Why is a model validator needed when <code>Field</code> constraints exist?</li>
+  <li>Why does a model validator end with <code>return self</code>?</li>
+  <li>What is the difference between <code>mode="after"</code> and <code>mode="before"</code>?</li>
+  <li>If one <code>CrewMember</code> is invalid, does the mission validator run? (No, field validation fails first.)</li>
+  <li>Why <code>ContactType.PHYSICAL</code> and not the string <code>"physical"</code> in comparisons?</li>
+  <li>Why does the error say <code>Value error, ...</code> and how did you remove it?</li>
+  <li>Why <code>//</code> in the 50% experience rule?</li>
+</ol>
+</section>
+
+<!-- ============================ 9 ============================ -->
+<section id="bugs">
+<h2>9. Bugs we actually hit (and why)</h2>
+
+<h3>Bug 1: the empty error message</h3>
+<p>The first version of the Exercise 1 demo printed nothing after <code>Expected validation error:</code>. The telepathic rule was not firing, so no <code>ValidationError</code> was raised and the <code>except</code> block never ran. See Bug 2 for why.</p>
+
+<h3>Bug 2: the "shortened" condition that was never true</h3>
+<div class="grid2">
+  <div>
+    <p class="cap ko">broken</p>
+    <div class="codewrap"><pre><code>condition = ContactType.TELEPATHIC and self.witness_count &lt; 3
+if self.contact_type == condition:
+    raise ValueError("...")</code></pre></div>
+  </div>
+  <div>
+    <p class="cap ok">correct</p>
+    <div class="codewrap"><pre><code>if (
+    self.contact_type == ContactType.TELEPATHIC
+    and self.witness_count &lt; 3
+):
+    raise ValueError("...")</code></pre></div>
+  </div>
+</div>
+<h4>Why the broken one fails</h4>
+<p>The <code>and</code> operator in Python does <em>not</em> return <code>True</code>/<code>False</code>. It returns one of its operands:</p>
+<ul>
+  <li><code>A and B</code> returns <code>A</code> if <code>A</code> is falsy, otherwise <code>B</code>.</li>
+  <li><code>ContactType.TELEPATHIC</code> is truthy (an Enum member is truthy by default), so <code>ContactType.TELEPATHIC and (witness_count &lt; 3)</code> evaluates to just <code>(witness_count &lt; 3)</code>, a plain <code>True</code> or <code>False</code>.</li>
+  <li>Then <code>self.contact_type == condition</code> compares an <code>Enum</code> member to a <code>bool</code>, which is never equal.</li>
+</ul>
+<p>The rule silently did nothing, and the sneaky part is that the code ran without any error. The fix is to compare <code>contact_type</code> against the Enum member <em>inside</em> the <code>and</code>, as two separate comparisons.</p>
+<div class="box warn"><span class="t">Lesson</span>
+<p>Silent logic bugs are worse than crashes. When a validator "seems to work" on valid data, always test it against data that <strong>should fail</strong>. This is exactly what the correction sheet asks you to do live.</p></div>
+
+<h3>Bug 3: flake8 E501 (line too long)</h3>
+<p>The single-line condition was over 79 characters. The cause of Bug 2 was a rushed attempt to shorten it. The correct fix is wrapping in parentheses.</p>
+
+<h3>Bug 4: fragile prefix removal</h3>
+<p>Pydantic adds <code>Value error, </code> to messages raised from validators. Using <code>.replace("Value error, ", "")</code> removes the text anywhere it appears; checking <code>startswith</code> and slicing only removes it at the start, which is more precise.</p>
+
+<h3>Bug 5: GitHub access limitation</h3>
+<p>Not a code bug, but worth noting: running the three scripts locally and comparing the output to the subject's expected output is the reliable self-check. Add <code>flake8</code> and <code>mypy</code> to that routine.</p>
+</section>
+
+<!-- ============================ 10 ============================ -->
+<section id="table">
+<h2>10. Quick reference</h2>
+<div class="scroll">
+<table>
+  <tr><th>Concept</th><th>What it does</th><th>Introduced in</th></tr>
+  <tr><td><code>BaseModel</code></td><td>Parent class that turns annotated attributes into a validated data model.</td><td>Ex 0</td></tr>
+  <tr><td>Type annotations as schema</td><td>Hints like <code>int</code> and <code>str</code> become enforced rules at object creation.</td><td>Ex 0</td></tr>
+  <tr><td><code>Field()</code></td><td>Attaches constraints, defaults and descriptions to one attribute.</td><td>Ex 0</td></tr>
+  <tr><td><code>...</code> (Ellipsis)</td><td>Marks a field as required (no default).</td><td>Ex 0</td></tr>
+  <tr><td><code>ge</code> / <code>le</code> / <code>gt</code> / <code>lt</code></td><td>Numeric bounds (&ge;, &le;, &gt;, &lt;).</td><td>Ex 0</td></tr>
+  <tr><td><code>min_length</code> / <code>max_length</code></td><td>Limit string length or list size.</td><td>Ex 0 (lists in Ex 2)</td></tr>
+  <tr><td><code>default=</code></td><td>Value used when the caller omits the field.</td><td>Ex 0</td></tr>
+  <tr><td><code>Optional[T]</code> / <code>T | None</code></td><td>Allows <code>None</code> in addition to type <code>T</code>.</td><td>Ex 0</td></tr>
+  <tr><td><code>datetime</code> field</td><td>Holds a date/time; accepts and parses ISO 8601 strings.</td><td>Ex 0</td></tr>
+  <tr><td>Type coercion (lax mode)</td><td>Auto-converts compatible inputs, rejects nonsense.</td><td>Ex 0</td></tr>
+  <tr><td><code>ValidationError</code></td><td>Exception listing every validation failure; read with <code>.errors()</code>.</td><td>Ex 0</td></tr>
+  <tr><td><code>try / except</code></td><td>Catches the error so the program reports it instead of crashing.</td><td>Ex 0</td></tr>
+  <tr><td><code>Enum</code></td><td>Restricts a field to a fixed set of named values.</td><td>Ex 1</td></tr>
+  <tr><td><code>@model_validator(mode="after")</code></td><td>Runs a custom check on the whole validated model (cross-field rules).</td><td>Ex 1</td></tr>
+  <tr><td><code>raise ValueError</code> in a validator</td><td>Rejects the data; Pydantic turns it into a <code>ValidationError</code>.</td><td>Ex 1</td></tr>
+  <tr><td><code>return self</code></td><td>Required end of an "after" validator; hands the valid model back.</td><td>Ex 1</td></tr>
+  <tr><td><code>"Value error, "</code> prefix</td><td>Text Pydantic prepends to validator messages; stripped for clean output.</td><td>Ex 1</td></tr>
+  <tr><td>Deprecated <code>@validator</code></td><td>Pydantic v1 decorator; forbidden here, use <code>@model_validator</code>.</td><td>Subject warning</td></tr>
+  <tr><td>Nested models</td><td>A model used as a field type inside another model.</td><td>Ex 2</td></tr>
+  <tr><td><code>List[Model]</code></td><td>A field holding several validated model instances.</td><td>Ex 2</td></tr>
+  <tr><td>Validation cascade</td><td>Inner items are validated first; the parent's validator runs only if all pass.</td><td>Ex 2</td></tr>
+  <tr><td><code>any()</code> / <code>sum()</code> with generators</td><td>Check or count crew members matching a condition.</td><td>Ex 2</td></tr>
+  <tr><td>List comprehension</td><td>Builds a filtered list (e.g. inactive crew names).</td><td>Ex 2</td></tr>
+  <tr><td>Floor division <code>//</code></td><td>Computes "half the crew" as a whole number.</td><td>Ex 2</td></tr>
+  <tr><td>flake8</td><td>Linter enforcing style, e.g. 79-character lines.</td><td>Subject rules</td></tr>
+  <tr><td>mypy</td><td>Static checker for type annotations.</td><td>Subject rules</td></tr>
+  <tr><td>Virtual environment + pip</td><td>Isolated package install for the project.</td><td>Subject rules</td></tr>
+  <tr><td><code>@dataclass</code>, <code>random.seed</code>, <code>timedelta</code></td><td>Config object, reproducible random data, date arithmetic (generator).</td><td>Provided tools</td></tr>
+  <tr><td><code>json</code>, <code>csv</code>, <code>pathlib</code>, recursion</td><td>File export formats, paths, flattening nested data (exporter).</td><td>Provided tools</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ============================ 11 ============================ -->
+<section id="further">
+<h2>11. Go further (research topics)</h2>
+<p>Beyond the module, but natural next steps. These are not required by the subject, so check the "Authorized" rules before using any in graded code.</p>
+<ul>
+  <li><code>@field_validator</code>: validate a single field with custom logic (v2 replacement for the old <code>@validator</code>).</li>
+  <li><code>model_validate()</code>, <code>model_validate_json()</code>, <code>model_dump()</code>, <code>model_dump_json()</code>: converting between models, dicts and JSON.</li>
+  <li><code>ConfigDict</code>: model settings such as <code>strict=True</code>, <code>validate_assignment=True</code> (re-validates on <code>obj.field = value</code>), <code>extra="forbid"</code>.</li>
+  <li>Strict types: <code>StrictInt</code>, <code>StrictStr</code>.</li>
+  <li><code>Annotated</code> types and reusable constraints.</li>
+  <li><code>pydantic.mypy</code> plugin: makes mypy understand coercion, so <code># type: ignore</code> is no longer needed.</li>
+  <li>Pydantic vs <code>dataclasses</code> vs <code>TypedDict</code> vs <code>attrs</code>.</li>
+  <li><code>pydantic-settings</code> for environment-variable configuration.</li>
+  <li>Why validating at the system boundary (APIs, files, user input) matters: FastAPI uses Pydantic for exactly this.</li>
+</ul>
+<p style="margin-top:24px;color:var(--muted)">Good luck with the defense.</p>
+</section>
+
+</main>
+</div>
+
+<script>
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.parentElement.querySelector('code').innerText;
+      var done = function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+      };
+      try {
+        navigator.clipboard.writeText(code).then(done, function () {});
+      } catch (e) {}
+    });
+  });
+</script>
+</body>
+</html>
